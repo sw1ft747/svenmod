@@ -39,5 +39,12 @@ For example, how it should look:
 
 Note, everything that goes after these symbols `//` is a comment
 
+# Console Commands
+SvenMod provides several important console commands:
+```
+- sm <command> [arg1] [arg2]... - type "sm" in the console to get very detailed information
+- help <cvarname> - will print a description about the given convar/concommand that was registered through SvenMod
+```
+
 # Plugins
 - [Improved Mute Manager](https://github.com/sw1ft747/ImprovedMuteManager "Improved Mute Manager")
