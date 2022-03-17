@@ -4,13 +4,13 @@ SvenMod is a C++ plugin environment for the game Sven Co-op that provides powerf
 Includes two main files: library `(svenmod.dll)` and launcher `(svenmod_launcher.exe)`. It is neccesary to launch the game using SvenMod's launcher.
 
 # For developers
-See the [wiki](github.com/sw1ft747/SvenMod/wiki "wiki") page
+See the [wiki](https://github.com/sw1ft747/SvenMod/wiki "wiki") page
 
 # VAC
 There's no VAC in the game but for safe you can use `-insecure` launch parameter, still you will be able to join any secure VAC server.
 
 # Installation
-1. Download the [release](github.com/sw1ft747/SvenMod/releases "release") version.
+1. Download the [release](https://github.com/sw1ft747/SvenMod/releases "release") version.
 
 2. Place all files `(svenmod_launcher.exe, svenmod.dll, folder "svenmod")` from the downloaded archive in the root directory of Sven Co-op.
 
@@ -40,4 +40,4 @@ For example, how it should look:
 Note, everything that goes after these symbols `//` is a comment
 
 # Plugins
-- [Improved Mute Manager](github.com/sw1ft747/SvenMod/releases "Improved Mute Manager")
+- [Improved Mute Manager](https://github.com/sw1ft747/SvenMod/releases "Improved Mute Manager")
