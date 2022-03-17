@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SvenMod.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="public\baselogic.h" />
+    <ClInclude Include="public\client_state.h" />
+    <ClInclude Include="public\color.h" />
+    <ClInclude Include="public\convar.h" />
+    <ClInclude Include="public\data_struct\hash.h" />
+    <ClInclude Include="public\data_struct\hashdict.h" />
+    <ClInclude Include="public\data_struct\hashtable.h" />
+    <ClInclude Include="public\dbg.h" />
+    <ClInclude Include="public\fieldtypes.h" />
+    <ClInclude Include="public\gameui\gameconsole.h" />
+    <ClInclude Include="public\gameui\gameconsoledialog.h" />
+    <ClInclude Include="public\gameui\ICareerUI.h" />
+    <ClInclude Include="public\gameui\IGameConsole.h" />
+    <ClInclude Include="public\gameui\IGameUI.h" />
+    <ClInclude Include="public\gameui\IMusicManager.h" />
+    <ClInclude Include="public\gameui\IRunGameEngine.h" />
+    <ClInclude Include="public\gameui\IVGuiModuleLoader.h" />
+    <ClInclude Include="public\generichash.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\ammo.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\ammohistory.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\cl_dll.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\global_consts.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\hud.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\interpolation.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\in_defs.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\kbutton.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\player_info.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\StudioModelRenderer.h" />
+    <ClInclude Include="public\hl_sdk\cl_dll\studio_util.h" />
+    <ClInclude Include="public\hl_sdk\common\beamdef.h" />
+    <ClInclude Include="public\hl_sdk\common\cl_entity.h" />
+    <ClInclude Include="public\hl_sdk\common\common_types.h" />
+    <ClInclude Include="public\hl_sdk\common\com_model.h" />
+    <ClInclude Include="public\hl_sdk\common\const.h" />
+    <ClInclude Include="public\hl_sdk\common\con_nprint.h" />
+    <ClInclude Include="public\hl_sdk\common\crc.h" />
+    <ClInclude Include="public\hl_sdk\common\cvardef.h" />
+    <ClInclude Include="public\hl_sdk\common\demo_api.h" />
+    <ClInclude Include="public\hl_sdk\common\director_cmds.h" />
+    <ClInclude Include="public\hl_sdk\common\dlight.h" />
+    <ClInclude Include="public\hl_sdk\common\dll_state.h" />
+    <ClInclude Include="public\hl_sdk\common\entity_state.h" />
+    <ClInclude Include="public\hl_sdk\common\entity_types.h" />
+    <ClInclude Include="public\hl_sdk\common\enums.h" />
+    <ClInclude Include="public\hl_sdk\common\event_api.h" />
+    <ClInclude Include="public\hl_sdk\common\event_args.h" />
+    <ClInclude Include="public\hl_sdk\common\event_flags.h" />
+    <ClInclude Include="public\hl_sdk\common\hltv.h" />
+    <ClInclude Include="public\hl_sdk\common\in_buttons.h" />
+    <ClInclude Include="public\hl_sdk\common\ivoicetweak.h" />
+    <ClInclude Include="public\hl_sdk\common\netadr.h" />
+    <ClInclude Include="public\hl_sdk\common\net_api.h" />
+    <ClInclude Include="public\hl_sdk\common\particledef.h" />
+    <ClInclude Include="public\hl_sdk\common\Platform.h" />
+    <ClInclude Include="public\hl_sdk\common\PlatformHeaders.h" />
+    <ClInclude Include="public\hl_sdk\common\pmtrace.h" />
+    <ClInclude Include="public\hl_sdk\common\qfont.h" />
+    <ClInclude Include="public\hl_sdk\common\ref_params.h" />
+    <ClInclude Include="public\hl_sdk\common\r_efx.h" />
+    <ClInclude Include="public\hl_sdk\common\r_studioint.h" />
+    <ClInclude Include="public\hl_sdk\common\screenfade.h" />
+    <ClInclude Include="public\hl_sdk\common\Sequence.h" />
+    <ClInclude Include="public\hl_sdk\common\studio_event.h" />
+    <ClInclude Include="public\hl_sdk\common\triangleapi.h" />
+    <ClInclude Include="public\hl_sdk\common\usercmd.h" />
+    <ClInclude Include="public\hl_sdk\common\usermsg.h" />
+    <ClInclude Include="public\hl_sdk\common\weaponinfo.h" />
+    <ClInclude Include="public\hl_sdk\dlls\cdll_dll.h" />
+    <ClInclude Include="public\hl_sdk\dlls\extdll.h" />
+    <ClInclude Include="public\hl_sdk\engine\anorms.h" />
+    <ClInclude Include="public\hl_sdk\engine\APIProxy.h" />
+    <ClInclude Include="public\hl_sdk\engine\cdll_int.h" />
+    <ClInclude Include="public\hl_sdk\engine\custom.h" />
+    <ClInclude Include="public\hl_sdk\engine\customentity.h" />
+    <ClInclude Include="public\hl_sdk\engine\edict.h" />
+    <ClInclude Include="public\hl_sdk\engine\eiface.h" />
+    <ClInclude Include="public\hl_sdk\engine\progdefs.h" />
+    <ClInclude Include="public\hl_sdk\engine\progs.h" />
+    <ClInclude Include="public\hl_sdk\engine\shake.h" />
+    <ClInclude Include="public\hl_sdk\engine\studio.h" />
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_debug.h" />
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_defs.h" />
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_info.h" />
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_materials.h" />
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_movevars.h" />
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_shared.h" />
+    <ClInclude Include="public\hook_codes.h" />
+    <ClInclude Include="public\IClientHooks.h" />
+    <ClInclude Include="public\IInventory.h" />
+    <ClInclude Include="public\IClientPlugin.h" />
+    <ClInclude Include="public\ICommandLine.h" />
+    <ClInclude Include="public\IConfigManager.h" />
+    <ClInclude Include="public\ICvar.h" />
+    <ClInclude Include="public\IDetoursAPI.h" />
+    <ClInclude Include="public\IEngineClient.h" />
+    <ClInclude Include="public\base_feature.h" />
+    <ClInclude Include="public\IFileSystem.h" />
+    <ClInclude Include="public\IHooks.h" />
+    <ClInclude Include="public\ILoggingSystem.h" />
+    <ClInclude Include="public\IMemoryUtils.h" />
+    <ClInclude Include="public\interface.h" />
+    <ClInclude Include="public\IPlayerUtils.h" />
+    <ClInclude Include="public\IPluginHelpers.h" />
+    <ClInclude Include="public\IRegistry.h" />
+    <ClInclude Include="public\ISvenModAPI.h" />
+    <ClInclude Include="public\IVGameUI.h" />
+    <ClInclude Include="public\IVGUI.h" />
+    <ClInclude Include="public\IVideoMode.h" />
+    <ClInclude Include="public\math\mathlib.h" />
+    <ClInclude Include="public\math\vector.h" />
+    <ClInclude Include="public\memutils\moduleinfo.h" />
+    <ClInclude Include="public\memutils\patterns.h" />
+    <ClInclude Include="public\netchan.h" />
+    <ClInclude Include="public\platform.h" />
+    <ClInclude Include="public\svenmod_version.h" />
+    <ClInclude Include="public\sys.h" />
+    <ClInclude Include="public\udis86\include\decode.h" />
+    <ClInclude Include="public\udis86\include\extern.h" />
+    <ClInclude Include="public\udis86\include\itab.h" />
+    <ClInclude Include="public\udis86\include\syn.h" />
+    <ClInclude Include="public\udis86\include\types.h" />
+    <ClInclude Include="public\udis86\include\udint.h" />
+    <ClInclude Include="public\udis86\udis86.h" />
+    <ClInclude Include="public\usermessages.h" />
+    <ClInclude Include="public\vgui2\IBaseUI.h" />
+    <ClInclude Include="public\vgui2\IClientPanel.h" />
+    <ClInclude Include="public\vgui2\IClientVGUI.h" />
+    <ClInclude Include="public\vgui2\IEngineSurface.h" />
+    <ClInclude Include="public\vgui2\IEngineVGui.h" />
+    <ClInclude Include="public\vgui2\IGameUIFuncs.h" />
+    <ClInclude Include="public\vgui2\IHTMLChromeController.h" />
+    <ClInclude Include="public\vgui2\IInput.h" />
+    <ClInclude Include="public\vgui2\IInputInternal.h" />
+    <ClInclude Include="public\vgui2\IKeyValues.h" />
+    <ClInclude Include="public\vgui2\ILocalize.h" />
+    <ClInclude Include="public\vgui2\IPanel.h" />
+    <ClInclude Include="public\vgui2\IScheme.h" />
+    <ClInclude Include="public\vgui2\ISurface.h" />
+    <ClInclude Include="public\vgui2\ISystem.h" />
+    <ClInclude Include="public\vgui2\IVGui.h" />
+    <ClInclude Include="public\vgui2\VGUI2.h" />
+    <ClInclude Include="public\vgui2\VGuiVertex.h" />
+    <ClInclude Include="shared\ISvenMod.h" />
+    <ClInclude Include="svenmod\client_hooks_handler.h" />
+    <ClInclude Include="svenmod\cvar_sm.h" />
+    <ClInclude Include="svenmod\dbg_sm.h" />
+    <ClInclude Include="svenmod\plugins_manager.h" />
+    <ClInclude Include="svenmod\plugins_loader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="public\hl_sdk\cl_dll\interpolation.cpp" />
+    <ClCompile Include="public\hl_sdk\pm_shared\pm_debug.cpp" />
+    <ClCompile Include="public\hl_sdk\pm_shared\pm_shared.cpp" />
+    <ClCompile Include="public\udis86\src\decode.c" />
+    <ClCompile Include="public\udis86\src\itab.c" />
+    <ClCompile Include="public\udis86\src\syn-att.c" />
+    <ClCompile Include="public\udis86\src\syn-intel.c" />
+    <ClCompile Include="public\udis86\src\syn.c" />
+    <ClCompile Include="public\udis86\src\udis86.c" />
+    <ClCompile Include="shared\convar.cpp" />
+    <ClCompile Include="shared\interface.cpp" />
+    <ClCompile Include="shared\mathlib.cpp" />
+    <ClCompile Include="shared\sys.cpp" />
+    <ClCompile Include="shared\usermessages.cpp" />
+    <ClCompile Include="svenmod\client_hooks_handler.cpp" />
+    <ClCompile Include="svenmod\config_manager.cpp" />
+    <ClCompile Include="svenmod\console.cpp" />
+    <ClCompile Include="svenmod\cvar.cpp" />
+    <ClCompile Include="svenmod\dbg.cpp" />
+    <ClCompile Include="svenmod\detours_api.cpp" />
+    <ClCompile Include="svenmod\gameui_iface.cpp" />
+    <ClCompile Include="svenmod\hooks.cpp" />
+    <ClCompile Include="svenmod\inventory.cpp" />
+    <ClCompile Include="svenmod\logging_system.cpp" />
+    <ClCompile Include="svenmod\memory_utils.cpp" />
+    <ClCompile Include="svenmod\player_utils.cpp" />
+    <ClCompile Include="svenmod\plugins_manager.cpp" />
+    <ClCompile Include="svenmod\plugins_loader.cpp" />
+    <ClCompile Include="svenmod\svenmod.cpp" />
+    <ClCompile Include="svenmod\svenmod_api.cpp" />
+    <ClCompile Include="svenmod\vgui_iface.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{0C19AAC1-93B0-48DA-822E-615E345FD51C}</ProjectGuid>
+    <RootNamespace>SvenMod</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>SvenMod</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>svenmod</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>svenmod</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile />
+      <PreprocessorDefinitions>DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+      <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "movelib.bat" (
+    start movelib.bat
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile />
+      <PreprocessorDefinitions>DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "movelib.bat" (
+    start movelib.bat
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

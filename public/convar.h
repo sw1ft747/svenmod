@@ -1,0 +1,318 @@
+//===== Copyright (c) 1996-2005, Valve Corporation, All rights reserved. ======//
+//
+// Purpose: 
+//
+// $Workfile:     $
+// $Date:         $
+//
+//-----------------------------------------------------------------------------
+// $NoKeywords: $
+//===========================================================================//
+
+#ifndef CONVAR_H
+#define CONVAR_H
+
+#ifdef _WIN32
+#pragma once
+#endif
+
+#include "color.h"
+#include "ICvar.h"
+#include "ISvenModAPI.h"
+
+#include "hl_sdk/common/const.h"
+#include "hl_sdk/common/cvardef.h"
+
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+
+class ConVar;
+class CCommand;
+class ConCommand;
+class ConCommandBase;
+class IConCommandBaseAccessor;
+
+//-----------------------------------------------------------------------------
+// Called when a ConCommand needs to execute
+//-----------------------------------------------------------------------------
+
+typedef void (*FnCommandCallback_t)(void);
+
+//-----------------------------------------------------------------------------
+// Purpose: register/unregister cvars
+//-----------------------------------------------------------------------------
+
+void ConVar_Register(int nCVarFlag = FCVAR_CLIENTDLL, IConCommandBaseAccessor *pAccessor = NULL);
+void ConVar_Unregister();
+
+//-----------------------------------------------------------------------------
+// Purpose: prints description about a cvar
+//-----------------------------------------------------------------------------
+
+void ConVar_PrintDescription(const ConCommandBase *pVar);
+
+//-----------------------------------------------------------------------------
+// Any executable that wants to use ConVars need to implement one of
+// these to hook up access to console variables.
+//-----------------------------------------------------------------------------
+
+class IConCommandBaseAccessor
+{
+public:
+	virtual bool RegisterConCommandBase(ConCommandBase *pVar) = 0;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: The base console invoked command/cvar interface
+//-----------------------------------------------------------------------------
+
+class ConCommandBase
+{
+	friend class CCvar;
+	friend class ConVar;
+	friend class ConCommand;
+	
+	friend void ConVar_Register(int nCVarFlag, IConCommandBaseAccessor *pAccessor);
+	friend void ConVar_Unregister();
+
+public:
+	ConCommandBase();
+	ConCommandBase(const char *pszName, const char *pszHelpString = NULL, int flags = 0);
+
+	virtual						~ConCommandBase();
+
+	virtual void				Create(const char *pszName, const char *pszDescription, int flags);
+
+	virtual bool				IsCommand() const;
+
+	virtual bool				IsFlagSet(int flag) const;
+	virtual void				AddFlags(int flags);
+	virtual void				RemoveFlags(int flags);
+	virtual int					GetFlags() const;
+
+	virtual const char			*GetName() const;
+	virtual const char			*GetHelpText() const;
+
+	virtual bool				IsRegistered() const;
+
+	const ConCommandBase		*GetNext() const;
+	ConCommandBase				*GetNext();
+
+public:
+	// Returns the DLL identifier
+	virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
+
+	virtual void				Init();
+	void						Shutdown();
+
+private:
+	ConCommandBase				*m_pNext;
+
+	const char					*m_pszName;
+	const char					*m_pszHelpString;
+
+	bool						m_bRegistered;
+
+protected:
+	int							m_nFlags;
+
+protected:
+	// ConVars add themselves to this list for the executable. 
+	// Then ConVar_Register runs through  all the console variables 
+	// and registers them into a global list stored in vstdlib.dll
+	static ConCommandBase		*s_pConCommandBases;
+
+	// ConVars in this executable use this 'global' to access values.
+	static IConCommandBaseAccessor *s_pAccessor;
+};
+
+//-----------------------------------------------------------------------------
+// Command tokenizer
+//-----------------------------------------------------------------------------
+
+class CCommand
+{
+public:
+	CCommand();
+	CCommand( int nArgC, const char **ppArgV );
+
+	int				ArgC() const;
+	const char		**ArgV() const;
+	const char		*operator[]( int nIndex ) const;	// Gets at arguments
+	const char		*Arg( int nIndex ) const;		// Gets at arguments
+	
+	// Helper functions to parse arguments to commands.
+	const char		*FindArg( const char *pszName ) const;
+	int				FindArgInt( const char *pszName, int nDefaultVal ) const;
+
+private:
+	int				m_nArgc;
+	const char		**m_ppArgv;
+};
+
+inline int CCommand::ArgC() const
+{
+	return m_nArgc;
+}
+
+inline const char **CCommand::ArgV() const
+{
+	return m_nArgc ? (const char **)m_ppArgv : NULL;
+}
+
+inline const char *CCommand::Arg( int nIndex ) const
+{
+	if ( nIndex < 0 || nIndex >= m_nArgc )
+		return "";
+
+	return m_ppArgv[nIndex];
+}
+
+inline const char *CCommand::operator[]( int nIndex ) const
+{
+	return Arg( nIndex );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: The console invoked command
+//-----------------------------------------------------------------------------
+
+class ConCommand : public ConCommandBase
+{
+friend class CCvar;
+
+public:
+	ConCommand( const char *pszName, FnCommandCallback_t pfnCallback, const char *pszHelpString = 0, int flags = 0 );
+
+	virtual				~ConCommand();
+
+	virtual bool		IsCommand() const;
+
+	virtual bool		IsFlagSet(int flag) const;
+	virtual void		AddFlags(int flags);
+	virtual void		RemoveFlags(int flags);
+	virtual int			GetFlags() const;
+
+private:
+	cmd_t				*m_pCommand;
+	FnCommandCallback_t m_pfnCallback;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: A console variable
+//-----------------------------------------------------------------------------
+
+class ConVar : public ConCommandBase
+{
+friend class CCvar;
+
+public:
+	ConVar( const char *pszName, const char *pszDefaultValue, int flags = 0);
+	ConVar( const char *pszName, const char *pszDefaultValue, int flags, const char *pszHelpString );
+	ConVar( const char *pszName, const char *pszDefaultValue, int flags, const char *pszHelpString, bool bMin, float fMin, bool bMax, float fMax );
+
+	virtual						~ConVar();
+
+	virtual void				Create( const char *pszName, const char *pszDefaultValue, int flags = 0,
+									   const char *pszHelpString = 0, bool bMin = false, float fMin = 0.0, bool bMax = false, float fMax = false );
+
+	virtual bool				IsCommand() const;
+
+	virtual bool				IsFlagSet(int flag) const;
+	virtual void				AddFlags(int flags);
+	virtual void				RemoveFlags(int flags);
+	virtual int					GetFlags() const;
+
+	// Retrieve value
+	float						GetFloat( void ) const;
+	int							GetInt( void ) const;
+	Color						GetColor( void ) const;
+	bool						GetBool() const;
+	const char					*GetString( void ) const;
+	
+	// Set value
+	void						SetValue( const char *value );
+	void						SetValue( float value );
+	void						SetValue( int value );
+	void						SetValue( bool value );
+	void						SetValue( Color value );
+	
+	// Reset to default value
+	void						Revert( void );
+
+	// True if it has a min/max setting
+	bool						HasMin() const;
+	bool						HasMax() const;
+
+	bool						GetMin( float &minVal ) const;
+	bool						GetMax( float &maxVal ) const;
+
+	float						GetMinValue() const;
+	float						GetMaxValue() const;
+
+	const char					*GetDefault( void ) const;
+	void						SetDefault( const char *pszDefault );
+
+	// Clamp cvar's current value
+	bool						Clamp( void );
+
+	// Clamp given value
+	bool						ClampValue( float &value );
+
+protected:
+	// The actual pointer to cvar
+	cvar_t						*m_pCvar;
+
+	// Static data
+	const char					*m_pszDefaultValue;
+	
+	// Min/Max values
+	bool						m_bHasMin;
+	bool						m_bHasMax;
+	float						m_fMinVal;
+	float						m_fMaxVal;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: Utility macros to quicky generate a simple console command
+//-----------------------------------------------------------------------------
+
+#define CON_COMMAND( name, description ) \
+	static void command__##name( const CCommand &args ); \
+	static void command_wrapper__##name() { CCommand args( SvenModAPI()->CVar()->ArgC(), SvenModAPI()->CVar()->ArgV() ); command__##name(args); } \
+	static ConCommand name##_command( #name, command_wrapper__##name, description ); \
+	static void command__##name( const CCommand &args )
+
+#define CON_COMMAND_F( name, description, flags ) \
+	static void command__##name( const CCommand &args ); \
+	static void command_wrapper__##name() { CCommand args( SvenModAPI()->CVar()->ArgC(), SvenModAPI()->CVar()->ArgV() ); command__##name(args); } \
+	static ConCommand name##_command( #name, command_wrapper__##name, description, flags ); \
+	static void command__##name( const CCommand &args )
+
+#define CON_COMMAND_EXTERN( name, _funcname, description ) \
+	void _funcname( const CCommand &args ); \
+	static void command_wrapper__##name() { CCommand args( SvenModAPI()->CVar()->ArgC(), SvenModAPI()->CVar()->ArgV() ); _funcname(args); } \
+	static ConCommand name##_command( #name, command_wrapper__##name, description ); \
+	void _funcname( const CCommand &args )
+
+//-----------------------------------------------------------------------------
+// Utility macros without CCommand wrapper
+//-----------------------------------------------------------------------------
+
+#define CON_COMMAND_NO_WRAPPER( name, description ) \
+	static void command__##name(); \
+	static ConCommand name##_command( #name, command__##name, description ); \
+	static void command__##name()
+
+#define CON_COMMAND_NO_WRAPPER_F( name, description, flags ) \
+	static void command__##name(); \
+	static ConCommand name##_command( #name, command__##name, description, flags ); \
+	static void command__##name()
+
+#define CON_COMMAND_NO_WRAPPER_EXTERN( name, _funcname, description ) \
+	void _funcname(); \
+	static ConCommand name##_command( #name, _funcname, description ); \
+	void _funcname()
+
+#endif // CONVAR_H

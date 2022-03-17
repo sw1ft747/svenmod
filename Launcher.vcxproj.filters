@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Launcher">
+      <UniqueIdentifier>{695890bb-5f64-40ff-b5c8-78b1ecce37fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Launcher\public">
+      <UniqueIdentifier>{2c49dc4f-eb93-41ef-a59a-5321b9829d98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Launcher\shared">
+      <UniqueIdentifier>{7af95ef1-67c4-4abe-85e7-ba7b6bac55d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Launcher\launcher">
+      <UniqueIdentifier>{5420d01d-33b5-4761-a0a3-e48769aad574}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Launcher.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Launcher.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="shared\commandline.cpp">
+      <Filter>Launcher\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="launcher\launcher.cpp">
+      <Filter>Launcher\launcher</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\interface.cpp">
+      <Filter>Launcher\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\sys.cpp">
+      <Filter>Launcher\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\registry.cpp">
+      <Filter>Launcher\shared</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="public\platform.h">
+      <Filter>Launcher\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ICommandLine.h">
+      <Filter>Launcher\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\sys.h">
+      <Filter>Launcher\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\interface.h">
+      <Filter>Launcher\public</Filter>
+    </ClInclude>
+    <ClInclude Include="shared\ISvenMod.h">
+      <Filter>Launcher\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IFileSystem.h">
+      <Filter>Launcher\public</Filter>
+    </ClInclude>
+    <ClInclude Include="launcher\IEngineAPI.h">
+      <Filter>Launcher\launcher</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IRegistry.h">
+      <Filter>Launcher\public</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

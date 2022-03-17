@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{f70b6790-ede9-43ad-8fb5-895aa28818c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\public">
+      <UniqueIdentifier>{f4e300c3-f22f-411f-b75c-248f50671e1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\shared">
+      <UniqueIdentifier>{bc77bbe5-b890-4275-a1f0-3c03fecebb63}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="public\platform.h">
+      <Filter>Interface\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\interface.h">
+      <Filter>Interface\public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="shared\interface.cpp">
+      <Filter>Interface\shared</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

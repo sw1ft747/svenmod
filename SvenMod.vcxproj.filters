@@ -1,0 +1,606 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="SvenMod">
+      <UniqueIdentifier>{f70b6790-ede9-43ad-8fb5-895aa28818c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\shared">
+      <UniqueIdentifier>{234f8cf0-b8c0-42ac-84d5-0d773d962f92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public">
+      <UniqueIdentifier>{f4e300c3-f22f-411f-b75c-248f50671e1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\udis86">
+      <UniqueIdentifier>{943c7702-ed38-4de9-8ebe-9874b60e8bf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\memutils">
+      <UniqueIdentifier>{b4f747bd-9c59-481e-8871-b720c46e0ff1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\udis86\src">
+      <UniqueIdentifier>{ccdfed03-a290-464c-b7ee-c8637c9095e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\udis86\include">
+      <UniqueIdentifier>{e708b58f-3a2b-412d-9beb-99396b9467b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\HL SDK">
+      <UniqueIdentifier>{bf01c3bc-85f3-4f2e-b0f1-73849b1561b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\HL SDK\pm">
+      <UniqueIdentifier>{f662725b-c2e8-4d86-909b-fe4f0fec962b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\HL SDK\common">
+      <UniqueIdentifier>{89889d01-cb72-4df2-9a66-1d37a5720284}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\HL SDK\engine">
+      <UniqueIdentifier>{ab440833-a0c0-4058-9842-f0fc771aa8d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\HL SDK\dlls">
+      <UniqueIdentifier>{96eb5a01-4b54-471e-a58f-e801e19f32de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\HL SDK\cl_dll">
+      <UniqueIdentifier>{5b4f7bd8-787d-4188-b43d-9def269cb369}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\svenmod">
+      <UniqueIdentifier>{f8d672ce-6c04-448f-9930-205f24122352}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\data_struct">
+      <UniqueIdentifier>{2a7e16fa-42d9-4205-98cc-5df2a1f60819}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\vgui2">
+      <UniqueIdentifier>{25d0b527-32b9-4e52-a113-0e68747a56c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SvenMod\public\GameUI">
+      <UniqueIdentifier>{7dc49458-085f-4760-a5b2-6cc275914ac2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SvenMod.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="shared\ISvenMod.h">
+      <Filter>SvenMod\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="public\interface.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\platform.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ICommandLine.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IFileSystem.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IMemoryUtils.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\memutils\moduleinfo.h">
+      <Filter>SvenMod\public\memutils</Filter>
+    </ClInclude>
+    <ClInclude Include="public\memutils\patterns.h">
+      <Filter>SvenMod\public\memutils</Filter>
+    </ClInclude>
+    <ClInclude Include="public\sys.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\udis86\udis86.h">
+      <Filter>SvenMod\public\udis86</Filter>
+    </ClInclude>
+    <ClInclude Include="public\udis86\include\decode.h">
+      <Filter>SvenMod\public\udis86\include</Filter>
+    </ClInclude>
+    <ClInclude Include="public\udis86\include\extern.h">
+      <Filter>SvenMod\public\udis86\include</Filter>
+    </ClInclude>
+    <ClInclude Include="public\udis86\include\itab.h">
+      <Filter>SvenMod\public\udis86\include</Filter>
+    </ClInclude>
+    <ClInclude Include="public\udis86\include\syn.h">
+      <Filter>SvenMod\public\udis86\include</Filter>
+    </ClInclude>
+    <ClInclude Include="public\udis86\include\types.h">
+      <Filter>SvenMod\public\udis86\include</Filter>
+    </ClInclude>
+    <ClInclude Include="public\udis86\include\udint.h">
+      <Filter>SvenMod\public\udis86\include</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_debug.h">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_defs.h">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_info.h">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_materials.h">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_movevars.h">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\pm_shared\pm_shared.h">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClInclude>
+    <ClInclude Include="public\math\mathlib.h">
+      <Filter>SvenMod\public\HL SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="public\math\vector.h">
+      <Filter>SvenMod\public\HL SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IDetoursAPI.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\beamdef.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\cl_entity.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\com_model.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\common_types.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\con_nprint.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\const.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\crc.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\cvardef.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\demo_api.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\director_cmds.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\dlight.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\dll_state.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\entity_state.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\entity_types.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\enums.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\event_api.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\event_args.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\event_flags.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\hltv.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\in_buttons.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\ivoicetweak.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\net_api.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\netadr.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\particledef.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\Platform.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\PlatformHeaders.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\pmtrace.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\qfont.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\r_efx.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\r_studioint.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\ref_params.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\screenfade.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\Sequence.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\studio_event.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\triangleapi.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\usercmd.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\weaponinfo.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\anorms.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\APIProxy.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\cdll_int.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\custom.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\customentity.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\edict.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\eiface.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\progdefs.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\progs.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\shake.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\engine\studio.h">
+      <Filter>SvenMod\public\HL SDK\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\dlls\cdll_dll.h">
+      <Filter>SvenMod\public\HL SDK\dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\dlls\extdll.h">
+      <Filter>SvenMod\public\HL SDK\dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\ammo.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\ammohistory.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\cl_dll.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\global_consts.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\in_defs.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\kbutton.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\studio_util.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\StudioModelRenderer.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\player_info.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\hud.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\cl_dll\interpolation.h">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ILoggingSystem.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\dbg.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\data_struct\hash.h">
+      <Filter>SvenMod\public\data_struct</Filter>
+    </ClInclude>
+    <ClInclude Include="public\data_struct\hashdict.h">
+      <Filter>SvenMod\public\data_struct</Filter>
+    </ClInclude>
+    <ClInclude Include="public\data_struct\hashtable.h">
+      <Filter>SvenMod\public\data_struct</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\plugins_loader.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IVideoMode.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ISvenModAPI.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IRegistry.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ICvar.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\convar.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IBaseUI.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IClientPanel.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IClientVGUI.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IEngineSurface.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IEngineVGui.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IGameUIFuncs.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IHTMLChromeController.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IInput.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IInputInternal.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IKeyValues.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\ILocalize.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IPanel.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IScheme.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\ISurface.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\ISystem.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\IVGui.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\VGUI2.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vgui2\VGuiVertex.h">
+      <Filter>SvenMod\public\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="public\color.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\plugins_manager.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="public\generichash.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IClientPlugin.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\svenmod_version.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IVGUI.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\baselogic.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IEngineClient.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\base_feature.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IConfigManager.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\fieldtypes.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\netchan.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\client_state.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IPluginHelpers.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hook_codes.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IClientHooks.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\client_hooks_handler.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IHooks.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\usermsg.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\usermessages.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\IGameUI.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\IMusicManager.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\IGameConsole.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\ICareerUI.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\IVGuiModuleLoader.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\IRunGameEngine.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IVGameUI.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\cvar_sm.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\dbg_sm.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\gameconsole.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\gameui\gameconsoledialog.h">
+      <Filter>SvenMod\public\GameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IPlayerUtils.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IInventory.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="public\udis86\src\decode.c">
+      <Filter>SvenMod\public\udis86\src</Filter>
+    </ClCompile>
+    <ClCompile Include="public\udis86\src\itab.c">
+      <Filter>SvenMod\public\udis86\src</Filter>
+    </ClCompile>
+    <ClCompile Include="public\udis86\src\syn.c">
+      <Filter>SvenMod\public\udis86\src</Filter>
+    </ClCompile>
+    <ClCompile Include="public\udis86\src\syn-att.c">
+      <Filter>SvenMod\public\udis86\src</Filter>
+    </ClCompile>
+    <ClCompile Include="public\udis86\src\syn-intel.c">
+      <Filter>SvenMod\public\udis86\src</Filter>
+    </ClCompile>
+    <ClCompile Include="public\udis86\src\udis86.c">
+      <Filter>SvenMod\public\udis86\src</Filter>
+    </ClCompile>
+    <ClCompile Include="public\hl_sdk\pm_shared\pm_debug.cpp">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClCompile>
+    <ClCompile Include="public\hl_sdk\pm_shared\pm_shared.cpp">
+      <Filter>SvenMod\public\HL SDK\pm</Filter>
+    </ClCompile>
+    <ClCompile Include="public\hl_sdk\cl_dll\interpolation.cpp">
+      <Filter>SvenMod\public\HL SDK\cl_dll</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\detours_api.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\logging_system.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\memory_utils.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\svenmod.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\dbg.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\plugins_loader.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\svenmod_api.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\interface.cpp">
+      <Filter>SvenMod\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\sys.cpp">
+      <Filter>SvenMod\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\cvar.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\convar.cpp">
+      <Filter>SvenMod\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\plugins_manager.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\vgui_iface.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\console.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\config_manager.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\mathlib.cpp">
+      <Filter>SvenMod\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\client_hooks_handler.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\hooks.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="shared\usermessages.cpp">
+      <Filter>SvenMod\shared</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\gameui_iface.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\player_utils.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\inventory.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

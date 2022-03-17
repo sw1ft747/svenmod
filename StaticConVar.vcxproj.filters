@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ConVar">
+      <UniqueIdentifier>{053ec835-3ae8-42ee-a911-02b83ec4afa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ConVar\public">
+      <UniqueIdentifier>{e46929d4-8205-4efc-ba27-d8769ab1194c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ConVar\shared">
+      <UniqueIdentifier>{60f8166f-bc9e-45ed-a09c-be4517cefee9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ConVar\public\HL SDK">
+      <UniqueIdentifier>{24b6e5ed-d339-45ea-ae88-92901d359862}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="shared\convar.cpp">
+      <Filter>ConVar\shared</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="public\convar.h">
+      <Filter>ConVar\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\dbg.h">
+      <Filter>ConVar\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ICvar.h">
+      <Filter>ConVar\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\color.h">
+      <Filter>ConVar\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ISvenModAPI.h">
+      <Filter>ConVar\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\const.h">
+      <Filter>ConVar\public\HL SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\cvardef.h">
+      <Filter>ConVar\public\HL SDK</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

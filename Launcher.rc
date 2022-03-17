@@ -1,0 +1,44 @@
+#include "winres.h"
+#include "public/svenmod_version.h"
+
+101 ICON "Launcher.ico"
+
+VS_VERSION_INFO VERSIONINFO
+	FILEVERSION SVENMOD_LAUNCHER_VERSION_FILE
+	PRODUCTVERSION SVENMOD_LAUNCHER_VERSION_FILE
+	FILEFLAGSMASK 0x17L
+	
+#ifdef _DEBUG
+	FILEFLAGS 0x1L
+#else
+	FILEFLAGS 0x0L
+#endif
+
+	FILEOS 0x4L
+	FILETYPE 0x1L
+	FILESUBTYPE 0x0L
+	
+BEGIN
+	BLOCK "StringFileInfo"
+
+	BEGIN
+		BLOCK "000004b0"
+
+		BEGIN
+			VALUE "ProductName", "SvenMod Launcher"
+			VALUE "FileDescription", "SvenMod Launcher"
+            VALUE "Comments", "SvenMod Launcher"
+			VALUE "InternalName", "svenmod_launcher"
+			VALUE "LegalCopyright", "Copyright (c) 2022 Sw1ft"
+			VALUE "OriginalFilename", "svenmod_launcher.exe"
+			VALUE "FileVersion", SVENMOD_LAUNCHER_VERSION_STRING
+			VALUE "ProductVersion", SVENMOD_LAUNCHER_VERSION_STRING
+		END
+	END
+
+	BLOCK "VarFileInfo"
+
+	BEGIN
+		VALUE "Translation", 0x0, 1200
+	END
+END
