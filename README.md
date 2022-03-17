@@ -40,4 +40,4 @@ For example, how it should look:
 Note, everything that goes after these symbols `//` is a comment
 
 # Plugins
-- [Improved Mute Manager](https://github.com/sw1ft747/SvenMod/releases "Improved Mute Manager")
+- [Improved Mute Manager](https://github.com/sw1ft747/ImprovedMuteManager "Improved Mute Manager")
