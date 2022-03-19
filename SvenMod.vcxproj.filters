@@ -56,6 +56,9 @@
     <Filter Include="SvenMod\public\GameUI">
       <UniqueIdentifier>{7dc49458-085f-4760-a5b2-6cc275914ac2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SvenMod\public\math">
+      <UniqueIdentifier>{ea46d8f8-302f-4f9f-9f8e-c9ee4e3dac8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SvenMod.rc">
@@ -128,12 +131,6 @@
     </ClInclude>
     <ClInclude Include="public\hl_sdk\pm_shared\pm_shared.h">
       <Filter>SvenMod\public\HL SDK\pm</Filter>
-    </ClInclude>
-    <ClInclude Include="public\math\mathlib.h">
-      <Filter>SvenMod\public\HL SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="public\math\vector.h">
-      <Filter>SvenMod\public\HL SDK</Filter>
     </ClInclude>
     <ClInclude Include="public\IDetoursAPI.h">
       <Filter>SvenMod\public</Filter>
@@ -506,6 +503,12 @@
     </ClInclude>
     <ClInclude Include="public\IInventory.h">
       <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\math\mathlib.h">
+      <Filter>SvenMod\public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="public\math\vector.h">
+      <Filter>SvenMod\public\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -24,6 +24,8 @@
 #define ENTITY_NORMAL (1 << 0)
 #define ENTITY_BEAM (1 << 1)
 
+#include "const.h"
+
 // Entity state is used for the baseline and for delta compression of a packet of
 //  entities that is sent to a client.
 typedef struct entity_state_s entity_state_t;

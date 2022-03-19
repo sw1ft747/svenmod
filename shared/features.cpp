@@ -7,14 +7,15 @@ static CBaseFeature *s_pLastLoaded = NULL;
 static bool s_bFeaturesLoaded = false;
 
 //-----------------------------------------------------------------------------
-// 
+// Implement control options for features
 //-----------------------------------------------------------------------------
 
-void LoadFeatures()
+bool LoadFeatures()
 {
 	if ( s_bFeaturesLoaded )
-		return;
+		return false;
 
+	bool bAllFeaturesLoaded = true;
 	s_bFeaturesLoaded = true;
 
 	CBaseFeature *pCur, *pNext;
@@ -31,7 +32,10 @@ void LoadFeatures()
 		else
 		{
 			pCur->SetLoaded(false);
+			bAllFeaturesLoaded = false;
 		}
+
+		pCur->SetPaused(false);
 
 		if ( !pNext )
 		{
@@ -40,6 +44,8 @@ void LoadFeatures()
 
 		pCur = pNext;
 	}
+
+	return bAllFeaturesLoaded;
 }
 
 void PostLoadFeatures()
@@ -53,7 +59,52 @@ void PostLoadFeatures()
 		{
 			pNext = pCur->m_pNext;
 
-			pCur->PostLoad();
+			if ( pCur->IsLoaded() )
+				pCur->PostLoad();
+
+			pCur = pNext;
+		}
+	}
+}
+
+void PauseFeatures()
+{
+	if ( s_bFeaturesLoaded )
+	{
+		CBaseFeature *pCur, *pNext;
+		pCur = CBaseFeature::s_pBaseFeaturesList;
+
+		while (pCur)
+		{
+			pNext = pCur->m_pNext;
+
+			if ( pCur->IsLoaded() && !pCur->IsPaused() )
+			{
+				pCur->Pause();
+				pCur->SetPaused(true);
+			}
+
+			pCur = pNext;
+		}
+	}
+}
+
+void UnpauseFeatures()
+{
+	if ( s_bFeaturesLoaded )
+	{
+		CBaseFeature *pCur, *pNext;
+		pCur = CBaseFeature::s_pBaseFeaturesList;
+
+		while (pCur)
+		{
+			pNext = pCur->m_pNext;
+
+			if ( pCur->IsLoaded() && pCur->IsPaused() )
+			{
+				pCur->Unpause();
+				pCur->SetPaused(false);
+			}
 
 			pCur = pNext;
 		}
@@ -71,13 +122,12 @@ void UnloadFeatures()
 
 		while (pCur)
 		{
-			pPrev = pCur->m_pNext;
+			pPrev = pCur->m_pPrev;
 
 			if ( pCur->IsLoaded() )
 				pCur->Unload();
 
 			pCur->SetLoaded(false);
-
 			pCur = pPrev;
 		}
 	}
@@ -90,13 +140,14 @@ void UnloadFeatures()
 CBaseFeature::CBaseFeature()
 {
 	m_bLoaded = false;
+	m_bPaused = false;
 
 	m_pNext = NULL;
 	m_pPrev = NULL;
 
 	m_pNext = s_pBaseFeaturesList;
 
-	if (s_pBaseFeaturesList)
+	if ( s_pBaseFeaturesList )
 	{
 		s_pBaseFeaturesList->m_pPrev = this;
 	}

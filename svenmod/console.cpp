@@ -7,6 +7,248 @@
 #include "cvar_sm.h"
 #include "plugins_manager.h"
 
+//-----------------------------------------------------------------------------
+// sm options
+//-----------------------------------------------------------------------------
+
+FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
+{
+	bool bPrintUsage = false;
+
+	if (args.ArgC() > 2)
+	{
+		const char *pszCommand = args[2];
+
+		if (!stricmp(pszCommand, "list"))
+		{
+			g_PluginsManager.PrintPlugins();
+		}
+		else if (!stricmp(pszCommand, "info"))
+		{
+			if (args.ArgC() > 3)
+			{
+				int nPluginIndex = atoi(args[3]);
+				g_PluginsManager.PrintPluginInfo(nPluginIndex);
+			}
+			else
+			{
+				ConMsg("Usage:  sm plugins info <index>\n");
+			}
+		}
+		else if (!stricmp(pszCommand, "load"))
+		{
+			if (args.ArgC() > 3)
+			{
+				const char *pszFileName = args[3];
+
+				g_PluginsManager.LoadPlugin(pszFileName, false);
+			}
+			else
+			{
+				ConMsg("Usage:  sm plugins load <filename>\n");
+			}
+		}
+		else if (!stricmp(pszCommand, "unload"))
+		{
+			if (args.ArgC() > 3)
+			{
+				int nPluginIndex = atoi(args[3]);
+
+				g_PluginsManager.UnloadPlugin(nPluginIndex);
+			}
+			else
+			{
+				ConMsg("Usage: sm plugins unload <index>\n");
+			}
+		}
+		else if (!stricmp(pszCommand, "unload_all"))
+		{
+			g_PluginsManager.UnloadPlugins();
+			ConMsg("[SvenMod] Unloaded all plugins\n");
+		}
+		else if (!stricmp(pszCommand, "pause"))
+		{
+			if (args.ArgC() > 3)
+			{
+				int nPluginIndex = atoi(args[3]);
+
+				g_PluginsManager.PausePlugin(nPluginIndex);
+			}
+			else
+			{
+				ConMsg("Usage:  sm plugins pause <index>\n");
+			}
+		}
+		else if (!stricmp(pszCommand, "unpause"))
+		{
+			if (args.ArgC() > 3)
+			{
+				int nPluginIndex = atoi(args[3]);
+
+				g_PluginsManager.UnpausePlugin(nPluginIndex);
+			}
+			else
+			{
+				ConMsg("Usage:  sm plugins unpause <index>\n");
+			}
+		}
+		else if (!stricmp(pszCommand, "pause_all"))
+		{
+			if (g_PluginsManager.PausePlugins())
+				ConMsg("[SvenMod] All plugins have been paused\n");
+			else
+				ConMsg("[SvenMod] None of plugins have been paused\n");
+		}
+		else if (!stricmp(pszCommand, "unpause_all"))
+		{
+			if (g_PluginsManager.UnpausePlugins())
+				ConMsg("[SvenMod] All plugins have been unpaused\n");
+			else
+				ConMsg("[SvenMod] None of plugins have been unpaused\n");
+		}
+		else if (!stricmp(pszCommand, "refresh"))
+		{
+			g_PluginsManager.UnloadPlugins();
+			g_PluginsManager.LoadPlugins();
+
+			ConMsg("[SvenMod] Reloaded all plugins from file \"../svenmod/plugins.txt\"");
+		}
+		else
+		{
+			bPrintUsage = true;
+		}
+	}
+	else
+	{
+		bPrintUsage = true;
+	}
+
+	if (bPrintUsage)
+	{
+		ConMsg("* sm plugins list        - Print list of indexed plugins\n");
+		ConMsg("* sm plugins info        - Print detailed information about a plugin\n");
+	#ifdef PLATFORM_WINDOWS
+		ConMsg("* sm plugins load        - Load a plugin from directory \"../svenmod/plugins/*.dll\"\n");
+	#else
+		ConMsg("* sm plugins load        - Load a plugin from directory \"../svenmod/plugins/*.so\"\n");
+	#endif
+		ConMsg("* sm plugins unload      - Unload a loaded plugin\n");
+		ConMsg("* sm plugins unload_all  - Unload all loaded plugins\n");
+		ConMsg("* sm plugins pause       - Pause a loaded plugin\n");
+		ConMsg("* sm plugins unpause     - Unpause a loaded plugin\n");
+		ConMsg("* sm plugins pause_all   - Pause all running plugins\n");
+		ConMsg("* sm plugins unpause_all - Unpause all paused plugins\n");
+		ConMsg("* sm plugins refresh     - Reload all plugins from file \"../svenmod/plugins.txt\"\n");
+	}
+}
+
+FORCEINLINE void ConCommand_sm_info(const CCommand &args)
+{
+	ConMsg("---------- SvenMod Info ----------\n");
+	ConMsg("* Version:          %s\n", SVENMOD_VERSION_STRING);
+	ConMsg("* API Version:      %s\n", SVENMOD_API_VERSION_STRING);
+	ConMsg("* Plugin Interface: %s\n", CLIENT_PLUGIN_INTERFACE_VERSION);
+	ConMsg("* URL:              https://github.com/sw1ft747/SvenMod\n");
+	ConMsg("* Compiled in:      %s\n", SVENMOD_BUILD_TIMESTAMP);
+	ConMsg("----------------------------------\n");
+}
+
+FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
+{
+	bool bPrintUsage = false;
+
+	if (args.ArgC() > 2)
+	{
+		const char *pszArgument = args[2];
+
+		if ( !stricmp(pszArgument, "all") )
+		{
+			if (args.ArgC() > 3)
+			{
+				if ( !stricmp(args[3], "?") )
+				{
+					if (args.ArgC() > 4)
+					{
+						PrintAllCvars(0, args[4]);
+					}
+					else
+					{
+						ConMsg("Usage:  sm printcvars all ? <prefix>\n");
+					}
+				}
+			}
+			else
+			{
+				PrintAllCvars(0, NULL);
+				ConMsg("For syntax:  sm printcvars all ? <prefix>\n");
+			}
+		}
+		else if ( !stricmp(pszArgument, "cvar") )
+		{
+			if (args.ArgC() > 3)
+			{
+				if ( !stricmp(args[3], "?") )
+				{
+					if (args.ArgC() > 4)
+					{
+						PrintAllCvars(1, args[4]);
+					}
+					else
+					{
+						ConMsg("Usage:  sm printcvars cvar ? <prefix>\n");
+					}
+				}
+			}
+			else
+			{
+				PrintAllCvars(1, NULL);
+				ConMsg("For syntax:  sm printcvars cvar ? <prefix>\n");
+			}
+		}
+		else if ( !stricmp(pszArgument, "cmd") )
+		{
+			if (args.ArgC() > 3)
+			{
+				if ( !stricmp(args[3], "?") )
+				{
+					if (args.ArgC() > 4)
+					{
+						PrintAllCvars(2, args[4]);
+					}
+					else
+					{
+						ConMsg("Usage:  sm printcvars cmd ? <prefix>\n");
+					}
+				}
+			}
+			else
+			{
+				PrintAllCvars(2, NULL);
+				ConMsg("For syntax:  sm printcvars cmd ? <prefix>\n");
+			}
+		}
+		else
+		{
+			bPrintUsage = true;
+		}
+	}
+	else
+	{
+		bPrintUsage = true;
+	}
+
+	if (bPrintUsage)
+	{
+		ConMsg("* sm printcvars all  - Print all registered convars/concommands\n");
+		ConMsg("* sm printcvars cvar - Print only convars\n");
+		ConMsg("* sm printcvars cmd  - Print only concommands\n");
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Console commands
+//-----------------------------------------------------------------------------
+
 CON_COMMAND(sm, "Options for SvenMod")
 {
 	bool bPrintUsage = false;
@@ -17,169 +259,15 @@ CON_COMMAND(sm, "Options for SvenMod")
 
 		if ( !stricmp(pszOption, "plugins") )
 		{
-			if (args.ArgC() > 2)
-			{
-				const char *pszCommand = args[2];
-
-				if ( !stricmp(pszCommand, "list") )
-				{
-					g_PluginsManager.PrintPlugins();
-				}
-				else if ( !stricmp(pszCommand, "info") )
-				{
-					if (args.ArgC() > 3)
-					{
-						int nPluginIndex = atoi(args[3]);
-						g_PluginsManager.PrintPluginInfo( nPluginIndex );
-					}
-					else
-					{
-						ConMsg("Usage:  sm plugins info <index>\n");
-					}
-				}
-				else if ( !stricmp(pszCommand, "load") )
-				{
-					if (args.ArgC() > 3)
-					{
-						const char *pszFileName = args[3];
-
-						g_PluginsManager.LoadPlugin( pszFileName, false );
-					}
-					else
-					{
-						ConMsg("Usage:  sm plugins load <filename>\n");
-					}
-				}
-				else if ( !stricmp(pszCommand, "unload") )
-				{
-					if (args.ArgC() > 3)
-					{
-						int nPluginIndex = atoi(args[3]);
-
-						g_PluginsManager.UnloadPlugin( nPluginIndex );
-					}
-					else
-					{
-						ConMsg("Usage: sm plugins unload <index>\n");
-					}
-				}
-				else if ( !stricmp(pszCommand, "unload_all") )
-				{
-					g_PluginsManager.UnloadPlugins();
-					ConMsg("[SvenMod] Unloaded all plugins\n");
-				}
-				else if ( !stricmp(pszCommand, "pause") )
-				{
-					if (args.ArgC() > 3)
-					{
-						int nPluginIndex = atoi(args[3]);
-
-						g_PluginsManager.PausePlugin( nPluginIndex );
-					}
-					else
-					{
-						ConMsg("Usage:  sm plugins pause <index>\n");
-					}
-				}
-				else if ( !stricmp(pszCommand, "unpause") )
-				{
-					if (args.ArgC() > 3)
-					{
-						int nPluginIndex = atoi(args[3]);
-
-						g_PluginsManager.UnpausePlugin( nPluginIndex );
-					}
-					else
-					{
-						ConMsg("Usage:  sm plugins unpause <index>\n");
-					}
-				}
-				else if ( !stricmp(pszCommand, "pause_all") )
-				{
-					if ( g_PluginsManager.PausePlugins() )
-						ConMsg("[SvenMod] All plugins have been paused\n");
-					else
-						ConMsg("[SvenMod] None of plugins have been paused\n");
-				}
-				else if ( !stricmp(pszCommand, "unpause_all") )
-				{
-					if ( g_PluginsManager.UnpausePlugins() )
-						ConMsg("[SvenMod] All plugins have been unpaused\n");
-					else
-						ConMsg("[SvenMod] None of plugins have been unpaused\n");
-				}
-				else if ( !stricmp(pszCommand, "refresh") )
-				{
-					g_PluginsManager.UnloadPlugins();
-					g_PluginsManager.LoadPlugins();
-
-					ConMsg("[SvenMod] Reloaded all plugins from file \"../svenmod/plugins.txt\"");
-				}
-				else
-				{
-					goto L_SHOW_PL_HELP;
-				}
-			}
-			else
-			{
-			L_SHOW_PL_HELP:
-					ConMsg("* sm plugins list        - Print list of indexed plugins\n");
-					ConMsg("* sm plugins info        - Print detailed information about a plugin\n");
-				#ifdef PLATFORM_WINDOWS
-					ConMsg("* sm plugins load        - Load a plugin from directory \"../svenmod/plugins/*.dll\"\n");
-				#else
-					ConMsg("* sm plugins load        - Load a plugin from directory \"../svenmod/plugins/*.so\"\n");
-				#endif
-					ConMsg("* sm plugins unload      - Unload a loaded plugin\n");
-					ConMsg("* sm plugins unload_all  - Unload all loaded plugins\n");
-					ConMsg("* sm plugins pause       - Pause a loaded plugin\n");
-					ConMsg("* sm plugins unpause     - Unpause a loaded plugin\n");
-					ConMsg("* sm plugins pause_all   - Pause all running plugins\n");
-					ConMsg("* sm plugins unpause_all - Unpause all paused plugins\n");
-					ConMsg("* sm plugins refresh     - Reload all plugins from file \"../svenmod/plugins.txt\"\n");
-			}
+			ConCommand_sm_plugins(args);
 		}
 		else if ( !stricmp(pszOption, "info") )
 		{
-			ConMsg("[SvenMod] Information:\n");
-			ConMsg("----------------------------------\n");
-			ConMsg("* Version:          %s\n", SVENMOD_VERSION_STRING);
-			ConMsg("* API Version:      %s\n", SVENMOD_API_VERSION_STRING);
-			ConMsg("* Plugin Interface: %s\n", CLIENT_PLUGIN_INTERFACE_VERSION);
-			ConMsg("* URL:              https://github.com/sw1ft747/SvenMod\n");
-			ConMsg("* Compiled in:      %s\n", SVENMOD_BUILD_TIMESTAMP);
-			ConMsg("----------------------------------\n");
+			ConCommand_sm_info(args);
 		}
 		else if ( !stricmp(pszOption, "printcvars") )
 		{
-			if (args.ArgC() > 2)
-			{
-				const char *pszArgument = args[2];
-
-				if ( !stricmp(pszArgument, "all") )
-				{
-					PrintAllCvars(0);
-				}
-				else if ( !stricmp(pszArgument, "cvar") )
-				{
-					PrintAllCvars(1);
-				}
-				else if ( !stricmp(pszArgument, "cmd") )
-				{
-					PrintAllCvars(2);
-				}
-				else
-				{
-					goto L_SHOW_PRINTCVARS_HELP;
-				}
-			}
-			else
-			{
-			L_SHOW_PRINTCVARS_HELP:
-				ConMsg("* sm printcvars all  - Print all registered convars/concommands\n");
-				ConMsg("* sm printcvars cvar - Print only convars\n");
-				ConMsg("* sm printcvars cmd  - Print only concommands\n");
-			}
+			ConCommand_sm_printcvars(args);
 		}
 		else
 		{
@@ -219,5 +307,116 @@ CON_COMMAND(help, "Find help about a convar/concommand registered through SvenMo
 	else
 	{
 		ConMsg("Usage:  help <cvarname>\n");
+	}
+}
+
+CON_COMMAND(toggle, "Toggle between values")
+{
+	int i;
+
+	if (args.ArgC() > 1)
+	{
+		const char *pszCvar = args[1];
+		cvar_t *pCvar = g_pEngineFuncs->GetCvarPointer(pszCvar);
+
+		if (pCvar)
+		{
+			if (args.ArgC() == 2)
+			{
+				bool bValue = static_cast<bool>(pCvar->value);
+				g_pEngineFuncs->Cvar_SetValue(pszCvar, float(!bValue));
+			}
+			else
+			{
+				for (i = 2; i < args.ArgC(); i++)
+				{
+					if ( !strcmp(pCvar->string, args[i]) )
+						break;
+				}
+
+				i++;
+
+				if (i >= args.ArgC())
+				{
+					i = 2;
+				}
+
+				g_pEngineFuncs->Cvar_Set(pszCvar, args[i]);
+			}
+		}
+	}
+	else
+	{
+		ConMsg("Usage:  toggle <cvarname> <value #1> <value #2> <value #3>..\n");
+	}
+}
+
+CON_COMMAND(incrementvar, "Increment a cvar")
+{
+	int argc = args.ArgC();
+
+	if (argc >= 5)
+	{
+		const char *pszCvar = args[1];
+		cvar_t *pCvar = g_pEngineFuncs->GetCvarPointer(pszCvar);
+
+		if (pCvar)
+		{
+			float currentValue = pCvar->value;
+			float startValue = strtof( args[2], NULL);
+			float endValue = strtof( args[3], NULL);
+			float delta = strtof( args[4], NULL);
+			float newValue = currentValue + delta;
+
+			if (newValue > endValue)
+			{
+				newValue = startValue;
+			}
+			else if (newValue < startValue)
+			{
+				newValue = endValue;
+			}
+
+			g_pEngineFuncs->Cvar_SetValue(pszCvar, newValue);
+		}
+	}
+	else
+	{
+		ConMsg("Usage:  incrementvar <cvarname> <minvalue> <maxvalue> <delta>\n");
+	}
+}
+
+CON_COMMAND(multvar, "Multiply a cvar")
+{
+	int argc = args.ArgC();
+
+	if (argc >= 5)
+	{
+		const char *pszCvar = args[1];
+		cvar_t *pCvar = g_pEngineFuncs->GetCvarPointer(pszCvar);
+
+		if (pCvar)
+		{
+			float currentValue = pCvar->value;
+			float startValue = strtof( args[2], NULL);
+			float endValue = strtof( args[3], NULL);
+			float factor = strtof( args[4], NULL);
+			float newValue = currentValue * factor;
+
+			if (newValue > endValue)
+			{
+				newValue = startValue;
+			}
+			else if (newValue < startValue)
+			{
+				newValue = endValue;
+			}
+
+			g_pEngineFuncs->Cvar_SetValue(pszCvar, newValue);
+		}
+	}
+	else
+	{
+		ConMsg("Usage:  multvar <cvarname> <minvalue> <maxvalue> <factor>\n");
 	}
 }

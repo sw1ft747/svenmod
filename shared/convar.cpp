@@ -28,7 +28,7 @@ class CDefaultAccessor : public IConCommandBaseAccessor
 public:
 	virtual bool RegisterConCommandBase( ConCommandBase *pVar )
 	{
-		SvenModAPI()->CVar()->RegisterConCommand( pVar );
+		CVar()->RegisterConCommand( pVar );
 		return true;
 	}
 };
@@ -48,7 +48,7 @@ void ConVar_Register( int nCVarFlag, IConCommandBaseAccessor *pAccessor )
 
 	s_bRegistered = true;
 	s_nCVarFlag = nCVarFlag;
-	s_nDLLIdentifier = SvenModAPI()->CVar()->AllocateDLLIdentifier();
+	s_nDLLIdentifier = CVar()->AllocateDLLIdentifier();
 
 	ConCommandBase *pCur, *pNext;
 
@@ -75,7 +75,7 @@ void ConVar_Unregister( )
 
 	AssertFatal( s_nDLLIdentifier >= 0 );
 
-	SvenModAPI()->CVar()->UnregisterConCommands( s_nDLLIdentifier );
+	CVar()->UnregisterConCommands( s_nDLLIdentifier );
 
 	s_nDLLIdentifier = -1;
 	s_bRegistered = false;
@@ -197,9 +197,9 @@ void ConCommandBase::Init()
 
 void ConCommandBase::Shutdown()
 {
-	if (SvenModAPI()->CVar())
+	if ( CVar() )
 	{
-		SvenModAPI()->CVar()->UnregisterConCommand(this);
+		CVar()->UnregisterConCommand(this);
 	}
 }
 
@@ -474,7 +474,7 @@ Color ConVar::GetColor() const
 {
 	if (IsRegistered() && m_pCvar)
 	{
-		return SvenModAPI()->CVar()->GetColorFromCvar(m_pCvar);
+		return CVar()->GetColorFromCvar(m_pCvar);
 	}
 
 	return { 255, 255, 255, 255 };
@@ -508,7 +508,7 @@ void ConVar::SetValue(const char *value)
 {
 	if (IsRegistered() && m_pCvar)
 	{
-		SvenModAPI()->CVar()->SetValue(m_pCvar, value);
+		CVar()->SetValue(m_pCvar, value);
 	}
 }
 
@@ -516,7 +516,7 @@ void ConVar::SetValue(float value)
 {
 	if (IsRegistered() && m_pCvar)
 	{
-		SvenModAPI()->CVar()->SetValue(m_pCvar, value);
+		CVar()->SetValue(m_pCvar, value);
 	}
 }
 
@@ -524,7 +524,7 @@ void ConVar::SetValue(int value)
 {
 	if (IsRegistered() && m_pCvar)
 	{
-		SvenModAPI()->CVar()->SetValue(m_pCvar, value);
+		CVar()->SetValue(m_pCvar, value);
 	}
 }
 
@@ -532,7 +532,7 @@ void ConVar::SetValue(bool value)
 {
 	if (IsRegistered() && m_pCvar)
 	{
-		SvenModAPI()->CVar()->SetValue(m_pCvar, value);
+		CVar()->SetValue(m_pCvar, value);
 	}
 }
 
@@ -540,7 +540,7 @@ void ConVar::SetValue(Color value)
 {
 	if (IsRegistered() && m_pCvar)
 	{
-		SvenModAPI()->CVar()->SetValue(m_pCvar, value);
+		CVar()->SetValue(m_pCvar, value);
 	}
 }
 
@@ -548,7 +548,7 @@ void ConVar::Revert()
 {
 	if (IsRegistered() && m_pCvar)
 	{
-		SvenModAPI()->CVar()->SetValue(m_pCvar, m_pszDefaultValue);
+		CVar()->SetValue(m_pCvar, m_pszDefaultValue);
 	}
 }
 
@@ -611,13 +611,13 @@ bool ConVar::Clamp()
 
 		if (m_bHasMin && (value < m_fMinVal))
 		{
-			SvenModAPI()->CVar()->SetValue(m_pCvar, m_fMinVal);
+			CVar()->SetValue(m_pCvar, m_fMinVal);
 			return true;
 		}
 
 		if (m_bHasMax && (value > m_fMaxVal))
 		{
-			SvenModAPI()->CVar()->SetValue(m_pCvar, m_fMaxVal);
+			CVar()->SetValue(m_pCvar, m_fMaxVal);
 			return true;
 		}
 	}

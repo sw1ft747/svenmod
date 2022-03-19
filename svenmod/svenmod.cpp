@@ -41,7 +41,7 @@ DEFINE_PATTERN(GetClientColor, "8B 4C 24 04 85 C9 7E 35 6B C1 ? 0F BF 80 ? ? ? ?
 DEFINE_PATTERN(WeaponsResource__GetFirstPos, "6B 54 24 04 68 56 57 33 F6 8B F9 81 C2 ? ? ? ? 8B 02 85 C0 74");
 
 DEFINE_PATTERN(build_number_sig, "51 A1 ? ? ? ? 56 33 F6 85 C0 0F 85 A4 00 00 00 53 57 33 FF EB 09");
-DEFINE_PATTERN(protocol_version_sig, "6A 30 68 ? ? ? ? FF D6 68 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 10 85 C0 75");
+DEFINE_PATTERN(protocol_version_sig, "6A ? 68 ? ? ? ? FF D6 68 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 10 85 C0 75");
 DEFINE_PATTERN(__MsgFunc_ServerVer, "8D 44 24 40 C6 44 24 3C 00 68 ? ? ? ? 50 0F 11 44 24 48");
 
 // Game interfaces
@@ -402,13 +402,15 @@ void CSvenMod::SystemPostInit()
 
 bool CSvenMod::StartSystems()
 {
-	ConColorMsg({ 40, 255, 40, 255 }, "Loaded SvenMod v%s (API version: v%s)\n", SVENMOD_VERSION_STRING, SVENMOD_API_VERSION_STRING);
+	ConColorMsg({ 40, 255, 40, 255 }, "Loaded SvenMod v%s (API version: %s)\n", SVENMOD_VERSION_STRING, SVENMOD_API_VERSION_STRING);
 	LogMsg("SvenMod v%s.\n", SVENMOD_VERSION_STRING_FULL);
 
 	ConVar_Register();
 
 	g_ClientHooksHandler.Init();
 	g_PluginsManager.LoadPlugins();
+
+	g_pEngineFuncs->ClientCmd("exec svenmod.cfg\n");
 
 	return true;
 }

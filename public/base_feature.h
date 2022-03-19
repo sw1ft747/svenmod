@@ -11,8 +11,12 @@
 // Load/unload all features
 //-----------------------------------------------------------------------------
 
-void LoadFeatures();
+// Returns 'false' if at least one feature can't be loaded, otherwise 'true'
+bool LoadFeatures();
 void PostLoadFeatures();
+
+void PauseFeatures();
+void UnpauseFeatures();
 
 void UnloadFeatures();
 
@@ -22,8 +26,12 @@ void UnloadFeatures();
 
 abstract_class CBaseFeature
 {
-	friend void LoadFeatures();
+	friend bool LoadFeatures();
 	friend void PostLoadFeatures();
+
+	friend void PauseFeatures();
+	friend void UnpauseFeatures();
+
 	friend void UnloadFeatures();
 
 public:
@@ -37,13 +45,19 @@ public:
 
 	virtual void Unload() {}
 
+	virtual void Pause() {}
+	virtual void Unpause() {}
+
 	virtual bool IsLoaded() final { return m_bLoaded; }
+	virtual bool IsPaused() final { return m_bPaused; }
 
 private:
 	virtual void SetLoaded(bool state) final { m_bLoaded = state; }
+	virtual void SetPaused(bool state) final { m_bPaused = state; }
 
 private:
 	bool m_bLoaded;
+	bool m_bPaused;
 
 	CBaseFeature *m_pNext;
 	CBaseFeature *m_pPrev;

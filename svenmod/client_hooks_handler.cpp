@@ -37,8 +37,6 @@ DECLARE_CLASS_HOOK(void, PaintTraverse, vgui::IPanel *, vgui::VPANEL, bool, bool
 
 DECLARE_CLASS_FUNC(void, HOOKED_PaintTraverse, vgui::IPanel *thisptr, vgui::VPANEL vguiPanel, bool forceRepaint, bool allowForce)
 {
-	ORIG_PaintTraverse(thisptr, vguiPanel, forceRepaint, allowForce);
-
 	static vgui::VPANEL s_StaticPanel = 0;
 
 	if ( !s_StaticPanel )
@@ -52,6 +50,8 @@ DECLARE_CLASS_FUNC(void, HOOKED_PaintTraverse, vgui::IPanel *thisptr, vgui::VPAN
 	{
 		g_PluginsManager.Draw();
 	}
+
+	ORIG_PaintTraverse(thisptr, vguiPanel, forceRepaint, allowForce);
 }
 
 //-----------------------------------------------------------------------------

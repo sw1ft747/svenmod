@@ -42,7 +42,7 @@ static Color s_ConsoleDefaultPrintColor = { 240, 240, 240, 250 };
 class CConCommandHash
 {
 	friend class CCvar;
-	friend void PrintAllCvars(int mode);
+	friend void PrintAllCvars(int mode, const char *pszPrefix);
 
 public:
 	~CConCommandHash();
@@ -86,7 +86,7 @@ class CCvar : public ICvar
 	friend void CvarShutdown();
 	friend void CvarEnablePrint();
 	friend void CvarDisablePrint();
-	friend void PrintAllCvars(int mode);
+	friend void PrintAllCvars(int mode, const char *pszPrefix);
 
 public:
 	CCvar();
@@ -1368,7 +1368,7 @@ void CvarDisablePrint()
 	s_CVar.m_bCanPrint = false;
 }
 
-void PrintAllCvars(int mode)
+void PrintAllCvars(int mode, const char *pszPrefix)
 {
 	// FIXME: use binary tree to sort the cvars
 
@@ -1383,6 +1383,9 @@ void PrintAllCvars(int mode)
 		for (size_t j = 0; j < bucket.size(); j++)
 		{
 			ConCommandBase *pCommandBase = bucket[j];
+
+			if ( pszPrefix && strncmp(pszPrefix, pCommandBase->GetName(), strlen(pszPrefix)) )
+				continue;
 
 			switch (mode)
 			{
@@ -1415,15 +1418,15 @@ void PrintAllCvars(int mode)
 	switch (mode)
 	{
 	case 0:
-		s_CVar.ConsolePrintf("%d Total CVars/Commands\n", iCount);
+		s_CVar.ConsolePrintf("%d Total CVar%s/Command%s\n", iCount, iCount == 1 ? "" : "s", iCount == 1 ? "" : "s");
 		break;
 
 	case 1:
-		s_CVar.ConsolePrintf("%d Total CVars\n", iCount);
+		s_CVar.ConsolePrintf("%d Total CVar%s\n", iCount, iCount == 1 ? "" : "s");
 		break;
 
 	case 2:
-		s_CVar.ConsolePrintf("%d Total Commands\n", iCount);
+		s_CVar.ConsolePrintf("%d Total Command%s\n", iCount, iCount == 1 ? "" : "s");
 		break;
 	}
 }

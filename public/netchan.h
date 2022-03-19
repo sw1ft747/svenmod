@@ -25,6 +25,7 @@
 
 #include "hl_sdk/common/Platform.h"
 #include "hl_sdk/common/netadr.h"
+#include "hl_sdk/common/enums.h"
 
 #define CS_SIZE	64	// size of one config string
 
@@ -37,13 +38,6 @@ typedef struct sizebuf_s
     int		iCurBit;
     int		nDataBits;
 } sizebuf_t;
-
-typedef enum
-{
-    NS_CLIENT,
-    NS_SERVER,
-    NS_MULTICAST
-} netsrc_t;
 
 /*
 ==========================================================

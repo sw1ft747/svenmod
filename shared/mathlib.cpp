@@ -22,6 +22,18 @@ float anglemod(float a)
 	return a;
 }
 
+float NormalizeAngle(float angle)
+{
+	angle = std::fmod(angle, 360.0f);
+
+	if (angle >= 180.0f)
+		angle -= 360.0f;
+	else if (angle < -180.0f)
+		angle += 360.0f;
+
+	return angle;
+}
+
 void AngleVectors(const Vector& angles, Vector* forward, Vector* right, Vector* up)
 {
 	float angle;

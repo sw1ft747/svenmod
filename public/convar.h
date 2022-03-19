@@ -18,7 +18,6 @@
 
 #include "color.h"
 #include "ICvar.h"
-#include "ISvenModAPI.h"
 
 #include "hl_sdk/common/const.h"
 #include "hl_sdk/common/cvardef.h"
@@ -279,21 +278,27 @@ protected:
 //-----------------------------------------------------------------------------
 
 #define CON_COMMAND( name, description ) \
-	static void command__##name( const CCommand &args ); \
-	static void command_wrapper__##name() { CCommand args( SvenModAPI()->CVar()->ArgC(), SvenModAPI()->CVar()->ArgV() ); command__##name(args); } \
+	static void name( const CCommand &args ); \
+	static void command_wrapper__##name() { CCommand args( CVar()->ArgC(), CVar()->ArgV() ); name(args); } \
 	static ConCommand name##_command( #name, command_wrapper__##name, description ); \
-	static void command__##name( const CCommand &args )
+	static void name( const CCommand &args )
 
 #define CON_COMMAND_F( name, description, flags ) \
-	static void command__##name( const CCommand &args ); \
-	static void command_wrapper__##name() { CCommand args( SvenModAPI()->CVar()->ArgC(), SvenModAPI()->CVar()->ArgV() ); command__##name(args); } \
+	static void name( const CCommand &args ); \
+	static void command_wrapper__##name() { CCommand args( CVar()->ArgC(), CVar()->ArgV() ); name(args); } \
 	static ConCommand name##_command( #name, command_wrapper__##name, description, flags ); \
-	static void command__##name( const CCommand &args )
+	static void name( const CCommand &args )
 
 #define CON_COMMAND_EXTERN( name, _funcname, description ) \
 	void _funcname( const CCommand &args ); \
-	static void command_wrapper__##name() { CCommand args( SvenModAPI()->CVar()->ArgC(), SvenModAPI()->CVar()->ArgV() ); _funcname(args); } \
+	static void command_wrapper__##name() { CCommand args( CVar()->ArgC(), CVar()->ArgV() ); _funcname(args); } \
 	static ConCommand name##_command( #name, command_wrapper__##name, description ); \
+	void _funcname( const CCommand &args )
+
+#define CON_COMMAND_EXTERN_F( name, _funcname, description, flags ) \
+	void _funcname( const CCommand &args ); \
+	static void command_wrapper__##name() { CCommand args( CVar()->ArgC(), CVar()->ArgV() ); _funcname(args); } \
+	static ConCommand name##_command( #name, _funcname, description, flags ); \
 	void _funcname( const CCommand &args )
 
 //-----------------------------------------------------------------------------
@@ -301,18 +306,23 @@ protected:
 //-----------------------------------------------------------------------------
 
 #define CON_COMMAND_NO_WRAPPER( name, description ) \
-	static void command__##name(); \
-	static ConCommand name##_command( #name, command__##name, description ); \
-	static void command__##name()
+	static void name(); \
+	static ConCommand name##_command( #name, name, description ); \
+	static void name()
 
-#define CON_COMMAND_NO_WRAPPER_F( name, description, flags ) \
-	static void command__##name(); \
-	static ConCommand name##_command( #name, command__##name, description, flags ); \
-	static void command__##name()
+#define CON_COMMAND_F_NO_WRAPPER( name, description, flags ) \
+	static void name(); \
+	static ConCommand name##_command( #name, name, description, flags ); \
+	static void name()
 
-#define CON_COMMAND_NO_WRAPPER_EXTERN( name, _funcname, description ) \
+#define CON_COMMAND_EXTERN_NO_WRAPPER( name, _funcname, description ) \
 	void _funcname(); \
 	static ConCommand name##_command( #name, _funcname, description ); \
+	void _funcname()
+
+#define CON_COMMAND_EXTERN_F_NO_WRAPPER( name, _funcname, description, flags ) \
+	void _funcname(); \
+	static ConCommand name##_command( #name, _funcname, description, flags ); \
 	void _funcname()
 
 #endif // CONVAR_H

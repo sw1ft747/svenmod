@@ -1,10 +1,12 @@
 # SvenMod
-SvenMod is a C++ plugin environment for the game Sven Co-op that provides powerful Source-like API for creating and supporting client-side plugins.
+SvenMod is a C++ plugin environment for Sven Co-op that provides powerful Source-like API for creating and supporting client-side plugins.
 
-Includes two main files: library `(svenmod.dll)` and launcher `(svenmod_launcher.exe)`. It is neccesary to launch the game using SvenMod's launcher.
+Includes two main files: library `svenmod.dll` and launcher `svenmod_launcher.exe`. It is neccesary to launch the game using SvenMod's launcher.
 
 # For developers
 See the [wiki](https://github.com/sw1ft747/SvenMod/wiki "wiki") page
+
+The project is written in Visual Studio 2022
 
 # VAC
 There's no VAC in the game but for safe you can use `-insecure` launch parameter, still you will be able to join any secure VAC server.
@@ -32,8 +34,8 @@ For example, how it should look:
 ```
 "Plugins" // Hey, I'm a comment!
 {
-		"name_of_the_plugin.dll"			"1" // enabled
-		"name_of_another_plugin"		 "0" // disabled
+	"name_of_the_plugin.dll"	"1" // the plugin is enabled
+	"name_of_another_plugin"	"0" // the plugin is disabled
 }
 ```
 
@@ -42,8 +44,11 @@ Note, everything that goes after these symbols `//` is a comment
 # Console Commands
 SvenMod provides several important console commands:
 ```
-- sm <command> [arg1] [arg2]... - type "sm" in the console to get very detailed information
+- sm <command> <arg1> <arg2>... - type "sm" in the console to get very detailed information
 - help <cvarname> - will print a description about the given convar/concommand that was registered through SvenMod
+- toggle <cvarname> <value #1> <value #2> <value #3>.. - Toggle between cvar values
+- incrementvar <cvarname> <minvalue> <maxvalue> <delta> - Increment a cvar
+- multvar <cvarname> <minvalue> <maxvalue> <factor> - Multiply a cvar
 ```
 
 # Plugins

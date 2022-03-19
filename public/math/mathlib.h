@@ -176,6 +176,7 @@ void AngleMatrix(const float *angles, float matrix[3][4]);
 void AngleIMatrix(const Vector &angles, float matrix[3][4]);
 void VectorTransform(const Vector &in1, float in2[3][4], Vector &out);
 
+float NormalizeAngle(float angle);
 void NormalizeAngles(float *angles);
 void InterpolateAngles(float *start, float *end, float *output, float frac);
 float AngleBetweenVectors(const Vector &v1, const Vector &v2);

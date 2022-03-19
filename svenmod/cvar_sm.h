@@ -11,6 +11,6 @@ void CvarShutdown();
 void CvarEnablePrint();
 void CvarDisablePrint();
 
-void PrintAllCvars(int mode);
+void PrintAllCvars(int mode, const char *pszPrefix);
 
 #endif // SM_CVAR_H

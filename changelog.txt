@@ -1,0 +1,16 @@
+Changelog for SvenMod
+
+18/03/2022 - Version 1.0.0 (API v1.0):
+- Released
+
+20/03/2022 - Version 1.0.1 (API v1.0):
+- Added several includes to Half-Life SDK headers
+- Added a few console commands: toggle, incrementvar, multvar
+- Added search syntax (control cmd "?") for command "sm printcvars"
+- Auto execution of file "svenmod.cfg" on load of SvenMod
+- Removed "v" from SvenMod's message about successful load
+- Fixed incorrect signature for protocol's version
+- Changed call priority for PaintTraverse hook
+- Updated features to pause/unpause them, fixed incorrect use linked list
+- convar.h: fixed naming of function in utility macros to create ConCommands
+- convar.cpp: removed call of imported function "SvenModAPI"
