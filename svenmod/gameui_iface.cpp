@@ -1,7 +1,7 @@
-#include <IVGUI.h>
 #include <ISvenModAPI.h>
-
 #include <sys.h>
+
+#include "gameui_iface.h"
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -15,46 +15,15 @@ IVGuiModuleLoader *g_pVGuiModuleLoader = NULL;
 ICareerUI *g_pCareerUI = NULL;
 
 //-----------------------------------------------------------------------------
-// CVGameUI
-//-----------------------------------------------------------------------------
-
-class CVGameUI : public IVGameUI
-{
-public:
-	CVGameUI();
-
-	virtual void Init();
-
-	virtual IGameUI *GameUI();
-
-	virtual IGameConsole *GameConsole();
-
-	virtual IMusicManager *MusicManager();
-
-	virtual IRunGameEngine *RunGameEngine();
-
-	virtual IVGuiModuleLoader *VGuiModuleLoader();
-
-	virtual ICareerUI *CareerUI();
-
-private:
-	bool m_bInitialized;
-};
-
-//-----------------------------------------------------------------------------
 // CVGameUI implementation
 //-----------------------------------------------------------------------------
 
 CVGameUI::CVGameUI()
 {
-	m_bInitialized = false;
 }
 
 void CVGameUI::Init()
 {
-	if (m_bInitialized)
-		return;
-
 	CreateInterfaceFn pfnGameUIFactory = Sys_GetFactory( SvenModAPI()->Modules()->GameUI );
 
 	if ( !pfnGameUIFactory )
@@ -110,8 +79,6 @@ void CVGameUI::Init()
 		Sys_Error("[SvenMod] Failed to get %s interface", "ICareerUI");
 		return;
 	}
-
-	m_bInitialized = true;
 }
 
 IGameUI *CVGameUI::GameUI()

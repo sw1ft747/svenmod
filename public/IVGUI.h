@@ -31,8 +31,6 @@ abstract_class IVGUI
 public:
 	virtual							~IVGUI() {}
 
-	virtual void					Init() = 0;
-
 	virtual vgui::IVGui				*VGui() = 0;
 
 	virtual IBaseUI					*BaseUI() = 0;

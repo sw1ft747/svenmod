@@ -14,7 +14,7 @@ public:
 	virtual int						GetProtocolVersion();
 	virtual client_version_s		*GetClientVersion();
 
-	virtual int						GetClientState();
+	virtual client_state_t			GetClientState();
 
 	virtual const char				*GetBaseDirectory();
 
@@ -41,8 +41,11 @@ public:
 	virtual ICvar					*CVar();
 	virtual IHooks					*Hooks();
 
+	virtual IClient					*Client();
+	virtual IClientWeapon			*ClientWeapon();
 	virtual IPlayerUtils			*PlayerUtils();
 	virtual IInventory				*Inventory();
+	virtual IUtils					*Utils();
 
 	//-----------------------------------------------------------------------------
 	// Game's API
@@ -106,11 +109,11 @@ client_version_s *CSvenModAPI::GetClientVersion()
 	return &g_ClientVersion;
 }
 
-int CSvenModAPI::GetClientState()
+client_state_t CSvenModAPI::GetClientState()
 {
 	extern int *g_pClientState;
 
-	return *g_pClientState;
+	return static_cast<client_state_t >(*g_pClientState);
 }
 
 const char *CSvenModAPI::GetBaseDirectory()
@@ -185,6 +188,16 @@ IHooks *CSvenModAPI::Hooks()
 	return g_pHooks;
 }
 
+IClient *CSvenModAPI::Client()
+{
+	return g_pClient;
+}
+
+IClientWeapon *CSvenModAPI::ClientWeapon()
+{
+	return g_pClientWeapon;
+}
+
 IPlayerUtils *CSvenModAPI::PlayerUtils()
 {
 	return g_pPlayerUtils;
@@ -193,6 +206,11 @@ IPlayerUtils *CSvenModAPI::PlayerUtils()
 IInventory *CSvenModAPI::Inventory()
 {
 	return g_pInventory;
+}
+
+IUtils *CSvenModAPI::Utils()
+{
+	return g_pUtils;
 }
 
 //-----------------------------------------------------------------------------

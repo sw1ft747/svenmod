@@ -18,8 +18,6 @@ abstract_class IInventory
 public:
 	virtual					~IInventory() {}
 
-	virtual void			Init( void ) = 0;
-
 	virtual WeaponsResource *GetWeaponsResource( void ) = 0;
 
 	virtual int				GetMaxWeaponSlots( void ) = 0;

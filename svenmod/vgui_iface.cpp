@@ -1,60 +1,7 @@
-#include <IVGUI.h>
 #include <ISvenModAPI.h>
-
 #include <sys.h>
 
-class CVGUI : public IVGUI
-{
-public:
-	CVGUI();
-
-	virtual void Init();
-
-	virtual vgui::IVGui *VGui();
-
-	virtual IBaseUI *BaseUI();
-	virtual IGameUIFuncs *GameUIFuncs();
-	virtual IEngineSurface *EngineSurface();
-
-	virtual vgui::IEngineVGui *EngineVGui();
-
-	virtual vgui::ISurface *Surface();
-	virtual vgui::ISchemeManager *SchemeManager();
-	virtual vgui::ILocalize *Localize();
-
-	virtual vgui::IPanel *Panel();
-
-	virtual vgui::IInput *Input();
-	virtual vgui::IInputInternal *InputInternal();
-
-	virtual vgui::ISystem *System();
-
-	virtual vgui::IKeyValues *KeyValues();
-
-private:
-	bool m_bInitialized;
-
-	vgui::IVGui *m_pVGui;
-
-	IBaseUI *m_pBaseUI;
-	IGameUIFuncs *m_pGameUIFuncs;
-	IEngineSurface *m_pEngineSurface;
-
-	vgui::IEngineVGui *m_pEngineVGui;
-
-	vgui::ISurface *m_pSurface;
-	vgui::ISchemeManager *m_pSchemeManager;
-	vgui::ILocalize *m_pLocalize;
-
-	vgui::IPanel *m_pPanel;
-
-	vgui::IInput *m_pInput;
-	vgui::IInputInternal *m_pInputInternal;
-
-	vgui::ISystem *m_pSystem;
-
-	vgui::IKeyValues *m_pKeyValues;
-};
+#include "vgui_iface.h"
 
 //-----------------------------------------------------------------------------
 // CVGUI implementation
@@ -62,8 +9,6 @@ private:
 
 CVGUI::CVGUI()
 {
-	m_bInitialized = false;
-
 	m_pVGui = NULL;
 	m_pBaseUI = NULL;
 	m_pGameUIFuncs = NULL;
@@ -81,9 +26,6 @@ CVGUI::CVGUI()
 
 void CVGUI::Init()
 {
-	if (m_bInitialized)
-		return;
-
 	CreateInterfaceFn pfnVGUI2Factory = Sys_GetFactory( SvenModAPI()->Modules()->VGUI2 );
 
 	if ( !pfnVGUI2Factory )
@@ -203,8 +145,6 @@ void CVGUI::Init()
 		Sys_Error("[SvenMod] Failed to get %s interface", "IKeyValues");
 		return;
 	}
-
-	m_bInitialized = true;
 }
 
 vgui::IVGui *CVGUI::VGui()

@@ -1,5 +1,5 @@
-#ifndef CLIENT_HOOKS_H
-#define CLIENT_HOOKS_H
+#ifndef GAME_HOOKS_H
+#define GAME_HOOKS_H
 
 #ifdef _WIN32
 #pragma once
@@ -10,7 +10,7 @@
 #include <IClientHooks.h>
 #include <IDetoursAPI.h>
 
-class CClientHooksHandler
+class CGameHooksHandler
 {
 public:
 	void Init();
@@ -24,8 +24,9 @@ public:
 
 private:
 	DetourHandle_t m_hPaintTraverse;
+	DetourHandle_t m_hUserMsgHook_CurWeapon;
 };
 
-extern CClientHooksHandler g_ClientHooksHandler;
+extern CGameHooksHandler g_GameHooksHandler;
 
-#endif // CLIENT_HOOKS_H
+#endif // GAME_HOOKS_H

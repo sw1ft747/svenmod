@@ -453,7 +453,7 @@
     <ClInclude Include="public\IClientHooks.h">
       <Filter>SvenMod\public</Filter>
     </ClInclude>
-    <ClInclude Include="svenmod\client_hooks_handler.h">
+    <ClInclude Include="svenmod\game_hooks.h">
       <Filter>SvenMod\svenmod</Filter>
     </ClInclude>
     <ClInclude Include="public\IHooks.h">
@@ -509,6 +509,33 @@
     </ClInclude>
     <ClInclude Include="public\math\vector.h">
       <Filter>SvenMod\public\math</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IUtils.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\utils.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\vgui_iface.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\gameui_iface.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\inventory.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\client.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\client_weapon.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IClient.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IClientWeapon.h">
+      <Filter>SvenMod\public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -587,7 +614,7 @@
     <ClCompile Include="shared\mathlib.cpp">
       <Filter>SvenMod\shared</Filter>
     </ClCompile>
-    <ClCompile Include="svenmod\client_hooks_handler.cpp">
+    <ClCompile Include="svenmod\game_hooks.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\hooks.cpp">
@@ -603,6 +630,15 @@
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\inventory.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\utils.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\client.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\client_weapon.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
   </ItemGroup>

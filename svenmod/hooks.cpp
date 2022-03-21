@@ -4,7 +4,7 @@
 
 #include <hl_sdk/common/usermsg.h>
 
-#include "client_hooks_handler.h"
+#include "game_hooks.h"
 
 extern usermsg_t **g_ppClientUserMsgs;
 
@@ -36,22 +36,22 @@ public:
 
 bool CHooks::RegisterClientHooks(IClientHooks *pClientHooks)
 {
-	return g_ClientHooksHandler.RegisterClientHooks(pClientHooks);
+	return g_GameHooksHandler.RegisterClientHooks(pClientHooks);
 }
 
 bool CHooks::RegisterClientPostHooks(IClientHooks *pClientHooks)
 {
-	return g_ClientHooksHandler.RegisterClientPostHooks(pClientHooks);
+	return g_GameHooksHandler.RegisterClientPostHooks(pClientHooks);
 }
 
 bool CHooks::UnregisterClientHooks(IClientHooks *pClientHooks)
 {
-	return g_ClientHooksHandler.UnregisterClientHooks(pClientHooks);
+	return g_GameHooksHandler.UnregisterClientHooks(pClientHooks);
 }
 
 bool CHooks::UnregisterClientPostHooks(IClientHooks *pClientHooks)
 {
-	return g_ClientHooksHandler.UnregisterClientPostHooks(pClientHooks);
+	return g_GameHooksHandler.UnregisterClientPostHooks(pClientHooks);
 }
 
 DetourHandle_t CHooks::HookUserMessage(const char *pszName, UserMsgHookFn pfnUserMsgHook, UserMsgHookFn *ppfnOriginalUserMsgHook)

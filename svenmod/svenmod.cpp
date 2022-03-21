@@ -26,8 +26,12 @@
 
 #include "cvar_sm.h"
 #include "dbg_sm.h"
+#include "utils.h"
+#include "vgui_iface.h"
+#include "gameui_iface.h"
+#include "inventory.h"
 #include "plugins_manager.h"
-#include "client_hooks_handler.h"
+#include "game_hooks.h"
 
 // Patterns
 DEFINE_PATTERN(LoadClientDLL, "FF 74 24 04 E8 ? ? ? ? 83 C4 04 A3 ? ? ? ? 85 C0 75 ? E8 ? ? ? ? 50 FF 74 24 08");
@@ -69,6 +73,7 @@ extra_player_info_t *g_pPlayerExtraInfo = NULL;
 
 // Common stuff
 double *g_pRealtime = NULL;
+double *g_pClientTime = NULL;
 double *g_pFrametime = NULL;
 
 const char *g_pszBaseDirectory = NULL;
@@ -202,7 +207,7 @@ DECLARE_FUNC(void, __cdecl, HOOKED_Host_Shutdown)
 {
 	// Unload all plugins before client DLL will be unloaded
 	g_PluginsManager.UnloadPlugins();
-	g_ClientHooksHandler.Shutdown();
+	g_GameHooksHandler.Shutdown();
 
 	CvarDisablePrint();
 
@@ -360,9 +365,10 @@ void CSvenMod::SystemPostInit()
 	FindExtraPlayerInfo();
 	FindWeaponsResource();
 
-	VGUI()->Init();
-	VGameUI()->Init();
-	Inventory()->Init();
+	g_VGUI.Init();
+	g_VGameUI.Init();
+	g_Inventory.Init();
+	g_Utils.Init();
 
 	CvarInit();
 	DbgInit();
@@ -407,7 +413,7 @@ bool CSvenMod::StartSystems()
 
 	ConVar_Register();
 
-	g_ClientHooksHandler.Init();
+	g_GameHooksHandler.Init();
 	g_PluginsManager.LoadPlugins();
 
 	g_pEngineFuncs->ClientCmd("exec svenmod.cfg\n");
@@ -742,9 +748,24 @@ void CSvenMod::FindFrametime()
 
 	} while ( MemoryUtils()->Disassemble(&g_inst) );
 
+	MemoryUtils()->InitDisasm(&g_inst, g_pEngineFuncs->GetClientTime, 32, 16);
+
+	if ( MemoryUtils()->Disassemble(&g_inst) )
+	{
+		if (g_inst.mnemonic == UD_Ifld)
+		{
+			g_pClientTime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
+		}
+	}
+
 	if ( !g_pRealtime )
 	{
 		Sys_Error("[SvenMod] Failed to get realtime");
+	}
+
+	if ( !g_pClientTime )
+	{
+		Sys_Error("[SvenMod] Failed to get r_refdef_time");
 	}
 
 	if ( !g_pFrametime )

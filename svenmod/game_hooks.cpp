@@ -1,4 +1,6 @@
-#include "client_hooks_handler.h"
+#include "client.h"
+#include "client_weapon.h"
+#include "game_hooks.h"
 #include "plugins_manager.h"
 
 #include <hl_sdk/engine/APIProxy.h> 
@@ -6,6 +8,9 @@
 #include <IClientHooks.h>
 #include <ISvenModAPI.h>
 #include <ILoggingSystem.h>
+#include <IHooks.h>
+
+#include <usermessages.h>
 #include <sys.h>
 #include <dbg.h>
 
@@ -55,11 +60,35 @@ DECLARE_CLASS_FUNC(void, HOOKED_PaintTraverse, vgui::IPanel *thisptr, vgui::VPAN
 }
 
 //-----------------------------------------------------------------------------
+// User's message "CurrentWeapon" hook
+//-----------------------------------------------------------------------------
+
+UserMsgHookFn ORIG_UserMsgHook_CurWeapon = NULL;
+
+int UserMsgHook_CurWeapon(const char *pszName, int iSize, void *pBuffer)
+{
+	UserMessages::BeginRead(pBuffer, iSize);
+
+	int iState = UserMessages::ReadByte();
+	int iId = UserMessages::ReadShort();
+
+	if ( iState )
+		g_iCurrentWeaponID = iId;
+	else if ( iId <= WEAPON_NONE )
+		g_iCurrentWeaponID = WEAPON_NONE;
+
+	return ORIG_UserMsgHook_CurWeapon(pszName, iSize, pBuffer);
+}
+
+//-----------------------------------------------------------------------------
 // Client DLL hooks
 //-----------------------------------------------------------------------------
 
 static int HUD_VidInit(void)
 {
+	g_iCurrentWeaponID = -1;
+	g_bCurrentWeaponCustom = false;
+
 	FOR_EACH_HOOK(i)
 	{
 		IClientHooks *pClientHooks = g_ClientHooks[i];
@@ -98,6 +127,7 @@ static int HUD_Redraw(float time, int intermission)
 
 		if (result == HOOK_STOP)
 		{
+			g_Client.ShowDebugInfo();
 			return 1;
 		}
 		else if (result == HOOK_CALL_STOP)
@@ -105,6 +135,7 @@ static int HUD_Redraw(float time, int intermission)
 			int r = s_ClientFuncsOriginal.HUD_Redraw(time, intermission);
 
 			g_PluginsManager.DrawHUD(time, intermission);
+			g_Client.ShowDebugInfo();
 
 			return r;
 		}
@@ -120,6 +151,7 @@ static int HUD_Redraw(float time, int intermission)
 	}
 
 	g_PluginsManager.DrawHUD(time, intermission);
+	g_Client.ShowDebugInfo();
 
 	return func_result;
 }
@@ -371,6 +403,13 @@ static void CL_CreateMove(float frametime, usercmd_t *cmd, int active)
 		else if (result == HOOK_CALL_STOP)
 		{
 			s_ClientFuncsOriginal.CL_CreateMove(frametime, cmd, active);
+
+			if ( g_bForceWeaponReload )
+			{
+				cmd->buttons |= IN_RELOAD;
+				g_bForceWeaponReload = false;
+			}
+
 			return;
 		}
 	}
@@ -382,6 +421,12 @@ static void CL_CreateMove(float frametime, usercmd_t *cmd, int active)
 		IClientHooks *pClientPostHooks = g_ClientPostHooks[i];
 
 		HOOK_RESULT result = pClientPostHooks->CL_CreateMove(frametime, cmd, active);
+	}
+
+	if ( g_bForceWeaponReload )
+	{
+		cmd->buttons |= IN_RELOAD;
+		g_bForceWeaponReload = false;
 	}
 }
 
@@ -743,11 +788,13 @@ static void HUD_PostRunCmd(local_state_t *from, local_state_t *to, usercmd_t *cm
 
 		if (result == HOOK_STOP)
 		{
+			g_Client.Update(from, to, cmd, time, random_seed);
 			return;
 		}
 		else if (result == HOOK_CALL_STOP)
 		{
 			s_ClientFuncsOriginal.HUD_PostRunCmd(from, to, cmd, runfuncs, time, random_seed);
+			g_Client.Update(from, to, cmd, time, random_seed);
 			return;
 		}
 	}
@@ -760,6 +807,8 @@ static void HUD_PostRunCmd(local_state_t *from, local_state_t *to, usercmd_t *cm
 
 		HOOK_RESULT result = pClientPostHooks->HUD_PostRunCmd(from, to, cmd, runfuncs, time, random_seed);
 	}
+
+	g_Client.Update(from, to, cmd, time, random_seed);
 }
 
 static void HUD_TxferLocalOverrides(entity_state_t *state, const clientdata_t *client)
@@ -1275,10 +1324,10 @@ static void ClientFactory(void)
 }
 
 //-----------------------------------------------------------------------------
-// CClientHooksHandler impl
+// CGameHooksHandler impl
 //-----------------------------------------------------------------------------
 
-void CClientHooksHandler::Init()
+void CGameHooksHandler::Init()
 {
 	s_ClientFuncsHooked =
 	{
@@ -1332,6 +1381,7 @@ void CClientHooksHandler::Init()
 	memcpy( g_pClientFuncs, &s_ClientFuncsHooked, sizeof(cl_clientfuncs_t) );
 
 	m_hPaintTraverse = DetoursAPI()->DetourVirtualFunction( vgui::panel(), 41, HOOKED_PaintTraverse, GET_FUNC_PTR(ORIG_PaintTraverse) );
+	m_hUserMsgHook_CurWeapon = Hooks()->HookUserMessage( "CurWeapon", UserMsgHook_CurWeapon, &ORIG_UserMsgHook_CurWeapon );
 
 	if ( m_hPaintTraverse == DETOUR_INVALID_HANDLE )
 	{
@@ -1339,9 +1389,10 @@ void CClientHooksHandler::Init()
 	}
 }
 
-void CClientHooksHandler::Shutdown()
+void CGameHooksHandler::Shutdown()
 {
 	DetoursAPI()->RemoveDetour( m_hPaintTraverse );
+	Hooks()->UnhookUserMessage( m_hUserMsgHook_CurWeapon );
 
 	memcpy( g_pClientFuncs, &s_ClientFuncsOriginal, sizeof(cl_clientfuncs_t) );
 
@@ -1349,7 +1400,7 @@ void CClientHooksHandler::Shutdown()
 	g_ClientPostHooks.clear();
 }
 
-bool CClientHooksHandler::RegisterClientHooks(IClientHooks *pClientHooks)
+bool CGameHooksHandler::RegisterClientHooks(IClientHooks *pClientHooks)
 {
 	FOR_EACH_HOOK(i)
 	{
@@ -1365,7 +1416,7 @@ bool CClientHooksHandler::RegisterClientHooks(IClientHooks *pClientHooks)
 	return true;
 }
 
-bool CClientHooksHandler::UnregisterClientHooks(IClientHooks *pClientHooks)
+bool CGameHooksHandler::UnregisterClientHooks(IClientHooks *pClientHooks)
 {
 	FOR_EACH_HOOK(i)
 	{
@@ -1381,7 +1432,7 @@ bool CClientHooksHandler::UnregisterClientHooks(IClientHooks *pClientHooks)
 	return false;
 }
 
-bool CClientHooksHandler::RegisterClientPostHooks(IClientHooks *pClientPostHooks)
+bool CGameHooksHandler::RegisterClientPostHooks(IClientHooks *pClientPostHooks)
 {
 	FOR_EACH_POST_HOOK(i)
 	{
@@ -1397,7 +1448,7 @@ bool CClientHooksHandler::RegisterClientPostHooks(IClientHooks *pClientPostHooks
 	return true;
 }
 
-bool CClientHooksHandler::UnregisterClientPostHooks(IClientHooks *pClientPostHooks)
+bool CGameHooksHandler::UnregisterClientPostHooks(IClientHooks *pClientPostHooks)
 {
 	FOR_EACH_POST_HOOK(i)
 	{
@@ -1416,4 +1467,4 @@ bool CClientHooksHandler::UnregisterClientPostHooks(IClientHooks *pClientPostHoo
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-CClientHooksHandler g_ClientHooksHandler;
+CGameHooksHandler g_GameHooksHandler;

@@ -21,6 +21,8 @@
 #pragma once
 #endif
 
+#include "const.h"
+
 typedef struct efrag_s
 {
 	struct mleaf_s* leaf;

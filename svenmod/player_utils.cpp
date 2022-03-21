@@ -137,5 +137,3 @@ IPlayerUtils *PlayerUtils()
 {
 	return g_pPlayerUtils;
 }
-
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CPlayerUtils, IPlayerUtils, PLAYERUTILS_INTERFACE_VERSION, g_PlayerUtils);

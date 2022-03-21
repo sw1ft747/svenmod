@@ -7,6 +7,7 @@
 
 #include "platform.h"
 #include "api_version.h"
+#include "client_state.h"
 #include "sys.h"
 
 #include "hl_sdk/engine/APIProxy.h"
@@ -22,7 +23,10 @@
 #include "IMemoryUtils.h"
 #include "IDetoursAPI.h"
 #include "IHooks.h"
+#include "IClient.h"
+#include "IUtils.h"
 #include "IPlayerUtils.h"
+#include "IClientWeapon.h"
 #include "IInventory.h"
 #include "ILoggingSystem.h"
 #include "IConfigManager.h"
@@ -88,8 +92,7 @@ public:
 	virtual int						GetProtocolVersion() = 0;
 	virtual client_version_s		*GetClientVersion() = 0;
 
-	// See client_state.h
-	virtual int						GetClientState() = 0;
+	virtual client_state_t			GetClientState() = 0;
 
 	virtual const char				*GetBaseDirectory() = 0;
 
@@ -116,8 +119,11 @@ public:
 	virtual ICvar					*CVar() = 0;
 	virtual IHooks					*Hooks() = 0;
 
+	virtual IClient					*Client() = 0;
+	virtual IClientWeapon			*ClientWeapon() = 0;
 	virtual IPlayerUtils			*PlayerUtils() = 0;
 	virtual IInventory				*Inventory() = 0;
+	virtual IUtils					*Utils() = 0;
 
 	//-----------------------------------------------------------------------------
 	// Game's API
@@ -148,7 +154,7 @@ public:
 };
 
 // Interface version! Not an API's version!
-#define SVENMOD_API_INTERFACE_VERSION "SvenModAPI001"
+#define SVENMOD_API_INTERFACE_VERSION "SvenModAPI002"
 
 extern modules_s *g_pModules;
 extern ISvenModAPI *g_pSvenModAPI;

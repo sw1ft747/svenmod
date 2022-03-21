@@ -14,3 +14,12 @@ Changelog for SvenMod
 - Updated features to pause/unpause them, fixed incorrect use linked list
 - convar.h: fixed naming of function in utility macros to create ConCommands
 - convar.cpp: removed call of imported function "SvenModAPI"
+
+21/03/2022 - Version 1.1.0 (API v2.0):
+- Added IClient, IClientWeapon and IUtils interfaces
+- Added pointer to engine's variable "r_refdef_time"
+- Removed interface version from IPlayerUtils.h
+- Removed virtual "Init" functions from some interfaces
+- Renamed "client_hooks_handler" source files to "game_hooks"
+- Fixed file's cl_entity.h header
+- Some fixes in manager of plugins

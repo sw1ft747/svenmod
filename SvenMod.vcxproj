@@ -101,7 +101,9 @@
     <ClInclude Include="public\hl_sdk\pm_shared\pm_movevars.h" />
     <ClInclude Include="public\hl_sdk\pm_shared\pm_shared.h" />
     <ClInclude Include="public\hook_codes.h" />
+    <ClInclude Include="public\IClient.h" />
     <ClInclude Include="public\IClientHooks.h" />
+    <ClInclude Include="public\IClientWeapon.h" />
     <ClInclude Include="public\IInventory.h" />
     <ClInclude Include="public\IClientPlugin.h" />
     <ClInclude Include="public\ICommandLine.h" />
@@ -119,6 +121,7 @@
     <ClInclude Include="public\IPluginHelpers.h" />
     <ClInclude Include="public\IRegistry.h" />
     <ClInclude Include="public\ISvenModAPI.h" />
+    <ClInclude Include="public\IUtils.h" />
     <ClInclude Include="public\IVGameUI.h" />
     <ClInclude Include="public\IVGUI.h" />
     <ClInclude Include="public\IVideoMode.h" />
@@ -157,11 +160,17 @@
     <ClInclude Include="public\vgui2\VGUI2.h" />
     <ClInclude Include="public\vgui2\VGuiVertex.h" />
     <ClInclude Include="shared\ISvenMod.h" />
-    <ClInclude Include="svenmod\client_hooks_handler.h" />
+    <ClInclude Include="svenmod\client.h" />
+    <ClInclude Include="svenmod\client_weapon.h" />
+    <ClInclude Include="svenmod\gameui_iface.h" />
+    <ClInclude Include="svenmod\game_hooks.h" />
     <ClInclude Include="svenmod\cvar_sm.h" />
     <ClInclude Include="svenmod\dbg_sm.h" />
+    <ClInclude Include="svenmod\inventory.h" />
     <ClInclude Include="svenmod\plugins_manager.h" />
     <ClInclude Include="svenmod\plugins_loader.h" />
+    <ClInclude Include="svenmod\utils.h" />
+    <ClInclude Include="svenmod\vgui_iface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="public\hl_sdk\cl_dll\interpolation.cpp" />
@@ -178,7 +187,9 @@
     <ClCompile Include="shared\mathlib.cpp" />
     <ClCompile Include="shared\sys.cpp" />
     <ClCompile Include="shared\usermessages.cpp" />
-    <ClCompile Include="svenmod\client_hooks_handler.cpp" />
+    <ClCompile Include="svenmod\client.cpp" />
+    <ClCompile Include="svenmod\client_weapon.cpp" />
+    <ClCompile Include="svenmod\game_hooks.cpp" />
     <ClCompile Include="svenmod\config_manager.cpp" />
     <ClCompile Include="svenmod\console.cpp" />
     <ClCompile Include="svenmod\cvar.cpp" />
@@ -194,6 +205,7 @@
     <ClCompile Include="svenmod\plugins_loader.cpp" />
     <ClCompile Include="svenmod\svenmod.cpp" />
     <ClCompile Include="svenmod\svenmod_api.cpp" />
+    <ClCompile Include="svenmod\utils.cpp" />
     <ClCompile Include="svenmod\vgui_iface.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

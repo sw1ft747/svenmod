@@ -23,8 +23,6 @@ abstract_class IVGameUI
 public:
 	virtual						~IVGameUI() {}
 
-	virtual void				Init() = 0;
-
 	virtual IGameUI				*GameUI() = 0;
 
 	virtual IGameConsole		*GameConsole() = 0;

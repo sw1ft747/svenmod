@@ -36,8 +36,6 @@ public:
 // Export
 //-----------------------------------------------------------------------------
 
-#define PLAYERUTILS_INTERFACE_VERSION "PlayerUtils001"
-
 extern IPlayerUtils *g_pPlayerUtils;
 PLATFORM_INTERFACE IPlayerUtils *PlayerUtils();
 
