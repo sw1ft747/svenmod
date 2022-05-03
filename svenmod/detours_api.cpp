@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <IDetoursAPI.h>
+#include <IMemoryUtils.h>
 
 #include <sys.h>
 
@@ -75,8 +76,6 @@ private:
 	std::vector<DWORD> m_SuspendedThreads;
 	DWORD m_dwCurrentThreadID;
 	DWORD m_dwCurrentProcessID;
-#else
-#error Implement Linux equivalent
 #endif
 
 	int m_iDetourHandles;
@@ -192,11 +191,8 @@ CDetoursAPI::~CDetoursAPI()
 void CDetoursAPI::Init()
 {
 #ifdef PLATFORM_WINDOWS
-	// Guess it's better to don't call WinAPI functions at DLL load
 	m_dwCurrentThreadID = GetCurrentThreadId();
 	m_dwCurrentProcessID = GetCurrentProcessId();
-#else
-#error Implement Linux equivalent
 #endif
 }
 
@@ -209,7 +205,7 @@ DetourHandle_t CDetoursAPI::DetourFunctionByName(HMODULE hModule, const char *ps
 {
 #ifdef PLATFORM_WINDOWS
 	void *pFunction = Sys_GetProcAddress(hModule, pszFunctionName);
-#else // Linux uwu
+#else
 	void *pFunction = MemoryUtils()->ResolveSymbol(hModule, pszFunctionName);
 #endif
 
@@ -414,8 +410,6 @@ void CDetoursAPI::SuspendThreads()
 
 		CloseHandle(hSnapshot);
 	}
-#else
-#error Implement Linux equivalent
 #endif
 }
 
@@ -434,8 +428,6 @@ void CDetoursAPI::ResumeThreads()
 	}
 
 	m_SuspendedThreads.clear();
-#else
-#error Implement Linux equivalent
 #endif
 }
 
@@ -538,7 +530,7 @@ CDetourContext::~CDetourContext()
 
 		if (m_pGateway)
 		{
-			VirtualFree(m_pGateway, 0, MEM_RELEASE);
+			MemoryUtils()->VirtualFree(m_pGateway, 0, MEM_RELEASE);
 			m_pGateway = NULL;
 		}
 	}
@@ -550,7 +542,6 @@ bool CDetourContext::Init(int iDisasmMinBytes)
 {
 	if (m_type == DETOUR_FUNCTION)
 	{
-	#ifdef PLATFORM_WINDOWS
 		std::vector<void *> vCalleeFunctions;
 		m_nStolenBytes = 0;
 
@@ -604,7 +595,7 @@ bool CDetourContext::Init(int iDisasmMinBytes)
 
 		// Alloc size: m_nStolenBytes + 5 ( JMP [relative offset] )
 		unsigned char callBytes[5] = { 0xE9 };
-		m_pGateway = VirtualAlloc(NULL, m_nStolenBytes + sizeof(callBytes), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+		m_pGateway = MemoryUtils()->VirtualAlloc(NULL, m_nStolenBytes + sizeof(callBytes), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
 		if ( !m_pGateway )
 		{
@@ -647,9 +638,6 @@ bool CDetourContext::Init(int iDisasmMinBytes)
 
 		vCalleeFunctions.clear();
 		return true;
-	#else
-	#error Implement Linux equivalent // VirtualAlloc..
-	#endif
 	}
 	else if (m_type == DETOUR_VTABLE_FUNCTION)
 	{
@@ -735,7 +723,7 @@ void CDetourContext::InstallDetours()
 		return;
 	}
 
-	unsigned long dwProtection;
+	int dwProtection;
 
 	if (m_type == DETOUR_FUNCTION)
 	{
@@ -744,29 +732,21 @@ void CDetourContext::InstallDetours()
 		// Relative address
 		*(unsigned long *)(m_pPatchedBytes + 1) = (unsigned long)pFirstDetour->GetDetour() - ((unsigned long)m_pFunction + sizeof(void *) + 1);
 
-	#ifdef PLATFORM_WINDOWS
-		VirtualProtect(m_pFunction, m_nStolenBytes, PAGE_EXECUTE_READWRITE, &dwProtection);
+		MemoryUtils()->VirtualProtect(m_pFunction, m_nStolenBytes, PAGE_EXECUTE_READWRITE, &dwProtection);
 
 		memcpy(m_pFunction, m_pPatchedBytes, m_nStolenBytes);
 
-		VirtualProtect(m_pFunction, m_nStolenBytes, dwProtection, &dwProtection);
-	#else
-	#error Implement Linux equivalent
-	#endif
+		MemoryUtils()->VirtualProtect(m_pFunction, m_nStolenBytes, dwProtection, NULL);
 
 		g_DetoursAPI.ResumeThreads();
 	}
 	else if (m_type == DETOUR_VTABLE_FUNCTION)
 	{
-	#ifdef PLATFORM_WINDOWS
-		VirtualProtect(m_pFunction, sizeof(void *), PAGE_EXECUTE_READWRITE, &dwProtection);
+		MemoryUtils()->VirtualProtect(m_pFunction, sizeof(void *), PAGE_EXECUTE_READWRITE, &dwProtection);
 
 		*(void **)(m_pFunction) = pFirstDetour->GetDetour();
 
-		VirtualProtect(m_pFunction, sizeof(void *), dwProtection, &dwProtection);
-	#else
-	#error Implement Linux equivalent
-	#endif
+		MemoryUtils()->VirtualProtect(m_pFunction, sizeof(void *), dwProtection, NULL);
 	}
 
 	pLastDetour->SetTrampoline( m_pGateway );
@@ -778,35 +758,27 @@ void CDetourContext::RemoveDetours()
 	if ( !m_bDetoursAttached )
 		return;
 
-	unsigned long dwProtection;
+	int dwProtection;
 
 	if (m_type == DETOUR_FUNCTION)
 	{
 		g_DetoursAPI.SuspendThreads();
 
-	#ifdef PLATFORM_WINDOWS
-		VirtualProtect(m_pFunction, m_nStolenBytes, PAGE_EXECUTE_READWRITE, &dwProtection);
+		MemoryUtils()->VirtualProtect(m_pFunction, m_nStolenBytes, PAGE_EXECUTE_READWRITE, &dwProtection);
 
 		memcpy(m_pFunction, m_pOriginalBytes, m_nStolenBytes);
 
-		VirtualProtect(m_pFunction, m_nStolenBytes, dwProtection, &dwProtection);
-	#else
-	#error Implement Linux equivalent
-	#endif
+		MemoryUtils()->VirtualProtect(m_pFunction, m_nStolenBytes, dwProtection, NULL);
 
 		g_DetoursAPI.ResumeThreads();
 	}
 	else if (m_type == DETOUR_VTABLE_FUNCTION)
 	{
-	#ifdef PLATFORM_WINDOWS
-		VirtualProtect(m_pFunction, sizeof(void *), PAGE_EXECUTE_READWRITE, &dwProtection);
+		MemoryUtils()->VirtualProtect(m_pFunction, sizeof(void *), PAGE_EXECUTE_READWRITE, &dwProtection);
 
 		*(void **)(m_pFunction) = m_pGateway;
 
-		VirtualProtect(m_pFunction, sizeof(void *), dwProtection, &dwProtection);
-	#else
-	#error Implement Linux equivalent
-	#endif
+		MemoryUtils()->VirtualProtect(m_pFunction, sizeof(void *), dwProtection, NULL);
 	}
 
 	if (m_type == DETOUR_VTABLE_FUNCTION)

@@ -7,6 +7,10 @@
 
 #include <interface.h>
 
+#ifdef PLATFORM_LINUX
+typedef void *HINSTANCE;
+#endif
+
 enum
 {
 	RUN_FAILED,

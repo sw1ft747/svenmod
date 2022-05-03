@@ -486,10 +486,7 @@
     <ClInclude Include="public\IVGameUI.h">
       <Filter>SvenMod\public</Filter>
     </ClInclude>
-    <ClInclude Include="svenmod\cvar_sm.h">
-      <Filter>SvenMod\svenmod</Filter>
-    </ClInclude>
-    <ClInclude Include="svenmod\dbg_sm.h">
+    <ClInclude Include="svenmod\cvar.h">
       <Filter>SvenMod\svenmod</Filter>
     </ClInclude>
     <ClInclude Include="public\gameui\gameconsole.h">
@@ -537,6 +534,15 @@
     <ClInclude Include="public\IClientWeapon.h">
       <Filter>SvenMod\public</Filter>
     </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\protocol.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\svenmod.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\patterns.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="public\udis86\src\decode.c">
@@ -576,9 +582,6 @@
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\svenmod.cpp">
-      <Filter>SvenMod\svenmod</Filter>
-    </ClCompile>
-    <ClCompile Include="svenmod\dbg.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\plugins_loader.cpp">
@@ -639,6 +642,9 @@
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\client_weapon.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\patterns.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
   </ItemGroup>

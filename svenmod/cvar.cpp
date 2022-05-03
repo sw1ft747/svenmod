@@ -1,6 +1,4 @@
-#include <ICvar.h>
-#include <IMemoryUtils.h>
-#include <ISvenModAPI.h>
+#include "cvar.h"
 
 #include <gameui/IGameConsole.h>
 #include <gameui/gameconsole.h>
@@ -12,9 +10,7 @@
 
 #include <hl_sdk/engine/APIProxy.h>
 
-#include <vector>
-
-#define CVAR_CONSOLE_MESSAGE_LENGTH 8192
+#define CONSOLE_PRINT_MESSAGE_LENGTH 8192
 
 // Patterns
 DEFINE_PATTERN(Z_Free_sig, "56 8B 74 24 08 85 F6 75 0D 68 ? ? ? ? E8 ? ? ? ? 83 C4 04 83 C6 E8");
@@ -23,166 +19,15 @@ DEFINE_PATTERN(Cvar_RemoveClientDLLCvars_sig, "56 8B 35 ? ? ? ? 57 33 FF 85 F6 7
 DEFINE_PATTERN(Cvar_RemoveClientDLLCmds_sig, "A1 ? ? ? ? 57 33 FF 85 C0 74 24 53 8B 5C 24 0C 56 8B 30");
 DEFINE_PATTERN(CGameConsoleDialog__DPrint, "55 8B EC 56 8B F1 FF B6 ? ? 00 00 8B 8E ? ? 00 00 E8 ? ? ? ? FF 75 08 8B 8E ? ? 00 00 E8 ? ? ? ? 5E 5D C2 04 00");
 
-// Signatures
-typedef void (__cdecl *Z_FreeFn)(void *);
-typedef void (__cdecl *Cvar_DirectSetFn)(cvar_t *, const char *);
-typedef void (__thiscall *RichText__InsertColorChangeFn)(void *, Color);
-typedef void (__thiscall *RichText__InsertStringFn)(void *, const char *);
+extern client_version_s g_ClientVersion;;
 
 //-----------------------------------------------------------------------------
 // Colors
 //-----------------------------------------------------------------------------
 
-static Color s_ConsoleDefaultPrintColor = { 240, 240, 240, 250 };
-
-//-----------------------------------------------------------------------------
-// ConCommandBase hash
-//-----------------------------------------------------------------------------
-
-class CConCommandHash
-{
-	friend class CCvar;
-	friend void PrintAllCvars(int mode, const char *pszPrefix);
-
-public:
-	~CConCommandHash();
-
-	void Init();
-
-	unsigned int Hash(ConCommandBase *pCommand);
-	unsigned int Hash(const char *pszCommand);
-
-	ConCommandBase *Find(ConCommandBase *pCommand);
-	ConCommandBase *Find(const char *pszName);
-
-	bool Insert(ConCommandBase *pCommand);
-
-	bool Remove(ConCommandBase *pCommand);
-	bool Remove(const char *pszCommand);
-
-	void RemoveAll();
-
-	int Size();
-
-protected:
-	typedef std::vector<ConCommandBase *> datapool_t;
-
-	enum
-	{
-		NUM_BUCKETS = 48,
-		NUM_BUCKETS_MASK = NUM_BUCKETS
-	};
-
-	datapool_t m_Buckets[NUM_BUCKETS];
-};
-
-//-----------------------------------------------------------------------------
-// CCvar
-//-----------------------------------------------------------------------------
-
-class CCvar : public ICvar
-{
-	friend bool CvarInit();
-	friend void CvarShutdown();
-	friend void CvarEnablePrint();
-	friend void CvarDisablePrint();
-	friend void PrintAllCvars(int mode, const char *pszPrefix);
-
-public:
-	CCvar();
-	virtual						~CCvar();
-
-	virtual CVarDLLIdentifier_t AllocateDLLIdentifier();
-
-	virtual void				RegisterConCommand(ConCommandBase *pCommandBase);
-	virtual void				UnregisterConCommand(ConCommandBase *pCommandBase);
-	virtual void				UnregisterConCommands(CVarDLLIdentifier_t id);
-
-	virtual const char			*GetCommandLineValue(const char *pszVariableName);
-
-	virtual cvar_t				*FindCvar(const char *pszName);
-	virtual const cvar_t		*FindCvar(const char *pszName) const;
-
-	virtual cmd_t				*FindCmd(const char *pszName);
-	virtual const cmd_t			*FindCmd(const char *pszName) const;
-
-	virtual ConCommandBase		*FindCommandBase(const char *pszName);
-	virtual const ConCommandBase *FindCommandBase(const char *pszName) const;
-
-	virtual ConVar				*FindVar(const char *pszName);
-	virtual const ConVar		*FindVar(const char *pszName) const;
-
-	virtual ConCommand			*FindCommand(const char *pszName);
-	virtual const ConCommand	*FindCommand(const char *pszName) const;
-
-	virtual void				RevertFlaggedConVars(int nFlag);
-
-	virtual bool				CanPrint(void) const;
-
-	virtual void				ConsoleColorPrint(const Color &clr, const char *pszMessage) const;
-	virtual void				ConsolePrint(const char *pszMessage) const;
-	virtual void				ConsoleDPrint(const char *pszMessage) const;
-
-	virtual void				ConsoleColorPrintf(const Color &clr, const char *pszFormat, ...) const;
-	virtual void				ConsolePrintf(const char *pszFormat, ...) const;
-	virtual void				ConsoleDPrintf(const char *pszFormat, ...) const;
-
-	virtual int					ArgC() const;
-	virtual const char			**ArgV() const;
-	virtual const char			*Arg(int nIndex) const;
-
-	virtual void				SetValue(cvar_t *pCvar, const char *value);
-	virtual void				SetValue(cvar_t *pCvar, float value);
-	virtual void				SetValue(cvar_t *pCvar, int value);
-	virtual void				SetValue(cvar_t *pCvar, bool value);
-	virtual void				SetValue(cvar_t *pCvar, Color value);
-
-	virtual void				SetValue(const char *pszCvar, const char *value);
-	virtual void				SetValue(const char *pszCvar, float value);
-	virtual void				SetValue(const char *pszCvar, int value);
-	virtual void				SetValue(const char *pszCvar, bool value);
-	virtual void				SetValue(const char *pszCvar, Color value);
-
-	virtual const char			*GetStringFromCvar(cvar_t *pCvar);
-	virtual float				GetFloatFromCvar(cvar_t *pCvar);
-	virtual int					GetIntFromCvar(cvar_t *pCvar);
-	virtual bool				GetBoolFromCvar(cvar_t *pCvar);
-	virtual Color				GetColorFromCvar(cvar_t *pCvar);
-
-	virtual const char			*GetStringFromCvar(const char *pszName);
-	virtual float				GetFloatFromCvar(const char *pszName);
-	virtual int					GetIntFromCvar(const char *pszName);
-	virtual bool				GetBoolFromCvar(const char *pszName);
-	virtual Color				GetColorFromCvar(const char *pszName);
-
-private:
-	bool Init();
-	void Shutdown();
-
-private:
-	CConCommandHash m_CommandHash;
-
-	CVarDLLIdentifier_t m_nNextDLLIdentifier;
-
-	Z_FreeFn Z_Free;
-	Cvar_DirectSetFn Cvar_DirectSet;
-
-	RichText__InsertColorChangeFn RichText__InsertColorChange;
-	RichText__InsertStringFn RichText__InsertString;
-
-	CGameConsole *m_pGameConsole;
-
-	cvar_t **m_ppCvarList;
-	cmd_t **m_ppCmdList;
-
-	cvar_t *m_pDeveloper;
-
-	int *m_pArgC;
-	const char **m_ppArgV;
-
-	bool m_bInitialized;
-	bool m_bCanPrint;
-};
+static const Color s_ConsoleDefaultPrintColor = { 240, 240, 240, 250 };
+static const Color s_MsgPrintColor = { 232, 232, 232, 255 };
+static const Color s_WarningPrintColor = { 255, 90, 90, 255 };
 
 //-----------------------------------------------------------------------------
 // CCvar implementation
@@ -221,6 +66,9 @@ bool CCvar::Init()
 {
 	if (m_bInitialized)
 		return true;
+
+	if (g_ClientVersion.version != 5025)
+		LogWarning("Validate paddings of class \"CGameConsoleDialog\"");
 
 	ud_t instruction;
 
@@ -394,7 +242,7 @@ bool CCvar::Init()
 
 void CCvar::Shutdown()
 {
-	if (!m_bInitialized)
+	if ( !m_bInitialized )
 		return;
 
 	for (int i = 0; i < m_CommandHash.Size(); i++)
@@ -505,6 +353,79 @@ void CCvar::Shutdown()
 	m_CommandHash.RemoveAll();
 
 	m_bInitialized = false;
+}
+
+void CCvar::EnablePrint()
+{
+	m_bCanPrint = true;
+}
+
+void CCvar::DisablePrint()
+{
+	m_bCanPrint = false;
+}
+
+void CCvar::PrintCvars(int mode, const char *pszPrefix) const
+{
+	// FIXME: use binary tree to sort the cvars
+
+	int iCount = 0;
+
+	ConsolePrint("----------------------------------\n");
+
+	for (int i = 0; i < m_CommandHash.Size(); i++)
+	{
+		const CConCommandHash::datapool_t &bucket = m_CommandHash.m_Buckets[i];
+
+		for (size_t j = 0; j < bucket.size(); j++)
+		{
+			ConCommandBase *pCommandBase = bucket[j];
+
+			if ( pszPrefix && strncmp(pszPrefix, pCommandBase->GetName(), strlen(pszPrefix)) )
+				continue;
+
+			switch (mode)
+			{
+			case 0:
+				ConsolePrintf("%s\n", pCommandBase->GetName());
+				iCount++;
+				break;
+
+			case 1:
+				if ( !pCommandBase->IsCommand() )
+				{
+					ConsolePrintf("%s\n", pCommandBase->GetName());
+					iCount++;
+				}
+				break;
+
+			case 2:
+				if ( pCommandBase->IsCommand() )
+				{
+					ConsolePrintf("%s\n", pCommandBase->GetName());
+					iCount++;
+				}
+				break;
+			}
+		}
+	}
+
+	ConsolePrint("----------------------------------\n");
+
+	switch (mode)
+	{
+	case 0:
+		ConsolePrintf("%d Total CVar%s/Command%s\n", iCount, iCount == 1 ? "" : "s", iCount == 1 ? "" : "s");
+		break;
+
+	case 1:
+		ConsolePrintf("%d Total CVar%s\n", iCount, iCount == 1 ? "" : "s");
+		break;
+
+	case 2:
+		ConsolePrintf("%d Total Command%s\n", iCount, iCount == 1 ? "" : "s");
+		break;
+	}
 }
 
 CVarDLLIdentifier_t CCvar::AllocateDLLIdentifier()
@@ -946,14 +867,14 @@ void CCvar::ConsoleColorPrintf(const Color &clr, const char *pszFormat, ...) con
 {
 	if ( m_bCanPrint && m_pGameConsole->IsInitialized() )
 	{
-		static char szFormattedMsg[CVAR_CONSOLE_MESSAGE_LENGTH] = { 0 };
+		static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
 
 		va_list args;
 		va_start(args, pszFormat);
-		_vsnprintf(szFormattedMsg, CVAR_CONSOLE_MESSAGE_LENGTH, pszFormat, args);
+		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszFormat, args);
 		va_end(args);
 
-		szFormattedMsg[CVAR_CONSOLE_MESSAGE_LENGTH - 1] = 0;
+		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
 
 		CGameConsoleDialog *pGameConsoleDialog = m_pGameConsole->GetGameConsoleDialog();
 
@@ -966,14 +887,14 @@ void CCvar::ConsolePrintf(const char *pszFormat, ...) const
 {
 	if ( m_bCanPrint && m_pGameConsole->IsInitialized() )
 	{
-		static char szFormattedMsg[CVAR_CONSOLE_MESSAGE_LENGTH] = { 0 };
+		static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
 
 		va_list args;
 		va_start(args, pszFormat);
-		_vsnprintf(szFormattedMsg, CVAR_CONSOLE_MESSAGE_LENGTH, pszFormat, args);
+		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszFormat, args);
 		va_end(args);
 
-		szFormattedMsg[CVAR_CONSOLE_MESSAGE_LENGTH - 1] = 0;
+		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
 
 		CGameConsoleDialog *pGameConsoleDialog = m_pGameConsole->GetGameConsoleDialog();
 
@@ -986,14 +907,14 @@ void CCvar::ConsoleDPrintf(const char *pszFormat, ...) const
 {
 	if ( m_bCanPrint && bool(m_pDeveloper->value) && m_pGameConsole->IsInitialized() )
 	{
-		static char szFormattedMsg[CVAR_CONSOLE_MESSAGE_LENGTH] = { 0 };
+		static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
 
 		va_list args;
 		va_start(args, pszFormat);
-		_vsnprintf(szFormattedMsg, CVAR_CONSOLE_MESSAGE_LENGTH, pszFormat, args);
+		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszFormat, args);
 		va_end(args);
 
-		szFormattedMsg[CVAR_CONSOLE_MESSAGE_LENGTH - 1] = 0;
+		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
 
 		CGameConsoleDialog *pGameConsoleDialog = m_pGameConsole->GetGameConsoleDialog();
 
@@ -1334,99 +1255,123 @@ int CConCommandHash::Size()
 // Export
 //-----------------------------------------------------------------------------
 
-static CCvar s_CVar;
-ICvar *g_pCVar = &s_CVar;
+CCvar g_CVar;
+ICvar *g_pCVar = &g_CVar;
 
 ICvar *CVar()
 {
 	return g_pCVar;
 }
 
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CCvar, ICvar, CVAR_INTERFACE_VERSION, s_CVar);
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CCvar, ICvar, CVAR_INTERFACE_VERSION, g_CVar);
 
 //-----------------------------------------------------------------------------
-// Let us control the CVar manager
+// Debug functions
 //-----------------------------------------------------------------------------
 
-bool CvarInit()
+void Msg(const char *pszMessageFormat, ...)
 {
-	return s_CVar.Init();
+	static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
+
+	va_list args;
+	va_start(args, pszMessageFormat);
+	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	va_end(args);
+
+	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+
+	g_pCVar->ConsolePrint(szFormattedMsg);
 }
 
-void CvarShutdown()
+void Warning(const char *pszMessageFormat, ...)
 {
-	s_CVar.Shutdown();
+	static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
+
+	va_list args;
+	va_start(args, pszMessageFormat);
+	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	va_end(args);
+
+	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+
+	g_pCVar->ConsoleColorPrint(s_WarningPrintColor, szFormattedMsg);
 }
 
-void CvarEnablePrint()
+void DevMsg(const char *pszMessageFormat, ...)
 {
-	s_CVar.m_bCanPrint = true;
-}
+	static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
 
-void CvarDisablePrint()
-{
-	s_CVar.m_bCanPrint = false;
-}
-
-void PrintAllCvars(int mode, const char *pszPrefix)
-{
-	// FIXME: use binary tree to sort the cvars
-
-	int iCount = 0;
-
-	s_CVar.ConsolePrint("----------------------------------\n");
-
-	for (int i = 0; i < s_CVar.m_CommandHash.Size(); i++)
+	if ( g_pCVar->CanPrint() && bool(g_CVar.m_pDeveloper->value) )
 	{
-		CConCommandHash::datapool_t &bucket = s_CVar.m_CommandHash.m_Buckets[i];
+		va_list args;
+		va_start(args, pszMessageFormat);
+		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+		va_end(args);
 
-		for (size_t j = 0; j < bucket.size(); j++)
-		{
-			ConCommandBase *pCommandBase = bucket[j];
+		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
 
-			if ( pszPrefix && strncmp(pszPrefix, pCommandBase->GetName(), strlen(pszPrefix)) )
-				continue;
-
-			switch (mode)
-			{
-			case 0:
-				s_CVar.ConsolePrintf("%s\n", pCommandBase->GetName());
-				iCount++;
-				break;
-
-			case 1:
-				if ( !pCommandBase->IsCommand() )
-				{
-					s_CVar.ConsolePrintf("%s\n", pCommandBase->GetName());
-					iCount++;
-				}
-				break;
-
-			case 2:
-				if ( pCommandBase->IsCommand() )
-				{
-					s_CVar.ConsolePrintf("%s\n", pCommandBase->GetName());
-					iCount++;
-				}
-				break;
-			}
-		}
+		g_pCVar->ConsoleDPrint(szFormattedMsg);
 	}
+}
 
-	s_CVar.ConsolePrint("----------------------------------\n");
+void DevWarning(const char *pszMessageFormat, ...)
+{
+	static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
 
-	switch (mode)
+	if ( g_pCVar->CanPrint() && bool(g_CVar.m_pDeveloper->value) )
 	{
-	case 0:
-		s_CVar.ConsolePrintf("%d Total CVar%s/Command%s\n", iCount, iCount == 1 ? "" : "s", iCount == 1 ? "" : "s");
-		break;
+		va_list args;
+		va_start(args, pszMessageFormat);
+		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+		va_end(args);
 
-	case 1:
-		s_CVar.ConsolePrintf("%d Total CVar%s\n", iCount, iCount == 1 ? "" : "s");
-		break;
+		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
 
-	case 2:
-		s_CVar.ConsolePrintf("%d Total Command%s\n", iCount, iCount == 1 ? "" : "s");
-		break;
+		g_pCVar->ConsoleColorPrint(s_WarningPrintColor, szFormattedMsg);
+	}
+}
+
+void ConColorMsg(const Color &clr, const char *pszMessageFormat, ...)
+{
+	static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
+
+	va_list args;
+	va_start(args, pszMessageFormat);
+	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	va_end(args);
+
+	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+
+	g_pCVar->ConsoleColorPrint(clr, szFormattedMsg);
+}
+
+void ConMsg(const char *pszMessageFormat, ...)
+{
+	static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
+
+	va_list args;
+	va_start(args, pszMessageFormat);
+	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	va_end(args);
+
+	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+
+	g_pCVar->ConsolePrint(szFormattedMsg);
+}
+
+void ConDMsg(const char *pszMessageFormat, ...)
+{
+	static char szFormattedMsg[CONSOLE_PRINT_MESSAGE_LENGTH] = { 0 };
+
+	if ( g_pCVar->CanPrint() && bool(g_CVar.m_pDeveloper->value) )
+	{
+		va_list args;
+		va_start(args, pszMessageFormat);
+		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+		va_end(args);
+
+		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+
+		g_pCVar->ConsolePrint(szFormattedMsg);
 	}
 }

@@ -6,6 +6,7 @@
 #endif
 
 #include <ctype.h>
+#include <string.h>
 
 inline unsigned int HashKey(unsigned char *pKey, size_t length)
 {

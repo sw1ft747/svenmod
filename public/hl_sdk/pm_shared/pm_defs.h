@@ -36,6 +36,10 @@
 #define PM_TRACELINE_PHYSENTSONLY 0
 #define PM_TRACELINE_ANYVISIBLE 1
 
+// Values for type of trace
+#define PM_HULL_PLAYER 0
+#define PM_HULL_DUCKED_PLAYER 1
+#define PM_HULL_POINT 2
 
 #include "pm_info.h"
 #include "pm_movevars.h"

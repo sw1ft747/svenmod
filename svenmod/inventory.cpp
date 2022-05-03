@@ -172,7 +172,7 @@ void CInventory::DropWeapon(WEAPON *pWeapon)
 {
 	static char cmd[CMD_BUFFER_LENGTH] = { 0 };
 
-	_snprintf(cmd, CMD_BUFFER_LENGTH, "drop %s\n", pWeapon->szName);
+	snprintf(cmd, CMD_BUFFER_LENGTH, "drop %s\n", pWeapon->szName);
 
 	cmd[CMD_BUFFER_LENGTH - 1] = 0;
 
@@ -183,7 +183,7 @@ void CInventory::DropWeapon(const char *pszWeaponName)
 {
 	static char cmd[CMD_BUFFER_LENGTH] = { 0 };
 
-	_snprintf(cmd, CMD_BUFFER_LENGTH, "drop %s\n", pszWeaponName);
+	snprintf(cmd, CMD_BUFFER_LENGTH, "drop %s\n", pszWeaponName);
 
 	cmd[CMD_BUFFER_LENGTH - 1] = 0;
 

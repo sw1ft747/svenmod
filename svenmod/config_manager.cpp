@@ -118,13 +118,13 @@ private:
 	public:
 		CLookupFunctor() {}
 
-		// The compare function config pairs
+		// The compare function for config pairs
 		bool operator()(const ConfigPair_t &a, const ConfigPair_t &b) const
 		{
 			return !stricmp(a.section, b.section) && !stricmp(a.property, b.property);
 		}
 
-		// The hash function config pairs
+		// The hash function for config pairs
 		unsigned int operator()(const ConfigPair_t &item) const
 		{
 			return HashStringCaseless(item.property);

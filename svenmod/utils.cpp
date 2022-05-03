@@ -40,7 +40,7 @@ bool CUtils::WorldToScreen(Vector &vWorldOrigin, Vector2D &vScreen)
 {
 	int iResult = g_pTriangleAPI->WorldToScreen(vWorldOrigin, vScreen);
 
-	if (vScreen.x <= 1 && vScreen.y <= 1 && vScreen.x >= -1 && vScreen.y >= -1 && !iResult)
+	if ( !iResult && vScreen.x <= 1 && vScreen.y <= 1 && vScreen.x >= -1 && vScreen.y >= -1 )
 	{
 		vScreen.x = (m_iScreenWidth / 2 * vScreen.x) + (vScreen.x + m_iScreenWidth / 2);
 		vScreen.y = -(m_iScreenHeight / 2 * vScreen.y) + (vScreen.y + m_iScreenHeight / 2);
@@ -56,13 +56,18 @@ void CUtils::ScreenToWorld(Vector2D &vScreen, Vector &vWorldOrigin)
 	g_pTriangleAPI->ScreenToWorld(vScreen, vWorldOrigin);
 }
 
+void CUtils::DrawSetTextColor(float r, float g, float b)
+{
+	g_pEngineFuncs->DrawSetTextColor(r, g, b);
+}
+
 int CUtils::DrawConsoleString(int x, int y, const char *pszFormat, ...)
 {
 	static char szFormattedMsg[4096] = { 0 };
 
 	va_list args;
 	va_start(args, pszFormat);
-	_vsnprintf(szFormattedMsg, 2048, pszFormat, args);
+	vsnprintf(szFormattedMsg, sizeof(szFormattedMsg), pszFormat, args);
 	va_end(args);
 
 	szFormattedMsg[sizeof(szFormattedMsg) - 1] = 0;

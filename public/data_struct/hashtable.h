@@ -249,7 +249,7 @@ bool CHashTable<KeyT, ValueT>::IsValidIterator(HashTableIterator_t iterator)
 }
 
 template <typename KeyT, class ValueT>
-__forceinline unsigned int CHashTable<KeyT, ValueT>::HashKey(const KeyT key) const
+FORCEINLINE unsigned int CHashTable<KeyT, ValueT>::HashKey(const KeyT key) const
 {
 	return ::HashKey((unsigned char *)&key, sizeof(KeyT));
 }

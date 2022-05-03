@@ -23,3 +23,16 @@ Changelog for SvenMod
 - Renamed "client_hooks_handler" source files to "game_hooks"
 - Fixed file's cl_entity.h header
 - Some fixes in manager of plugins
+
+03/05/2022 - Version 1.2.0 (API v3.0):
+- Minor improvements in the code
+- Added CMake, scripts for building on Windows/Linux (Linux project is not finished yet)
+- Added Linux equivalents for WinAPI functions
+- Added 'Drop' method for interface 'IClientWeapon'
+- Added 'DrawSetTextColor' method for interface 'IUtils'
+- Added 'VirtualProtect', 'VirtualAlloc' and 'VirtualFree' methods for interface 'IMemoryUtils'
+- Added headers 'hl_sdk/common/protocol.h', 'svenmod.h'
+- Updated header 'platform.h'
+- Fixed include of header 'mathlib.h'
+- Replaced function '_snprintf' to 'snprintf'
+- Replaced keyword '__forceinline' to macro 'FORCEINLINE' in hash map, hash table and hash dictionary

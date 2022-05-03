@@ -28,6 +28,7 @@ public:
 	virtual bool			WorldToScreen( Vector &vWorldOrigin, Vector2D &vScreen ) = 0;
 	virtual void			ScreenToWorld( Vector2D &vScreen, Vector &vWorldOrigin ) = 0;
 
+	virtual void			DrawSetTextColor( float r, float g, float b ) = 0;
 	virtual int				DrawConsoleString( int x, int y, const char *pszFormat, ... ) = 0;
 };
 

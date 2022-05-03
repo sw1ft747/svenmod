@@ -17,6 +17,8 @@
 #define DEFINE_PATTERN_IGNORE_BYTE(name, signature, ignorebyte) struct tpattern_s<get_pattern_length(signature), (unsigned char)ignorebyte> __pattern_##name(signature); \
 	struct pattern_s *name = reinterpret_cast<struct pattern_s *>(&(__pattern_##name))
 
+#define DEFINE_NULL_PATTERN(name) struct pattern_s *name = 0
+
 #define EXTERN_PATTERN(name) extern struct pattern_s *name
 
 #define REPLACE_PATTERN(dest, src) dest = src

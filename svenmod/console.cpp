@@ -4,7 +4,7 @@
 #include <svenmod_version.h>
 #include <dbg.h>
 
-#include "cvar_sm.h"
+#include "cvar.h"
 #include "plugins_manager.h"
 
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 				{
 					if (args.ArgC() > 4)
 					{
-						PrintAllCvars(0, args[4]);
+						g_CVar.PrintCvars(0, args[4]);
 					}
 					else
 					{
@@ -179,7 +179,7 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 			}
 			else
 			{
-				PrintAllCvars(0, NULL);
+				g_CVar.PrintCvars(0, NULL);
 				ConMsg("For syntax:  sm printcvars all ? <prefix>\n");
 			}
 		}
@@ -191,7 +191,7 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 				{
 					if (args.ArgC() > 4)
 					{
-						PrintAllCvars(1, args[4]);
+						g_CVar.PrintCvars(1, args[4]);
 					}
 					else
 					{
@@ -201,7 +201,7 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 			}
 			else
 			{
-				PrintAllCvars(1, NULL);
+				g_CVar.PrintCvars(1, NULL);
 				ConMsg("For syntax:  sm printcvars cvar ? <prefix>\n");
 			}
 		}
@@ -213,7 +213,7 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 				{
 					if (args.ArgC() > 4)
 					{
-						PrintAllCvars(2, args[4]);
+						g_CVar.PrintCvars(2, args[4]);
 					}
 					else
 					{
@@ -223,7 +223,7 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 			}
 			else
 			{
-				PrintAllCvars(2, NULL);
+				g_CVar.PrintCvars(2, NULL);
 				ConMsg("For syntax:  sm printcvars cmd ? <prefix>\n");
 			}
 		}

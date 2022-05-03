@@ -1,6 +1,8 @@
 #include "client.h"
 #include "client_weapon.h"
 
+#include "svenmod.h"
+
 #include <hl_sdk/engine/APIProxy.h>
 #include <hl_sdk/pm_shared/pm_shared.h>
 
@@ -38,13 +40,11 @@ clientdata_t *CClient::GetClientData()
 
 double CClient::Time()
 {
-	extern double *g_pClientTime;
 	return *g_pClientTime;
 }
 
 float CClient::Frametime()
 {
-	extern double *g_pFrametime;
 	return static_cast<float>(*g_pFrametime);
 }
 
@@ -71,13 +71,11 @@ bool CClient::IsMultiplayer()
 
 bool CClient::IsConnected()
 {
-	extern int *g_pClientState;
 	return *g_pClientState >= CLS_CONNECTED;
 }
 
 bool CClient::IsInGame()
 {
-	extern int *g_pClientState;
 	return *g_pClientState == CLS_ACTIVE;
 }
 
@@ -116,7 +114,6 @@ bool CClient::IsDucking()
 
 bool CClient::CanAttack()
 {
-	extern double *g_pClientTime;
 	return static_cast<float>(*g_pClientTime) + m_LocalState.client.m_flNextAttack <= static_cast<float>(*g_pClientTime);
 }
 
@@ -197,7 +194,6 @@ int CClient::GetWeaponAnim()
 
 float CClient::GetNextAttack()
 {
-	extern double *g_pClientTime;
 	return static_cast<float>(*g_pClientTime) + m_LocalState.client.m_flNextAttack;
 }
 
@@ -379,6 +375,8 @@ void CClient::ShowWeaponData()
 
 		int id = g_iCurrentWeaponID;
 
+		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
+
 		g_pUtils->DrawConsoleString(x, y, "Weapon ID: %d", g_iCurrentWeaponID);
 		y += offset; g_pUtils->DrawConsoleString(x, y, "Custom: %d", g_bCurrentWeaponCustom);
 
@@ -436,6 +434,8 @@ void CClient::ShowClientData()
 
 		int offset = sm_debug_new_line_height.GetInt();
 
+		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
+
 		g_pUtils->DrawConsoleString(x, y, "client.origin: %.6f %.6f %.6f", VectorExpand(m_LocalState.client.origin));
 		y += offset; g_pUtils->DrawConsoleString(x, y, "client.velocity: %.6f %.6f %.6f", VectorExpand(m_LocalState.client.velocity));
 		y += offset; g_pUtils->DrawConsoleString(x, y, "client.viewmodel: %d", m_LocalState.client.viewmodel);
@@ -486,6 +486,8 @@ void CClient::ShowEntityState()
 		int y = int(float(g_pUtils->GetScreenHeight()) * 0.0185185f);
 
 		int offset = sm_debug_new_line_height.GetInt();
+
+		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
 
 		g_pUtils->DrawConsoleString(x, y, "playerstate.entityType: %d", m_LocalState.playerstate.entityType);
 		y += offset; g_pUtils->DrawConsoleString(x, y, "playerstate.number: %d", m_LocalState.playerstate.number);
@@ -548,6 +550,8 @@ void CClient::ShowPlayerMove()
 		int y = int(float(g_pUtils->GetScreenHeight()) * 0.0185185f);
 
 		int offset = sm_debug_new_line_height.GetInt();
+
+		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
 
 		g_pUtils->DrawConsoleString(x, y, "playermove.player_index: %d", g_pPlayerMove->player_index);
 		y += offset; g_pUtils->DrawConsoleString(x, y, "playermove.multiplayer: %d", g_pPlayerMove->multiplayer);

@@ -47,6 +47,7 @@ public:
 	virtual bool			IsInZoom() = 0;
 
 	virtual void			Reload() = 0;
+	virtual void			Drop() = 0;
 };
 
 //-----------------------------------------------------------------------------

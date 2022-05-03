@@ -11,7 +11,14 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <hl_sdk/common/Platform.h>
 #include <ICommandLine.h>
+
+#ifdef PLATFORM_LINUX
+#include <limits.h>
+
+#define _MAX_PATH PATH_MAX
+#endif
 
 static const int MAX_PARAMETER_LEN = 128;
 
@@ -247,10 +254,6 @@ void CCommandLine::CreateCmdLine( const char *commandline )
 	size_t len = strlen( szFull ) + 1;
 	m_pszCmdLine = new char[len];
 	memcpy( m_pszCmdLine, szFull, len );
-
-#if defined( POSIX )
-	Plat_SetCommandLine( m_pszCmdLine );
-#endif
 
 	ParseCommandLine();
 }
@@ -582,7 +585,7 @@ int CCommandLine::FindParm( const char *psz ) const
 	// Start at 1 so as to not search the exe name
 	for ( int i = 1; i < m_nParmCount; ++i )
 	{
-		if ( !_stricmp( psz, m_ppParms[i] ) )
+		if ( !stricmp( psz, m_ppParms[i] ) )
 			return i;
 	}
 	return 0;

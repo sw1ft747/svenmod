@@ -14,6 +14,9 @@
 ****/
 // mathlib.h
 
+#ifndef MATHLIB_H
+#define MATHLIB_H
+
 #ifdef _WIN32
 #pragma once
 #endif
@@ -203,3 +206,5 @@ void AngleQuaternion(float *angles, vec4_t quaternion);
 																   ((p)->dist >= (emaxs)[(p)->type]) ? 2   \
 																									 : 3)) \
 					 : BoxOnPlaneSide((emins), (emaxs), (p)))
+					 
+#endif

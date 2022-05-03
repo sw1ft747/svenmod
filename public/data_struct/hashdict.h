@@ -278,7 +278,7 @@ bool CHashDict<T, bCaseInsensitive, bDupeStrings>::IsValidIterator(HashDictItera
 }
 
 template <class T, bool bCaseInsensitive, bool bDupeStrings>
-__forceinline unsigned int CHashDict<T, bCaseInsensitive, bDupeStrings>::HashKey(const char *pszKey) const
+FORCEINLINE unsigned int CHashDict<T, bCaseInsensitive, bDupeStrings>::HashKey(const char *pszKey) const
 {
 	unsigned int hash;
 

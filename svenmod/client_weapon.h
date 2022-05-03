@@ -44,6 +44,7 @@ public: // IClientWeapon
 	virtual bool			IsInZoom();
 
 	virtual void			Reload();
+	virtual void			Drop();
 
 private:
 	weapon_data_t *GetWeaponDataInternal(int iWeaponID);

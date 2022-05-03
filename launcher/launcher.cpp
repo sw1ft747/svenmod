@@ -5,6 +5,8 @@
 #pragma comment(lib, "ws2_32.lib")
 #endif
 
+#include <hl_sdk/common/Platform.h>
+
 #include <platform.h>
 #include <interface.h>
 #include <sys.h>
@@ -15,6 +17,12 @@
 #include <ICommandLine.h>
 #include <IRegistry.h>
 
+#ifdef PLATFORM_LINUX
+#include <string.h>
+#include <limits.h>
+#include <stdlib.h>
+#endif
+
 ISvenMod *g_pSvenMod = NULL;
 IEngineAPI *g_pEngineAPI = NULL;
 IFileSystem *g_pFileSystem = NULL;
@@ -23,30 +31,26 @@ IFileSystem *g_pFileSystem = NULL;
 typedef BOOL (__cdecl *IsDebuggerPresentFn)(void);
 #endif
 
+#ifdef PLATFORM_WINDOWS
 static void StartupWinSock()
 {
-#ifdef PLATFORM_WINDOWS
 	WSAData WSAData;
 	WSAStartup(0x202, &WSAData);
-#endif
 }
 
 static void CleanupWinSock()
 {
-#ifdef PLATFORM_WINDOWS
 	WSACleanup();
-#endif
 }
 
 static bool GrabSvenCoopMutex(HANDLE *hMutex)
 {
-#ifdef PLATFORM_WINDOWS
 #pragma warning(push)
 #pragma warning(disable : 6387)
 
 	IsDebuggerPresentFn IsDebuggerPresent = (IsDebuggerPresentFn)GetProcAddress(GetModuleHandle("kernel32.dll"), "IsDebuggerPresent");
 
-	if (!IsDebuggerPresent())
+	if ( !IsDebuggerPresent() )
 	{
 		*hMutex = CreateMutex(NULL, FALSE, TEXT("svencoop_singleton_mutex"));
 
@@ -59,9 +63,19 @@ static bool GrabSvenCoopMutex(HANDLE *hMutex)
 	}
 
 #pragma warning(pop)
-#endif
 
 	return true;
+}
+#endif
+
+static void V_CreateCmdLine(const char *pszCmdLine)
+{
+	CommandLine()->CreateCmdLine( pszCmdLine );
+}
+
+static void V_CreateCmdLine(int argc, char *argv[])
+{
+	CommandLine()->CreateCmdLine( argc, argv );
 }
 
 static void RemoveCommandParams(const char *pszNewCommandParams)
@@ -81,7 +95,6 @@ static void RemoveCommandParams(const char *pszNewCommandParams)
 	CommandLine()->RemoveParm("-h");
 	CommandLine()->RemoveParm("-height");
 	CommandLine()->RemoveParm("-novid");
-	CommandLine()->RemoveParm("-game");
 
 	if (strstr(pszNewCommandParams, "-game"))
 		CommandLine()->RemoveParm("-game");
@@ -90,6 +103,7 @@ static void RemoveCommandParams(const char *pszNewCommandParams)
 		CommandLine()->RemoveParm("+load");
 }
 
+#ifdef PLATFORM_WINDOWS
 static bool CheckVideoModeInit()
 {
 	if ( Registry()->ReadInt("CrashInitializingVideoMode", 0) )
@@ -98,7 +112,7 @@ static bool CheckVideoModeInit()
 
 		const char *pszHardware = Registry()->ReadString("EngineDLL", "hw.dll");
 
-		if ( !_stricmp(pszHardware, "hw.dll") )
+		if ( !stricmp(pszHardware, "hw.dll") )
 		{
 			Registry()->WriteInt("ScreenWidth", 640);
 			Registry()->WriteInt("ScreenHeight", 480);
@@ -121,6 +135,7 @@ static bool CheckVideoModeInit()
 
 	return true;
 }
+#endif
 
 static bool LoadFileSystem(HMODULE *pModule, CreateInterfaceFn *pfnCreateInterface)
 {
@@ -137,9 +152,9 @@ static bool LoadFileSystem(HMODULE *pModule, CreateInterfaceFn *pfnCreateInterfa
 	if (!hModule)
 	{
 	#ifdef PLATFORM_WINDOWS
-		Sys_ErrorMessage("Failed to load library filesystem_stdio.dll");
+		Sys_ErrorMessage("Failed to load library \"filesystem_stdio.dll\"");
 	#elif defined(PLATFORM_LINUX)
-		Sys_ErrorMessage("Failed to load library filesystem_stdio.so");
+		Sys_ErrorMessage("Failed to load library \"filesystem_stdio.so\"");
 	#endif
 
 		return false;
@@ -175,9 +190,9 @@ static bool LoadEngine(HMODULE *pModule, CreateInterfaceFn *pfnCreateInterface)
 	if (!hModule)
 	{
 	#ifdef PLATFORM_WINDOWS
-		Sys_ErrorMessage("Failed to load engine binary hw.dll");
+		Sys_ErrorMessage("Failed to load engine binary \"hw.dll\"");
 	#elif defined(PLATFORM_LINUX)
-		Sys_ErrorMessage("Failed to load engine binary hw.so");
+		Sys_ErrorMessage("Failed to load engine binary \"hw.so\"");
 	#endif
 
 		return false;
@@ -213,9 +228,9 @@ static bool LoadSvenMod(HMODULE *pModule, CreateInterfaceFn *pfnCreateInterface)
 	if (!hModule)
 	{
 	#ifdef PLATFORM_WINDOWS
-		Sys_ErrorMessage("Failed to load SvenMod's binary svenmod.dll");
+		Sys_ErrorMessage("Failed to load SvenMod's binary \"svenmod.dll\"");
 	#elif defined(PLATFORM_LINUX)
-		Sys_ErrorMessage("Failed to load SvenMod's binary svenmod.so");
+		Sys_ErrorMessage("Failed to load SvenMod's binary \"svenmod.so\"");
 	#endif
 
 		return false;
@@ -236,12 +251,17 @@ static bool LoadSvenMod(HMODULE *pModule, CreateInterfaceFn *pfnCreateInterface)
 	return true;
 }
 
-static int LauncherMain(HINSTANCE hInstance)
+static int LauncherMain(HINSTANCE hInstance, int argc, char *argv[])
 {
 	static char szNewCommandParams[2048];
+	
+#ifdef PLATFORM_LINUX
+	static char szFileName[PATH_MAX];
+#else
 	static char szFileName[MAX_PATH];
-
+	
 	HANDLE hMutex = NULL;
+#endif
 
 	HMODULE hFileSystem = NULL;
 	HMODULE hEngine = NULL;
@@ -253,8 +273,26 @@ static int LauncherMain(HINSTANCE hInstance)
 
 	int iEngineRunResult = RUN_FAILED;
 
+#ifdef PLATFORM_LINUX
+	const char pszLocale[] = "en_US.UTF-8";
+	
+	setenv("LC_ALL", pszLocale, 1);
+	setlocale(6, pszLocale); // todo: what constant is 6?
+	
+	char *pszCurrentLocale = setlocale(6, NULL);
+	
+	if ( strcasecmp(pszCurrentLocale, pszLocale) != 0 )
+	{
+		Sys_ErrorMessage("WARNING: setlocale(\"%s\") failed, using locale: \"%s\". International characters may not work.", pszLocale, pszCurrentLocale);
+	}
+#endif
+
 	// Init command line
-	CommandLine()->CreateCmdLine( GetCommandLine() );
+#ifdef PLATFORM_WINDOWS
+	V_CreateCmdLine( GetCommandLine() );
+#else
+	V_CreateCmdLine( argc, argv );
+#endif
 
 #ifdef PLATFORM_WINDOWS
 	if ( !GrabSvenCoopMutex(&hMutex) && CommandLine()->CheckParm("-allowmultiple") == NULL )
@@ -296,7 +334,6 @@ static int LauncherMain(HINSTANCE hInstance)
 	{
 		SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS );
 	}
-#endif
 
 	StartupWinSock();
 
@@ -306,6 +343,7 @@ static int LauncherMain(HINSTANCE hInstance)
 		return 0;
 
 	Registry()->WriteString("EngineDLL", "hw.dll");
+#endif
 
 	// Start main routine
 	do
@@ -325,19 +363,19 @@ static int LauncherMain(HINSTANCE hInstance)
 		g_pEngineAPI = reinterpret_cast<IEngineAPI *>(pfnEngineFactory(VENGINE_LAUNCHER_API_VERSION, NULL));
 		g_pSvenMod = reinterpret_cast<ISvenMod *>(pfnSvenModFactory(SVENMOD_INTERFACE_VERSION, NULL));
 
-		if (!g_pFileSystem)
+		if ( !g_pFileSystem )
 		{
 			Sys_ErrorMessage("Cannot find IFileSystem interface.");
 			goto L_EXIT;
 		}
 
-		if (!g_pEngineAPI)
+		if ( !g_pEngineAPI )
 		{
 			Sys_ErrorMessage("Cannot find IEngineAPI interface.");
 			goto L_EXIT;
 		}
 		
-		if (!g_pSvenMod)
+		if ( !g_pSvenMod )
 		{
 			Sys_ErrorMessage("Cannot find ISvenMod interface.");
 			goto L_EXIT;
@@ -348,7 +386,11 @@ static int LauncherMain(HINSTANCE hInstance)
 		g_pFileSystem->Mount();
 		g_pFileSystem->AddSearchPath(Sys_GetLongPathName(), "ROOT");
 
+	#ifdef PLATFORM_WINDOWS
 		if ( !g_pSvenMod->Init( CommandLine(), g_pFileSystem, Registry() ) )
+	#else
+		if ( !g_pSvenMod->Init( CommandLine(), g_pFileSystem, NULL ) )
+	#endif
 		{
 			Sys_ErrorMessage("SvenMod failed initialization");
 			goto L_EXIT;
@@ -360,11 +402,13 @@ static int LauncherMain(HINSTANCE hInstance)
 
 		if ( iEngineRunResult == RUN_UNSUPPORTEDVIDEO )
 		{
+		#ifdef PLATFORM_WINDOWS
 			Registry()->WriteInt("ScreenWidth", 640);
 			Registry()->WriteInt("ScreenHeight", 480);
 			Registry()->WriteInt("ScreenBPP", 32);
 
 			Registry()->WriteString("EngineDLL", "hw.dll");
+		#endif
 
 			Sys_ErrorMessage("The specified video mode is not supported.");
 
@@ -373,11 +417,11 @@ static int LauncherMain(HINSTANCE hInstance)
 			Sys_UnloadModule(hEngine);
 			Sys_UnloadModule(hFileSystem);
 
+		#ifdef PLATFORM_WINDOWS
 			Registry()->Shutdown();
 
 			CleanupWinSock();
 
-		#ifdef PLATFORM_WINDOWS
 			if (hMutex)
 				CloseHandle(hMutex);
 		#endif
@@ -396,11 +440,11 @@ static int LauncherMain(HINSTANCE hInstance)
 
 	} while ( iEngineRunResult == RUN_RESTART );
 
+#ifdef PLATFORM_WINDOWS
 	Registry()->Shutdown();
 
 	CleanupWinSock();
 
-#ifdef PLATFORM_WINDOWS
 	if (hMutex)
 		CloseHandle(hMutex);
 #endif
@@ -412,14 +456,14 @@ static int LauncherMain(HINSTANCE hInstance)
 
 int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
 {
-	return LauncherMain(hInstance);
+	return LauncherMain(hInstance, 0, NULL);
 }
 
-#elif defined(PLATFORM_LINUX)
+#else
 
 int main( int argc, char *argv[] )
 {
-	return 1;
+	return LauncherMain(NULL, argc, argv);
 }
 
 #endif

@@ -38,11 +38,6 @@ bool CClientWeapon::IsCustom(void)
 
 int CClientWeapon::Clip()
 {
-	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
-
-	if ( !pWeaponData )
-		return -1;
-
 	if ( g_bCurrentWeaponCustom )
 	{
 		WEAPON *pWeapon = g_pInventory->GetWeapon(g_iCurrentWeaponID);
@@ -53,17 +48,17 @@ int CClientWeapon::Clip()
 		return pWeapon->iClip;
 	}
 
-	return pWeaponData->m_iClip;
-}
-
-int CClientWeapon::PrimaryAmmo()
-{
 	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
 
 	if ( !pWeaponData )
 		return -1;
 
-	if ( g_bCurrentWeaponCustom || g_iCurrentWeaponID == WEAPON_RPG )
+	return pWeaponData->m_iClip;
+}
+
+int CClientWeapon::PrimaryAmmo()
+{
+	if ( g_bCurrentWeaponCustom )
 	{
 		WEAPON *pWeapon = g_pInventory->GetWeapon(g_iCurrentWeaponID);
 
@@ -73,7 +68,16 @@ int CClientWeapon::PrimaryAmmo()
 		return g_pInventory->GetPrimaryAmmoCount(pWeapon);
 	}
 
-	if ( g_iCurrentWeaponID == WEAPON_M249 || g_iCurrentWeaponID == WEAPON_M16 )
+	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
+
+	if ( !pWeaponData )
+		return -1;
+
+	switch (g_iCurrentWeaponID)
+	{
+	case WEAPON_RPG:
+	case WEAPON_M249:
+	case WEAPON_M16:
 	{
 		int iAmmoType = pWeaponData->iuser1;
 		int ammo = g_pInventory->CountAmmo(iAmmoType);
@@ -90,17 +94,13 @@ int CClientWeapon::PrimaryAmmo()
 
 		return ammo;
 	}
+	}
 
 	return pWeaponData->iuser2;
 }
 
 int CClientWeapon::SecondaryAmmo()
 {
-	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
-
-	if ( !pWeaponData )
-		return -1;
-
 	if ( g_bCurrentWeaponCustom )
 	{
 		WEAPON *pWeapon = g_pInventory->GetWeapon(g_iCurrentWeaponID);
@@ -111,19 +111,23 @@ int CClientWeapon::SecondaryAmmo()
 		return g_pInventory->GetSecondaryAmmoCount(pWeapon);
 	}
 
-	if ( g_iCurrentWeaponID == WEAPON_MP5 || g_iCurrentWeaponID == WEAPON_M16 )
+	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
+
+	if ( !pWeaponData )
+		return -1;
+
+	switch (g_iCurrentWeaponID)
+	{
+	case WEAPON_MP5:
+	case WEAPON_M16:
 		return pWeaponData->iuser3;
+	}
 
 	return 0;
 }
 
 int CClientWeapon::PrimaryAmmoType()
 {
-	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
-
-	if ( !pWeaponData )
-		return -1;
-
 	if ( g_bCurrentWeaponCustom )
 	{
 		WEAPON *pWeapon = g_pInventory->GetWeapon(g_iCurrentWeaponID);
@@ -133,6 +137,11 @@ int CClientWeapon::PrimaryAmmoType()
 
 		return pWeapon->iAmmoType;
 	}
+
+	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
+
+	if ( !pWeaponData )
+		return -1;
 
 	int iAmmoType = pWeaponData->iuser1;
 
@@ -144,11 +153,6 @@ int CClientWeapon::PrimaryAmmoType()
 
 int CClientWeapon::SecondaryAmmoType()
 {
-	weapon_data_t *pWeaponData = GetWeaponDataInternal(g_iCurrentWeaponID);
-
-	if ( !pWeaponData )
-		return -1;
-
 	WEAPON *pWeapon = g_pInventory->GetWeapon(g_iCurrentWeaponID);
 
 	if ( !pWeapon )
@@ -221,19 +225,19 @@ bool CClientWeapon::CanPrimaryAttack()
 	switch ( g_iCurrentWeaponID )
 	{
 	case WEAPON_GAUSS:
-		return pWeaponData->fuser4 == 0.f && flCurrentTime >= flCurrentTime + pWeaponData->m_flNextPrimaryAttack;
+		return pWeaponData->fuser4 == 0.f && flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextPrimaryAttack);
 		
 	case WEAPON_RPG:
-		return pWeaponData->fuser1 == 0.f && flCurrentTime >= flCurrentTime + pWeaponData->m_flNextPrimaryAttack;
+		return pWeaponData->fuser1 == 0.f && flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextPrimaryAttack);
 
 	case WEAPON_HANDGRENADE:
-		return pWeaponData->fuser1 >= 0.f && pWeaponData->fuser2 >= 0.f && flCurrentTime >= flCurrentTime + pWeaponData->m_flNextPrimaryAttack;
+		return pWeaponData->fuser1 >= 0.f && pWeaponData->fuser2 >= 0.f && flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextPrimaryAttack);
 
 	case WEAPON_DISPLACER:
 		return pWeaponData->fuser1 == 0.f;
 	}
 
-	return flCurrentTime >= flCurrentTime + pWeaponData->m_flNextPrimaryAttack;
+	return flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextPrimaryAttack);
 }
 
 bool CClientWeapon::CanSecondaryAttack()
@@ -251,19 +255,19 @@ bool CClientWeapon::CanSecondaryAttack()
 	switch ( g_iCurrentWeaponID )
 	{
 	case WEAPON_M16:
-		return pWeaponData->fuser1 == 0.f && flCurrentTime >= flCurrentTime + pWeaponData->m_flNextSecondaryAttack;
+		return pWeaponData->fuser1 == 0.f && flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextSecondaryAttack);
 
 	case WEAPON_HANDGRENADE:
-		return pWeaponData->fuser1 < 0.f && flCurrentTime >= flCurrentTime + pWeaponData->m_flNextSecondaryAttack;
+		return pWeaponData->fuser1 < 0.f && flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextSecondaryAttack);
 
 	case WEAPON_SATCHEL:
-		return pWeaponData->iuser2 != 0 && flCurrentTime >= flCurrentTime + pWeaponData->m_flNextSecondaryAttack;
+		return pWeaponData->iuser2 != 0 && flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextSecondaryAttack);
 
 	case WEAPON_DISPLACER:
 		return pWeaponData->fuser1 == 0.f;
 	}
 
-	return flCurrentTime >= flCurrentTime + pWeaponData->m_flNextSecondaryAttack;
+	return flCurrentTime >= (flCurrentTime + pWeaponData->m_flNextSecondaryAttack);
 }
 
 bool CClientWeapon::IsReloading()
@@ -283,10 +287,9 @@ bool CClientWeapon::IsReloading()
 
 	case WEAPON_SPORE_LAUNCHER:
 		return pWeaponData->iuser3 != 0;
-
-	default:
-		return pWeaponData->m_fInReload;
 	}
+
+	return pWeaponData->m_fInReload;
 }
 
 bool CClientWeapon::IsInZoom()
@@ -305,6 +308,14 @@ bool CClientWeapon::IsInZoom()
 void CClientWeapon::Reload()
 {
 	g_bForceWeaponReload = true;
+}
+
+void CClientWeapon::Drop()
+{
+	WEAPON *pWeapon = g_pInventory->GetWeapon(g_iCurrentWeaponID);
+	
+	if (pWeapon)
+		g_pInventory->DropWeapon( pWeapon );
 }
 
 weapon_data_t *CClientWeapon::GetWeaponDataInternal(int iWeaponID)

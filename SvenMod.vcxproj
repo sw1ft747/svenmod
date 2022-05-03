@@ -70,6 +70,7 @@
     <ClInclude Include="public\hl_sdk\common\Platform.h" />
     <ClInclude Include="public\hl_sdk\common\PlatformHeaders.h" />
     <ClInclude Include="public\hl_sdk\common\pmtrace.h" />
+    <ClInclude Include="public\hl_sdk\common\protocol.h" />
     <ClInclude Include="public\hl_sdk\common\qfont.h" />
     <ClInclude Include="public\hl_sdk\common\ref_params.h" />
     <ClInclude Include="public\hl_sdk\common\r_efx.h" />
@@ -164,11 +165,12 @@
     <ClInclude Include="svenmod\client_weapon.h" />
     <ClInclude Include="svenmod\gameui_iface.h" />
     <ClInclude Include="svenmod\game_hooks.h" />
-    <ClInclude Include="svenmod\cvar_sm.h" />
-    <ClInclude Include="svenmod\dbg_sm.h" />
+    <ClInclude Include="svenmod\cvar.h" />
     <ClInclude Include="svenmod\inventory.h" />
+    <ClInclude Include="svenmod\patterns.h" />
     <ClInclude Include="svenmod\plugins_manager.h" />
     <ClInclude Include="svenmod\plugins_loader.h" />
+    <ClInclude Include="svenmod\svenmod.h" />
     <ClInclude Include="svenmod\utils.h" />
     <ClInclude Include="svenmod\vgui_iface.h" />
   </ItemGroup>
@@ -193,13 +195,13 @@
     <ClCompile Include="svenmod\config_manager.cpp" />
     <ClCompile Include="svenmod\console.cpp" />
     <ClCompile Include="svenmod\cvar.cpp" />
-    <ClCompile Include="svenmod\dbg.cpp" />
     <ClCompile Include="svenmod\detours_api.cpp" />
     <ClCompile Include="svenmod\gameui_iface.cpp" />
     <ClCompile Include="svenmod\hooks.cpp" />
     <ClCompile Include="svenmod\inventory.cpp" />
     <ClCompile Include="svenmod\logging_system.cpp" />
     <ClCompile Include="svenmod\memory_utils.cpp" />
+    <ClCompile Include="svenmod\patterns.cpp" />
     <ClCompile Include="svenmod\player_utils.cpp" />
     <ClCompile Include="svenmod\plugins_manager.cpp" />
     <ClCompile Include="svenmod\plugins_loader.cpp" />
@@ -264,7 +266,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
@@ -284,13 +286,14 @@
       <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <PreprocessorDefinitions>DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vgui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>

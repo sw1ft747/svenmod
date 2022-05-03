@@ -143,7 +143,7 @@ void CLoggingSystem::Log_Msg(const char *pszMessageFormat, ...)
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;
@@ -169,7 +169,7 @@ void CLoggingSystem::Log_Warning(const char *pszMessageFormat, ...)
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;
@@ -195,7 +195,7 @@ void CLoggingSystem::Log_Assert(const char *pszMessageFormat, ...)
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;
@@ -221,7 +221,7 @@ void CLoggingSystem::Log_Error(const char *pszMessageFormat, ...)
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;
@@ -251,7 +251,7 @@ void CLoggingSystem::Plugin_Log_Msg(IClientPlugin *pPlugin, const char *pszMessa
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;
@@ -277,7 +277,7 @@ void CLoggingSystem::Plugin_Log_Warning(IClientPlugin *pPlugin, const char *pszM
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;
@@ -303,7 +303,7 @@ void CLoggingSystem::Plugin_Log_Assert(IClientPlugin *pPlugin, const char *pszMe
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;
@@ -329,7 +329,7 @@ void CLoggingSystem::Plugin_Log_Error(IClientPlugin *pPlugin, const char *pszMes
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		_vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
+		vsnprintf(szFormattedLog, MAX_LOGGING_MESSAGE_LENGTH, pszMessageFormat, args);
 		va_end(args);
 
 		szFormattedLog[MAX_LOGGING_MESSAGE_LENGTH - 1] = 0;

@@ -8,7 +8,9 @@
 
 #ifdef PLATFORM_LINUX
 #include <dlfcn.h> // dlopen,dlclose, et al
+#include <libgen.h>
 #include <unistd.h>
+#include <limits.h>
 
 #define GetProcAddress dlsym
 #endif
@@ -21,7 +23,7 @@ void Sys_TerminateProcess(int nCode)
 {
 #ifdef PLATFORM_WINDOWS
 	TerminateProcess(GetCurrentProcess(), nCode);
-#elif defined(PLATFORM_LINUX)
+#else
 	exit(nCode);
 #endif
 }
@@ -32,18 +34,20 @@ void Sys_TerminateProcess(int nCode)
 
 void Sys_Error(const char *pszMessageFormat, ...)
 {
-#ifdef PLATFORM_WINDOWS
 	static char buffer[4096] = { 0 };
 
 	va_list args;
 
 	va_start(args, pszMessageFormat);
-	_vsnprintf(buffer, sizeof(buffer), pszMessageFormat, args);
+	vsnprintf(buffer, sizeof(buffer), pszMessageFormat, args);
 	va_end(args);
 
 	buffer[sizeof(buffer) - 1] = 0;
 
+#ifdef PLATFORM_WINDOWS
 	MessageBoxA(NULL, buffer, "Fatal Error", MB_ICONERROR);
+#else
+	printf("[MSG] %s\n", buffer);
 #endif
 
 	Sys_TerminateProcess(0);
@@ -55,18 +59,20 @@ void Sys_Error(const char *pszMessageFormat, ...)
 
 void Sys_ErrorMessage(const char *pszMessageFormat, ...)
 {
-#ifdef PLATFORM_WINDOWS
 	static char buffer[4096] = { 0 };
 
 	va_list args;
 
 	va_start(args, pszMessageFormat);
-	_vsnprintf(buffer, sizeof(buffer), pszMessageFormat, args);
+	vsnprintf(buffer, sizeof(buffer), pszMessageFormat, args);
 	va_end(args);
 
 	buffer[sizeof(buffer) - 1] = 0;
 
+#ifdef PLATFORM_WINDOWS
 	MessageBoxA(NULL, buffer, "Fatal Error", MB_ICONERROR);
+#else
+	printf("[MSG] %s\n", buffer);
 #endif
 }
 
@@ -76,13 +82,16 @@ void Sys_ErrorMessage(const char *pszMessageFormat, ...)
 
 bool Sys_GetExecutableName(char *pszExecName, int nSize)
 {
-	bool result = false;
-
 #ifdef PLATFORM_WINDOWS
-	result = GetModuleFileNameA(GetModuleHandleA(NULL), pszExecName, nSize) != 0;
+	return GetModuleFileNameA(GetModuleHandleA(NULL), pszExecName, nSize) != 0;
+#elif defined(PLATFORM_LINUX)
+	if (nSize > 0)
+		pszExecName[0] = 0;
+
+	return readlink("/proc/self/exe", pszExecName, nSize) != -1;
 #endif
 
-	return result;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -123,7 +132,7 @@ char *Sys_GetLongPathName()
 #ifdef PLATFORM_WINDOWS
 	char szShortPath[MAX_PATH];
 	static char szLongPath[MAX_PATH];
-	char *pszPath;
+	char *pszPath = NULL;
 
 	szShortPath[0] = 0;
 	szLongPath[0] = 0;
@@ -140,15 +149,37 @@ char *Sys_GetLongPathName()
 
 		if (len > 0)
 		{
-			if (szLongPath[len - 1] == '\\' || szLongPath[len - 1] == '/')
+			if (szLongPath[len - 1] == '\\')
 				szLongPath[len - 1] = 0;
 		}
 	}
 
 	return szLongPath;
-#else
-	return NULL;
+#elif defined(PLATFORM_LINUX)
+	static char szLongPath[PATH_MAX];
+	
+	szLongPath[0] = 0;
+	
+	if (readlink("/proc/self/exe", szLongPath, PATH_MAX) != -1)
+	{
+		char *pszPath = strrchr(szLongPath, '/');
+		
+		if (pszPath[0])
+			pszPath[1] = 0;
+
+		size_t len = strlen(szLongPath);
+
+		if (len > 0)
+		{
+			if (szLongPath[len - 1] == '/')
+				szLongPath[len - 1] = 0;
+		}
+	}
+
+	return szLongPath;
 #endif
+
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,16 +194,16 @@ HMODULE Sys_GetModuleHandle(const char *pszModuleName)
 	void *handle = NULL;
 
 	if (pszModuleName == NULL)
-		return NULL;
+		return dlopen(NULL, RTLD_NOW);
 
 	if ((handle = dlopen(pszModuleName, RTLD_NOW)) == NULL)
 		return NULL;
 
 	dlclose(handle);
 	return reinterpret_cast<HMODULE>(handle);
-#else
-	return NULL;
 #endif
+
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,9 +216,9 @@ void *Sys_GetProcAddress(HMODULE hModule, const char *pszProcName)
 	return GetProcAddress(hModule, pszProcName);
 #elif defined(PLATFORM_LINUX)
 	return dlsym(hModule, pszProcName);
-#else
-	return NULL;
 #endif
+
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -201,8 +232,7 @@ HMODULE Sys_LoadModule(const char *pszModuleName)
 #elif defined(PLATFORM_LINUX)
 	HMODULE hDLL = NULL;
 
-	char szAbsoluteModuleName[1024];
-	szAbsoluteModuleName[0] = 0;
+	char szAbsoluteModuleName[1024] = { 0 };
 
 	if (pszModuleName[0] != '/')
 	{
@@ -227,8 +257,6 @@ HMODULE Sys_LoadModule(const char *pszModuleName)
 		snprintf(szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s", pszModuleName);
 		hDLL = dlopen(pszModuleName, RTLD_NOW);
 	}
-#else
-	return NULL;
 #endif
 
 	if (!hDLL)
@@ -238,7 +266,7 @@ HMODULE Sys_LoadModule(const char *pszModuleName)
 		snprintf(str, sizeof(str), "%s.dll", pszModuleName);
 		hDLL = LoadLibraryA(str);
 #elif defined(PLATFORM_LINUX)
-		printf("Error:%s\n", dlerror());
+		printf("Sys_LoadModule Error: %s\n", dlerror());
 		snprintf(str, sizeof(str), "%s.so", szAbsoluteModuleName);
 		hDLL = dlopen(str, RTLD_NOW);
 #endif

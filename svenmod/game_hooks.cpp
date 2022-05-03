@@ -2,6 +2,7 @@
 #include "client_weapon.h"
 #include "game_hooks.h"
 #include "plugins_manager.h"
+#include "svenmod.h"
 
 #include <hl_sdk/engine/APIProxy.h> 
 
@@ -14,7 +15,6 @@
 #include <sys.h>
 #include <dbg.h>
 
-extern int *g_pClientState;
 extern extra_player_info_t *g_pPlayerExtraInfo;
 
 //-----------------------------------------------------------------------------

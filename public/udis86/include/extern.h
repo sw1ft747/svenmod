@@ -38,8 +38,14 @@ extern "C" {
 # else 
 #  define LIBUDIS86_DLLEXTERN __declspec(dllimport)
 # endif
+#elif defined(__linux__)
+# ifdef LIBUDIS86_EXPORTS
+#  define LIBUDIS86_DLLEXTERN __attribute__((visibility("default")))
+# else 
+#  define LIBUDIS86_DLLEXTERN
+# endif
 #else
-# define LIBUDIS86_DLLEXTERN 
+# define LIBUDIS86_DLLEXTERN
 #endif
 
 /* ============================= PUBLIC API ================================= */
