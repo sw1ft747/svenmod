@@ -4,7 +4,7 @@ SvenMod is a C++ plugin environment for Sven Co-op that provides powerful Source
 Includes two main files: library `svenmod.dll` and launcher `svenmod_launcher.exe`. It is neccesary to launch the game using SvenMod's launcher.
 
 # For developers
-Read the documentation [here](https://github.com/sw1ft747/svenmod/wiki "here")
+Read the documentation [here](https://github.com/sw1ft747/svenmod/wiki "here").
 
 The project is written in Visual Studio 2022. Also, you can build it via CMake.
 
@@ -34,7 +34,7 @@ For example, how it should look:
 ```
 "Plugins"
 {
-	"name_of_the_plugin.dll"	"1" // the plugin is enabled, this is comment btw
+	"name_of_the_plugin.dll"	"1" // the plugin is enabled, this is a comment btw
 	"name_of_another_plugin"	"0" // the plugin is disabled
 }
 ```
@@ -44,7 +44,7 @@ Note, everything that goes after these symbols `//` is a comment
 # Console Commands
 SvenMod provides several important console commands:
 ```
-- sm <command> <arg1> <arg2>... - type "sm" in the console to get very detailed information SvenMod related commands
+- sm <command> <arg1> <arg2>... - type "sm" in the console to get very detailed information about SvenMod related commands
 - help <cvarname> - will print a description about the given convar/concommand that was registered through SvenMod
 - toggle <cvarname> <value #1> <value #2> <value #3>.. - Toggle between cvar values
 - incrementvar <cvarname> <minvalue> <maxvalue> <delta> - Increment a cvar
