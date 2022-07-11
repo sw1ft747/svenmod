@@ -4,7 +4,7 @@
 #include <interface.h>
 #include <dbg.h>
 #include <convar.h>
-#include <usermessages.h>
+#include <messagebuffer.h>
 
 //-----------------------------------------------------------------------------
 // Export the global interface
@@ -17,6 +17,8 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CSamplePlugin, IClientPlugin, CLIENT_PLUGIN_IN
 // Example hooks
 //-----------------------------------------------------------------------------
 
+CMessageBuffer VoteMenuBuffer;
+
 UserMsgHookFn ORIG_UserMsgHook_VoteMenu = NULL;
 DetourHandle_t hUserMsgHook_VoteMenu = 0;
 
@@ -25,9 +27,9 @@ DetourHandle_t hversion_callback = 0;
 
 int UserMsgHook_VoteMenu(const char *pszName, int iSize, void *pBuffer)
 {
-	UserMessages::BeginRead(pBuffer, iSize);
+	VoteMenuBuffer.Init(pBuffer, iSize, true);
 
-	int type = UserMessages::ReadByte();
+	int type = VoteMenuBuffer.ReadByte();
 
 	Msg("Called vote of type: %d\n", type);
 
@@ -63,7 +65,7 @@ CON_COMMAND(sp_get_player_info, "")
 			Msg("Health: %.1f\n", PlayerUtils()->GetHealth(playerindex));
 			Msg("Armor: %.1f\n", PlayerUtils()->GetArmor(playerindex));
 			Msg("Team Number: %d\n", PlayerUtils()->GetTeamNumber(playerindex));
-			Msg("SteamID 64: %llu\n", PlayerUtils()->GetSteamID(playerindex));
+			Msg("Steam64 ID: %llu\n", PlayerUtils()->GetSteamID(playerindex));
 			Msg("View Angles: %.3f %.3f %.3f\n", VectorExpand(va));
 		}
 	}
@@ -179,7 +181,7 @@ const char *CSamplePlugin::GetAuthor(void)
 
 const char *CSamplePlugin::GetVersion(void)
 {
-	return "1.0";
+	return "1.0.1";
 }
 
 const char *CSamplePlugin::GetDescription(void)

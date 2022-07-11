@@ -11,6 +11,7 @@
 
 #include "hl_sdk/common/cvardef.h"
 #include "hl_sdk/common/usermsg.h"
+#include "hl_sdk/common/netmsg.h"
 
 class IClientHooks;
 
@@ -29,6 +30,11 @@ public:
 	virtual bool			UnregisterClientHooks( IClientHooks *pClientHooks ) = 0;
 	virtual bool			UnregisterClientPostHooks( IClientHooks *pClientHooks ) = 0;
 
+	virtual DetourHandle_t	HookNetworkMessage( int iType, NetMsgHookFn pfnNetMsgHook, NetMsgHookFn *ppfnOriginalNetMsgHook ) = 0;
+	virtual DetourHandle_t	HookNetworkMessage( const char *pszName, NetMsgHookFn pfnNetMsgHook, NetMsgHookFn *ppfnOriginalNetMsgHook ) = 0;
+	virtual DetourHandle_t	HookNetworkMessage( netmsg_t *pNetMsg, NetMsgHookFn pfnNetMsgHook, NetMsgHookFn *ppfnOriginalNetMsgHook ) = 0;
+	virtual bool			UnhookNetworkMessage( DetourHandle_t hNetMsgHook ) = 0;
+	
 	virtual DetourHandle_t	HookUserMessage( const char *pszName, UserMsgHookFn pfnUserMsgHook, UserMsgHookFn *ppfnOriginalUserMsgHook ) = 0;
 	virtual DetourHandle_t	HookUserMessage( usermsg_t *pUserMsg, UserMsgHookFn pfnUserMsgHook, UserMsgHookFn *ppfnOriginalUserMsgHook ) = 0;
 	virtual bool			UnhookUserMessage( DetourHandle_t hUserMsgHook ) = 0;
@@ -42,7 +48,7 @@ public:
 // Export
 //-----------------------------------------------------------------------------
 
-#define HOOKS_INTERFACE_VERSION "Hooks001"
+#define HOOKS_INTERFACE_VERSION "Hooks002"
 
 extern IHooks *g_pHooks;
 PLATFORM_INTERFACE IHooks *Hooks();

@@ -49,16 +49,22 @@ public:
 	virtual void *ResolveSymbol(HMODULE hModule, const char *pszSymbol);
 
 	virtual void *FindPattern(HMODULE hModule, pattern_s *pPattern, unsigned int offset = 0);
+	virtual void *FindPatternWithin(HMODULE hModule, pattern_s *pPattern, void *pSearchStart, void *pSearchEnd);
 
 	virtual void *FindPattern(HMODULE hModule, const char *pszPattern, char *pszMask, unsigned int offset = 0);
+	virtual void *FindPatternWithin(HMODULE hModule, const char *pszPattern, char *pszMask, void *pSearchStart, void *pSearchEnd);
 
 	virtual void *FindPattern(HMODULE hModule, const char *pszPattern, unsigned int length, unsigned int offset = 0, char ignoreByte = '\x2A');
+	virtual void *FindPatternWithin(HMODULE hModule, const char *pszPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, char ignoreByte = '\x2A');
 
 	virtual void *FindPattern(HMODULE hModule, unsigned char *pPattern, unsigned int length, unsigned int offset = 0, unsigned char ignoreByte = 0x2A);
+	virtual void *FindPatternWithin(HMODULE hModule, unsigned char *pPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, unsigned char ignoreByte = 0x2A);
 
 	virtual void *FindString(HMODULE hModule, const char *pszString, unsigned int offset = 0);
+	virtual void *FindStringWithin(HMODULE hModule, const char *pszString, void *pSearchStart, void *pSearchEnd);
 
 	virtual void *FindAddress(HMODULE hModule, void *pAddress, unsigned int offset = 0);
+	virtual void *FindAddressWithin(HMODULE hModule, void *pAddress, void *pSearchStart, void *pSearchEnd);
 
 #ifdef PLATFORM_LINUX
 private:
@@ -657,6 +663,7 @@ void *CMemoryUtils::ResolveSymbol(HMODULE hModule, const char *pszSymbol)
 }
 
 //-----------------------------------------------------------------------------
+// Sig scanner
 //-----------------------------------------------------------------------------
 
 void *CMemoryUtils::FindPattern(HMODULE hModule, pattern_s *pPattern, unsigned int offset /* = 0 */)
@@ -834,6 +841,226 @@ void *CMemoryUtils::FindAddress(HMODULE hModule, void *pAddress, unsigned int of
 
 	return NULL;
 }
+
+//-----------------------------------------------------------------------------
+// Find a pattern within a range
+//-----------------------------------------------------------------------------
+
+void *CMemoryUtils::FindPatternWithin(HMODULE hModule, pattern_s *pPattern, void *pSearchStart, void *pSearchEnd)
+{
+	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	{
+		unsigned long nLength = pPattern->length;
+		unsigned char *pSignature = &pPattern->signature;
+
+		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - nLength;
+
+		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
+			return NULL;
+
+		pModuleSearchStart = (unsigned char *)pSearchStart;
+		pModuleSearchEnd = (unsigned char *)pSearchEnd;
+
+		while (pModuleSearchStart < pModuleSearchEnd)
+		{
+			bool bFound = true;
+
+			for (register unsigned long i = 0; i < nLength; i++)
+			{
+				if (pSignature[i] != pPattern->ignorebyte && pSignature[i] != pModuleSearchStart[i])
+				{
+					bFound = false;
+					break;
+				}
+			}
+
+			if (bFound)
+				return (void *)pModuleSearchStart;
+
+			pModuleSearchStart++;
+		}
+	}
+
+	return NULL;
+}
+
+void *CMemoryUtils::FindPatternWithin(HMODULE hModule, const char *pszPattern, char *pszMask, void *pSearchStart, void *pSearchEnd)
+{
+	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	{
+		unsigned long nMaskLength = strlen(pszMask);
+
+		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - nMaskLength;
+
+		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
+			return NULL;
+
+		pModuleSearchStart = (unsigned char *)pSearchStart;
+		pModuleSearchEnd = (unsigned char *)pSearchEnd;
+
+		while (pModuleSearchStart < pModuleSearchEnd)
+		{
+			bool bFound = true;
+
+			for (register unsigned long i = 0; i < nMaskLength; i++)
+			{
+				if (pszMask[i] != '?' && pszPattern[i] != pModuleSearchStart[i])
+				{
+					bFound = false;
+					break;
+				}
+			}
+
+			if (bFound)
+				return (void *)pModuleSearchStart;
+
+			pModuleSearchStart++;
+		}
+	}
+
+	return NULL;
+}
+
+void *CMemoryUtils::FindPatternWithin(HMODULE hModule, const char *pszPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, char ignoreByte /* = '0x2A' */)
+{
+	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	{
+		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - length;
+
+		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
+			return NULL;
+
+		pModuleSearchStart = (unsigned char *)pSearchStart;
+		pModuleSearchEnd = (unsigned char *)pSearchEnd;
+
+		while (pModuleSearchStart < pModuleSearchEnd)
+		{
+			bool bFound = true;
+
+			for (register unsigned long i = 0; i < length; i++)
+			{
+				if (pszPattern[i] != ignoreByte && pszPattern[i] != pModuleSearchStart[i])
+				{
+					bFound = false;
+					break;
+				}
+			}
+
+			if (bFound)
+				return (void *)pModuleSearchStart;
+
+			pModuleSearchStart++;
+		}
+	}
+
+	return NULL;
+}
+
+void *CMemoryUtils::FindPatternWithin(HMODULE hModule, unsigned char *pPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, unsigned char ignoreByte /* = 0x2A */)
+{
+	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	{
+		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - length;
+
+		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
+			return NULL;
+
+		pModuleSearchStart = (unsigned char *)pSearchStart;
+		pModuleSearchEnd = (unsigned char *)pSearchEnd;
+
+		while (pModuleSearchStart < pModuleSearchEnd)
+		{
+			bool bFound = true;
+
+			for (register unsigned long i = 0; i < length; i++)
+			{
+				if (pPattern[i] != ignoreByte && pPattern[i] != pModuleSearchStart[i])
+				{
+					bFound = false;
+					break;
+				}
+			}
+
+			if (bFound)
+				return (void *)pModuleSearchStart;
+
+			pModuleSearchStart++;
+		}
+	}
+
+	return NULL;
+}
+
+void *CMemoryUtils::FindStringWithin(HMODULE hModule, const char *pszString, void *pSearchStart, void *pSearchEnd)
+{
+	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	{
+		unsigned long nLength = strlen(pszString);
+
+		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - nLength;
+
+		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
+			return NULL;
+
+		pModuleSearchStart = (unsigned char *)pSearchStart;
+		pModuleSearchEnd = (unsigned char *)pSearchEnd;
+
+		while (pModuleSearchStart < pModuleSearchEnd)
+		{
+			bool bFound = true;
+
+			for (register unsigned long i = 0; i < nLength; i++)
+			{
+				if (pszString[i] != pModuleSearchStart[i])
+				{
+					bFound = false;
+					break;
+				}
+			}
+
+			if (bFound)
+				return (void *)pModuleSearchStart;
+
+			pModuleSearchStart++;
+		}
+	}
+
+	return NULL;
+}
+
+void *CMemoryUtils::FindAddressWithin(HMODULE hModule, void *pSearchStart, void *pSearchEnd, void *pAddress)
+{
+	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	{
+		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - sizeof(void *);
+
+		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
+			return NULL;
+
+		pModuleSearchStart = (unsigned char *)pSearchStart;
+		pModuleSearchEnd = (unsigned char *)pSearchEnd;
+
+		while (pModuleSearchStart < pModuleSearchEnd)
+		{
+			if (*(unsigned long *)pModuleSearchStart == (unsigned long)pAddress)
+				return (void *)pModuleSearchStart;
+
+			pModuleSearchStart++;
+		}
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Read memory's protection in Linux
+//-----------------------------------------------------------------------------
 
 #ifdef PLATFORM_LINUX
 

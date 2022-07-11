@@ -44,21 +44,6 @@ private:
 	void SystemPostInit();
 	bool StartSystems();
 
-	// Lookup for stuff
-	void FindEngineStudio();
-	void FindPlayerMove();
-	void FindVideoMode();
-	void FindStudioModelRenderer();
-	void FindClientVersion();
-	void FindEngineClient();
-	void FindUserMsgs();
-	void FindExtraPlayerInfo();
-	void FindWeaponsResource();
-
-	void FindClientState();
-	void FindFrametime();
-	void FindProtocolVersion();
-
 	// Utilities
 	bool FindSignatures();
 	bool AttachDetours();

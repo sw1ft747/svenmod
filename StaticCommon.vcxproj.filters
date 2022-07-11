@@ -64,7 +64,7 @@
     <ClInclude Include="public\svenmod_version.h">
       <Filter>Common\public</Filter>
     </ClInclude>
-    <ClInclude Include="public\usermessages.h">
+    <ClInclude Include="public\messagebuffer.h">
       <Filter>Common\public</Filter>
     </ClInclude>
   </ItemGroup>
@@ -78,7 +78,7 @@
     <ClCompile Include="shared\features.cpp">
       <Filter>Common\shared</Filter>
     </ClCompile>
-    <ClCompile Include="shared\usermessages.cpp">
+    <ClCompile Include="shared\messagebuffer.cpp">
       <Filter>Common\shared</Filter>
     </ClCompile>
   </ItemGroup>

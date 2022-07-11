@@ -24,9 +24,9 @@ Changelog for SvenMod
 - Fixed file's cl_entity.h header
 - Some fixes in manager of plugins
 
-03/05/2022 - Version 1.2.0 (API v3.0):
+03/05/2022, 11/07/2022 - Version 1.2.0 (API v3.0):
 - Minor improvements in the code
-- Added CMake, scripts for building on Windows/Linux (Linux project is not finished yet)
+- Added CMake, scripts for building on Windows/Linux (Linux project is not finished, and probably won't be finished lol)
 - Added Linux equivalents for WinAPI functions
 - Added 'Drop' method for interface 'IClientWeapon'
 - Added 'DrawSetTextColor' method for interface 'IUtils'
@@ -36,3 +36,14 @@ Changelog for SvenMod
 - Fixed include of header 'mathlib.h'
 - Replaced function '_snprintf' to 'snprintf'
 - Replaced keyword '__forceinline' to macro 'FORCEINLINE' in hash map, hash table and hash dictionary
+- Added file header 'sizebuf.h'
+- Added several methods in 'IClient' interface
+- Added support to hook network messages
+- Added class 'CMessageBuffer' for reading or writing network/user messages
+- Added method 'FindPatternWithin' in interface 'IMemoryUtils'
+- Added methods 'GetNetMessageParams', 'FindNetworkMessage', 'FindUserMessage' in interface 'IUtils'
+- Removed method 'IsValidSteam64ID' from interface 'IUtils' (doesn't work correctly)
+- All patterns moved in separate files: 'patterns.h' and 'patterns.cpp'
+- All lookup stuff to find game functions, variables moved in separate files: 'gamedata_finder.h' and 'gamedata_finder.cpp'
+- The console command 'sm printcvars <arg>..' now sorts Cvars and ConCommands
+- Updated failure messages when SvenMod's and plugin's API are different

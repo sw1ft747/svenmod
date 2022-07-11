@@ -21,6 +21,7 @@
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <locale.h>
 #endif
 
 ISvenMod *g_pSvenMod = NULL;
@@ -359,6 +360,7 @@ static int LauncherMain(HINSTANCE hInstance, int argc, char *argv[])
 			return 0;
 
 		// Find interfaces
+		// This shit can't find any interface on Linux, what the actual fuck
 		g_pFileSystem = reinterpret_cast<IFileSystem *>(pfnFileSystemFactory(FILESYSTEM_INTERFACE_VERSION, NULL));
 		g_pEngineAPI = reinterpret_cast<IEngineAPI *>(pfnEngineFactory(VENGINE_LAUNCHER_API_VERSION, NULL));
 		g_pSvenMod = reinterpret_cast<ISvenMod *>(pfnSvenModFactory(SVENMOD_INTERFACE_VERSION, NULL));

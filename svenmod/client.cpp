@@ -87,6 +87,11 @@ bool CClient::IsDead()
 	return g_pPlayerMove->iuser1 != 0 || g_pPlayerMove->dead;
 }
 
+bool CClient::IsDying()
+{
+	return g_pPlayerMove->dead;
+}
+
 bool CClient::IsSpectating()
 {
 	return g_pPlayerMove->iuser1 != 0;
@@ -104,12 +109,17 @@ bool CClient::IsOnLadder()
 
 bool CClient::IsDucked()
 {
-	return g_pPlayerMove->usehull;
+	return g_pPlayerMove->flags & FL_DUCKING;
 }
 
 bool CClient::IsDucking()
 {
 	return g_pPlayerMove->bInDuck;
+}
+
+bool CClient::HasWeapon()
+{
+	return g_iCurrentWeaponID != WEAPON_NONE;
 }
 
 bool CClient::CanAttack()
@@ -141,10 +151,10 @@ int CClient::GetGroundEntity()
 {
 	int physent = g_pPlayerMove->onground;
 
-	if (physent == 0)
+	if ( physent == 0 )
 		return 0;
 
-	if (physent > 0 && physent < MAX_PHYSENTS)
+	if ( physent > 0 && physent < MAX_PHYSENTS )
 	{
 		return g_pPlayerMove->physents[physent].info;
 	}
@@ -250,6 +260,16 @@ Vector CClient::GetViewAngles()
 	g_pEngineFuncs->GetViewAngles(va);
 
 	return va;
+}
+
+Vector CClient::GetOrigin()
+{
+	return g_pPlayerMove->origin;
+}
+
+const Vector &CClient::GetOrigin() const
+{
+	return g_pPlayerMove->origin;
 }
 
 Vector CClient::GetVelocity()

@@ -29,36 +29,36 @@ abstract_class IClientPlugin
 public:
 	virtual						~IClientPlugin() {}
 
-	// Add this in implementation: return SVENMOD_API_VER;
+	// Always add this in implementation: return SVENMOD_API_VER;
 	virtual api_version_s		GetAPIVersion( void ) = 0;
 
 	// Initialize the plugin to run
 	// Return 'false' if there is an error during startup
 	virtual bool				Load( CreateInterfaceFn pfnSvenModFactory, ISvenModAPI *pSvenModAPI, IPluginHelpers *pPluginHelpers ) = 0;
 
-	// Called if plugin was loaded during SvenMod's initialization after attaching detours (via plugins.txt file, @bGlobalLoad is 'true')
+	// Called if the plugin was loaded during SvenMod's initialization after attaching detours (via plugins.txt file, @bGlobalLoad is 'true')
 	// Otherwise, called right after 'Load' callback (@bGlobalLoad is 'false')
 	virtual void				PostLoad( bool bGlobalLoad ) = 0;
 
 	// Called when the plugin should be shutdown
 	virtual void				Unload( void ) = 0;
 
-	// Called when a plugins execution is stopped but the plugin is not unloaded
+	// Called when the plugin should stop executing
 	// Return 'false' if it should not pause
 	virtual bool				Pause( void ) = 0;
 
-	// Called when a plugin should start executing again (sometime after a Pause() call)
+	// Called when the plugin should start executing again (sometime after a Pause() call)
 	virtual void				Unpause( void ) = 0;
 
 	// Called on each game frame twice (if @bPostRunCmd is 'false', then none of inputs/commands were processed yet)
 	virtual void				GameFrame( client_state_t state, double frametime, bool bPostRunCmd ) = 0;
 	
-	// Called to draw 2D paints after rendering the game view, it's only callback that you can handle to influence on other plugins
+	// Called to draw 2D paints after rendering the game view, you can handle the callback to influence on other plugins
 	// @PLUGIN_CONTINUE - don't abort the call sequence
 	// @PLUGIN_STOP and @PLUGIN_CALL_STOP - don't call the further plugins callbacks
 	virtual PLUGIN_RESULT		Draw( void ) = 0;
 	
-	// Called to redraw client's HUD, same callback as @Draw method
+	// Called to redraw client's HUD, the same callback as @Draw method
 	virtual PLUGIN_RESULT		DrawHUD( float time, int intermission ) = 0;
 
 	// Name of the plugin

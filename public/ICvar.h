@@ -65,19 +65,19 @@ public:
 	virtual void				RevertFlaggedConVars( int nFlag ) = 0;
 
 	// Print to the console
-	virtual bool				CanPrint(void) const = 0;
+	virtual bool				CanPrint( void ) const = 0;
 
-	virtual void				ConsoleColorPrint(const Color &clr, const char *pszMessage) const = 0;
-	virtual void				ConsolePrint(const char *pszMessage) const = 0;
-	virtual void				ConsoleDPrint(const char *pszMessage) const = 0;
+	virtual void				ConsoleColorPrint( const Color &clr, const char *pszMessage ) const = 0;
+	virtual void				ConsolePrint( const char *pszMessage ) const = 0;
+	virtual void				ConsoleDPrint( const char *pszMessage ) const = 0;
 	
-	virtual void				ConsoleColorPrintf(const Color &clr, const char *pszFormat, ...) const = 0;
-	virtual void				ConsolePrintf(const char *pszFormat, ...) const = 0;
-	virtual void				ConsoleDPrintf(const char *pszFormat, ...) const = 0;
+	virtual void				ConsoleColorPrintf( const Color &clr, const char *pszFormat, ... ) const = 0;
+	virtual void				ConsolePrintf( const char *pszFormat, ... ) const = 0;
+	virtual void				ConsoleDPrintf( const char *pszFormat, ... ) const = 0;
 
 	// Access to command arguments
-	virtual int					ArgC() const = 0;
-	virtual const char			**ArgV() const = 0;
+	virtual int					ArgC( void ) const = 0;
+	virtual const char			**ArgV( void ) const = 0;
 	virtual const char			*Arg( int nIndex ) const = 0;
 
 	// Directly set cvar's value (if cl_enginefuncs_t doesn't implement it, then we will)

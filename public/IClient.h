@@ -53,6 +53,7 @@ public:
 	//-----------------------------------------------------------------------------
 
 	virtual bool				IsDead() = 0;
+	virtual bool				IsDying() = 0;
 	virtual bool				IsSpectating() = 0;
 	
 	virtual bool				IsOnGround() = 0;
@@ -61,6 +62,7 @@ public:
 	virtual bool				IsDucked() = 0;
 	virtual bool				IsDucking() = 0;
 
+	virtual bool				HasWeapon() = 0;
 	virtual bool				CanAttack() = 0;
 
 	virtual float				GetHealth() = 0;
@@ -96,11 +98,14 @@ public:
 	virtual int					ButtonReleased() = 0;
 
 	//-----------------------------------------------------------------------------
-	// Player move's view angles, offset, velocity
+	// Player's view angles, offset, velocity
 	//-----------------------------------------------------------------------------
 
 	virtual Vector				GetViewAngles() = 0;
 
+	virtual Vector				GetOrigin() = 0;
+	virtual const Vector		&GetOrigin() const = 0;
+	
 	virtual Vector				GetVelocity() = 0;
 	virtual const Vector		&GetVelocity() const = 0;
 

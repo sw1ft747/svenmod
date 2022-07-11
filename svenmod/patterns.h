@@ -12,6 +12,11 @@ namespace Patterns
 {
 	namespace Hardware
 	{
+		EXTERN_PATTERN(g_NetworkMessages);
+		EXTERN_PATTERN(MSG_ReadByte);
+
+		EXTERN_PATTERN(Z_Free);
+
 		EXTERN_PATTERN(build_number);
 
 		EXTERN_PATTERN(LoadClientDLL);
@@ -21,6 +26,10 @@ namespace Patterns
 
 		EXTERN_PATTERN(Host_FilterTime);
 		EXTERN_PATTERN(Host_Shutdown);
+
+		EXTERN_PATTERN(Cvar_DirectSet);
+		EXTERN_PATTERN(Cvar_RemoveClientDLLCvars);
+		EXTERN_PATTERN(Cvar_RemoveClientDLLCmds);
 
 		/**
 		* Signatures that don't point to the beginning of functions
@@ -48,14 +57,13 @@ namespace Patterns
 
 	namespace GameUI
 	{
-
+		EXTERN_PATTERN(CGameConsoleDialog__DPrint);
 	}
 
 	void CheckGameVersion();
 }
 
-#ifdef PLATFORM_WINDOWS
-// #ifdef PLATFORM_LINUX
+#ifdef PLATFORM_LINUX
 
 namespace Symbols
 {

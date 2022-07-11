@@ -132,6 +132,7 @@ public:
 	//-----------------------------------------------------------------------------
 
 	virtual void *FindPattern(HMODULE hModule, pattern_s *pPattern, unsigned int offset = 0) = 0;
+	virtual void *FindPatternWithin(HMODULE hModule, pattern_s *pPattern, void *pSearchStart, void *pSearchEnd) = 0;
 
 	//-----------------------------------------------------------------------------
 	// Find signature from string with given mask
@@ -139,6 +140,7 @@ public:
 	//-----------------------------------------------------------------------------
 
 	virtual void *FindPattern(HMODULE hModule, const char *pszPattern, char *pszMask, unsigned int offset = 0) = 0;
+	virtual void *FindPatternWithin(HMODULE hModule, const char *pszPattern, char *pszMask, void *pSearchStart, void *pSearchEnd) = 0;
 
 	//-----------------------------------------------------------------------------
 	// Find signature from string but ignore a specific byte
@@ -146,6 +148,7 @@ public:
 	//-----------------------------------------------------------------------------
 
 	virtual void *FindPattern(HMODULE hModule, const char *pszPattern, unsigned int length, unsigned int offset = 0, char ignoreByte = '\x2A') = 0;
+	virtual void *FindPatternWithin(HMODULE hModule, const char *pszPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, char ignoreByte = '\x2A') = 0;
 
 	//-----------------------------------------------------------------------------
 	// Find signature from range of bytes with a specific byte to ignore
@@ -153,18 +156,21 @@ public:
 	//-----------------------------------------------------------------------------
 
 	virtual void *FindPattern(HMODULE hModule, unsigned char *pPattern, unsigned int length, unsigned int offset = 0, unsigned char ignoreByte = 0x2A) = 0;
+	virtual void *FindPatternWithin(HMODULE hModule, unsigned char *pPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, unsigned char ignoreByte = 0x2A) = 0;
 
 	//-----------------------------------------------------------------------------
 	// Lookup for a string
 	//-----------------------------------------------------------------------------
 
 	virtual void *FindString(HMODULE hModule, const char *pszString, unsigned int offset = 0) = 0;
+	virtual void *FindStringWithin(HMODULE hModule, const char *pszString, void *pSearchStart, void *pSearchEnd) = 0;
 
 	//-----------------------------------------------------------------------------
 	// Lookup for an address
 	//-----------------------------------------------------------------------------
 
 	virtual void *FindAddress(HMODULE hModule, void *pAddress, unsigned int offset = 0) = 0;
+	virtual void *FindAddressWithin(HMODULE hModule, void *pAddress, void *pSearchStart, void *pSearchEnd) = 0;
 };
 
 #define MEMORYUTILS_INTERFACE_VERSION "MemoryUtils002"

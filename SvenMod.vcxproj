@@ -65,6 +65,7 @@
     <ClInclude Include="public\hl_sdk\common\in_buttons.h" />
     <ClInclude Include="public\hl_sdk\common\ivoicetweak.h" />
     <ClInclude Include="public\hl_sdk\common\netadr.h" />
+    <ClInclude Include="public\hl_sdk\common\netmsg.h" />
     <ClInclude Include="public\hl_sdk\common\net_api.h" />
     <ClInclude Include="public\hl_sdk\common\particledef.h" />
     <ClInclude Include="public\hl_sdk\common\Platform.h" />
@@ -77,6 +78,7 @@
     <ClInclude Include="public\hl_sdk\common\r_studioint.h" />
     <ClInclude Include="public\hl_sdk\common\screenfade.h" />
     <ClInclude Include="public\hl_sdk\common\Sequence.h" />
+    <ClInclude Include="public\hl_sdk\common\sizebuf.h" />
     <ClInclude Include="public\hl_sdk\common\studio_event.h" />
     <ClInclude Include="public\hl_sdk\common\triangleapi.h" />
     <ClInclude Include="public\hl_sdk\common\usercmd.h" />
@@ -141,7 +143,7 @@
     <ClInclude Include="public\udis86\include\types.h" />
     <ClInclude Include="public\udis86\include\udint.h" />
     <ClInclude Include="public\udis86\udis86.h" />
-    <ClInclude Include="public\usermessages.h" />
+    <ClInclude Include="public\messagebuffer.h" />
     <ClInclude Include="public\vgui2\IBaseUI.h" />
     <ClInclude Include="public\vgui2\IClientPanel.h" />
     <ClInclude Include="public\vgui2\IClientVGUI.h" />
@@ -163,6 +165,7 @@
     <ClInclude Include="shared\ISvenMod.h" />
     <ClInclude Include="svenmod\client.h" />
     <ClInclude Include="svenmod\client_weapon.h" />
+    <ClInclude Include="svenmod\gamedata_finder.h" />
     <ClInclude Include="svenmod\gameui_iface.h" />
     <ClInclude Include="svenmod\game_hooks.h" />
     <ClInclude Include="svenmod\cvar.h" />
@@ -188,9 +191,10 @@
     <ClCompile Include="shared\interface.cpp" />
     <ClCompile Include="shared\mathlib.cpp" />
     <ClCompile Include="shared\sys.cpp" />
-    <ClCompile Include="shared\usermessages.cpp" />
+    <ClCompile Include="shared\messagebuffer.cpp" />
     <ClCompile Include="svenmod\client.cpp" />
     <ClCompile Include="svenmod\client_weapon.cpp" />
+    <ClCompile Include="svenmod\gamedata_finder.cpp" />
     <ClCompile Include="svenmod\game_hooks.cpp" />
     <ClCompile Include="svenmod\config_manager.cpp" />
     <ClCompile Include="svenmod\console.cpp" />

@@ -16,6 +16,7 @@ set(SVENMOD_SOURCE_FILES
 	svenmod/cvar.cpp
 	svenmod/detours_api.cpp
 	svenmod/game_hooks.cpp
+	svenmod/gamedata_finder.cpp
 	svenmod/gameui_iface.cpp
 	svenmod/hooks.cpp
 	svenmod/inventory.cpp

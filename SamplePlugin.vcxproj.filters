@@ -41,7 +41,7 @@
     <ClInclude Include="public\ISvenModAPI.h">
       <Filter>Sample Plugin\public</Filter>
     </ClInclude>
-    <ClInclude Include="public\usermessages.h">
+    <ClInclude Include="public\messagebuffer.h">
       <Filter>Sample Plugin\public</Filter>
     </ClInclude>
   </ItemGroup>

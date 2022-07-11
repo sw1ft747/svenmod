@@ -11,11 +11,16 @@
 #include <ILoggingSystem.h>
 #include <IHooks.h>
 
-#include <usermessages.h>
+#include <messagebuffer.h>
 #include <sys.h>
 #include <dbg.h>
 
 extern extra_player_info_t *g_pPlayerExtraInfo;
+
+static CMessageBuffer CurWeaponBuffer;
+
+static bool s_bLoading = false;
+static float s_flClientDataLastUpdate = -1.f;
 
 //-----------------------------------------------------------------------------
 // Macro defenitions
@@ -67,10 +72,11 @@ UserMsgHookFn ORIG_UserMsgHook_CurWeapon = NULL;
 
 int UserMsgHook_CurWeapon(const char *pszName, int iSize, void *pBuffer)
 {
-	UserMessages::BeginRead(pBuffer, iSize);
+	CurWeaponBuffer.Init(pBuffer, iSize, true);
+	CurWeaponBuffer.BeginReading();
 
-	int iState = UserMessages::ReadByte();
-	int iId = UserMessages::ReadShort();
+	int iState = CurWeaponBuffer.ReadByte();
+	int iId = CurWeaponBuffer.ReadShort();
 
 	if ( iState )
 		g_iCurrentWeaponID = iId;
@@ -156,6 +162,19 @@ static int HUD_Redraw(float time, int intermission)
 	return func_result;
 }
 
+FORCEINLINE static void OnClientFinishLoading_Think(float flTime)
+{
+	bool bLoading = (flTime < s_flClientDataLastUpdate) || (s_flClientDataLastUpdate == -1.f);
+	s_flClientDataLastUpdate = flTime;
+
+	if ( !bLoading && s_bLoading )
+	{
+		//g_PluginsManager.OnClientFinishLoading();
+	}
+
+	s_bLoading = bLoading;
+}
+
 static int HOOK_RETURN_VALUE HUD_UpdateClientData(client_data_t *pcldata, float flTime)
 {
 	int changed = 0;
@@ -179,11 +198,13 @@ static int HOOK_RETURN_VALUE HUD_UpdateClientData(client_data_t *pcldata, float 
 		}
 		else if (result == HOOK_STOP)
 		{
+			//OnClientFinishLoading_Think(flTime);
 			return changed;
 		}
 		else if (result == HOOK_CALL_STOP)
 		{
 			s_ClientFuncsOriginal.HUD_UpdateClientData(pcldata, flTime);
+			//OnClientFinishLoading_Think(flTime);
 			return changed;
 		}
 	}
@@ -207,10 +228,12 @@ static int HOOK_RETURN_VALUE HUD_UpdateClientData(client_data_t *pcldata, float 
 		}
 		else if (result == HOOK_STOP)
 		{
+			//OnClientFinishLoading_Think(flTime);
 			return dummy;
 		}
 	}
 
+	//OnClientFinishLoading_Think(flTime);
 	return bRetValOverridden ? SavedRetVal : changed;
 }
 

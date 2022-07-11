@@ -34,6 +34,7 @@ public: // IClient
 	virtual bool				IsInGame();
 
 	virtual bool				IsDead();
+	virtual bool				IsDying();
 	virtual bool				IsSpectating();
 	
 	virtual bool				IsOnGround();
@@ -42,6 +43,7 @@ public: // IClient
 	virtual bool				IsDucked();
 	virtual bool				IsDucking();
 
+	virtual bool				HasWeapon();
 	virtual bool				CanAttack();
 
 	virtual float				GetHealth();
@@ -74,6 +76,9 @@ public: // IClient
 
 	virtual Vector				GetViewAngles();
 
+	virtual Vector				GetOrigin();
+	virtual const Vector		&GetOrigin() const;
+	
 	virtual Vector				GetVelocity();
 	virtual const Vector		&GetVelocity() const;
 

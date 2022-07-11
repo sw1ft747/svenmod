@@ -462,7 +462,7 @@
     <ClInclude Include="public\hl_sdk\common\usermsg.h">
       <Filter>SvenMod\public\HL SDK\common</Filter>
     </ClInclude>
-    <ClInclude Include="public\usermessages.h">
+    <ClInclude Include="public\messagebuffer.h">
       <Filter>SvenMod\public</Filter>
     </ClInclude>
     <ClInclude Include="public\gameui\IGameUI.h">
@@ -542,6 +542,15 @@
     </ClInclude>
     <ClInclude Include="svenmod\patterns.h">
       <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\netmsg.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\gamedata_finder.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\sizebuf.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -623,7 +632,7 @@
     <ClCompile Include="svenmod\hooks.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
-    <ClCompile Include="shared\usermessages.cpp">
+    <ClCompile Include="shared\messagebuffer.cpp">
       <Filter>SvenMod\shared</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\gameui_iface.cpp">
@@ -645,6 +654,9 @@
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\patterns.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\gamedata_finder.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
   </ItemGroup>

@@ -19,11 +19,11 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 	{
 		const char *pszCommand = args[2];
 
-		if (!stricmp(pszCommand, "list"))
+		if ( !stricmp(pszCommand, "list") )
 		{
 			g_PluginsManager.PrintPlugins();
 		}
-		else if (!stricmp(pszCommand, "info"))
+		else if ( !stricmp(pszCommand, "info") )
 		{
 			if (args.ArgC() > 3)
 			{
@@ -35,7 +35,7 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 				ConMsg("Usage:  sm plugins info <index>\n");
 			}
 		}
-		else if (!stricmp(pszCommand, "load"))
+		else if ( !stricmp(pszCommand, "load") )
 		{
 			if (args.ArgC() > 3)
 			{
@@ -48,7 +48,7 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 				ConMsg("Usage:  sm plugins load <filename>\n");
 			}
 		}
-		else if (!stricmp(pszCommand, "unload"))
+		else if ( !stricmp(pszCommand, "unload") )
 		{
 			if (args.ArgC() > 3)
 			{
@@ -61,12 +61,12 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 				ConMsg("Usage: sm plugins unload <index>\n");
 			}
 		}
-		else if (!stricmp(pszCommand, "unload_all"))
+		else if ( !stricmp(pszCommand, "unload_all") )
 		{
 			g_PluginsManager.UnloadPlugins();
 			ConMsg("[SvenMod] Unloaded all plugins\n");
 		}
-		else if (!stricmp(pszCommand, "pause"))
+		else if ( !stricmp(pszCommand, "pause") )
 		{
 			if (args.ArgC() > 3)
 			{
@@ -79,7 +79,7 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 				ConMsg("Usage:  sm plugins pause <index>\n");
 			}
 		}
-		else if (!stricmp(pszCommand, "unpause"))
+		else if ( !stricmp(pszCommand, "unpause") )
 		{
 			if (args.ArgC() > 3)
 			{
@@ -92,21 +92,21 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 				ConMsg("Usage:  sm plugins unpause <index>\n");
 			}
 		}
-		else if (!stricmp(pszCommand, "pause_all"))
+		else if ( !stricmp(pszCommand, "pause_all") )
 		{
 			if (g_PluginsManager.PausePlugins())
 				ConMsg("[SvenMod] All plugins have been paused\n");
 			else
 				ConMsg("[SvenMod] None of plugins have been paused\n");
 		}
-		else if (!stricmp(pszCommand, "unpause_all"))
+		else if ( !stricmp(pszCommand, "unpause_all") )
 		{
 			if (g_PluginsManager.UnpausePlugins())
 				ConMsg("[SvenMod] All plugins have been unpaused\n");
 			else
 				ConMsg("[SvenMod] None of plugins have been unpaused\n");
 		}
-		else if (!stricmp(pszCommand, "refresh"))
+		else if ( !stricmp(pszCommand, "refresh") )
 		{
 			g_PluginsManager.UnloadPlugins();
 			g_PluginsManager.LoadPlugins();
@@ -148,7 +148,7 @@ FORCEINLINE void ConCommand_sm_info(const CCommand &args)
 	ConMsg("* Version:          %s\n", SVENMOD_VERSION_STRING);
 	ConMsg("* API Version:      %s\n", SVENMOD_API_VERSION_STRING);
 	ConMsg("* Plugin Interface: %s\n", CLIENT_PLUGIN_INTERFACE_VERSION);
-	ConMsg("* URL:              https://github.com/sw1ft747/SvenMod\n");
+	ConMsg("* URL:              https://github.com/sw1ft747/svenmod\n");
 	ConMsg("* Compiled in:      %s\n", SVENMOD_BUILD_TIMESTAMP);
 	ConMsg("----------------------------------\n");
 }

@@ -18,13 +18,17 @@ public:
 
 	void Init();
 
-	virtual bool			IsValidSteam64ID( uint64 steamid );
-
 	virtual int				GetScreenWidth( void );
 	virtual int				GetScreenHeight( void );
 
 	virtual bool			WorldToScreen( Vector &vWorldOrigin, Vector2D &vScreen );
 	virtual void			ScreenToWorld( Vector2D &vScreen, Vector &vWorldOrigin );
+
+	virtual CNetMessageParams *GetNetMessageParams( void );
+
+	virtual const netmsg_t *FindNetworkMessage( int iNetMessageType );
+	virtual const netmsg_t *FindNetworkMessage( const char *pszName );
+	virtual const usermsg_t *FindUserMessage( const char *pszName );
 
 	virtual void			DrawSetTextColor( float r, float g, float b );
 	virtual int				DrawConsoleString( int x, int y, const char *pszFormat, ... );
@@ -32,6 +36,8 @@ public:
 private:
 	int m_iScreenWidth;
 	int m_iScreenHeight;
+
+	CNetMessageParams m_NetMessageParams;
 };
 
 extern CUtils g_Utils;

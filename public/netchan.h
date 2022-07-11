@@ -26,18 +26,9 @@
 #include "hl_sdk/common/Platform.h"
 #include "hl_sdk/common/netadr.h"
 #include "hl_sdk/common/enums.h"
+#include "hl_sdk/common/sizebuf.h"
 
 #define CS_SIZE	64	// size of one config string
-
-typedef struct sizebuf_s
-{
-    qboolean		bOverflow;	// overflow reading or writing
-    const char	*pDebugName;	// buffer name (pointer to const name)
-
-    byte		*pData;
-    int		iCurBit;
-    int		nDataBits;
-} sizebuf_t;
 
 /*
 ==========================================================

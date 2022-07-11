@@ -5,11 +5,23 @@
 #pragma once
 #endif
 
+#include "hl_sdk/common/usermsg.h"
+#include "hl_sdk/common/netmsg.h"
+#include "hl_sdk/common/sizebuf.h"
+
 #include "platform.h"
 #include "steamtypes.h"
 #include "sys.h"
 
 #include "math/vector.h"
+
+class CNetMessageParams
+{
+public:
+	const sizebuf_t *buffer;
+	int readcount;
+	bool badread;
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: utility functions
@@ -20,13 +32,17 @@ abstract_class IUtils
 public:
 	virtual					~IUtils() {}
 
-	virtual bool			IsValidSteam64ID( uint64 steamid ) = 0;
-
 	virtual int				GetScreenWidth( void ) = 0;
 	virtual int				GetScreenHeight( void ) = 0;
 
 	virtual bool			WorldToScreen( Vector &vWorldOrigin, Vector2D &vScreen ) = 0;
 	virtual void			ScreenToWorld( Vector2D &vScreen, Vector &vWorldOrigin ) = 0;
+
+	virtual CNetMessageParams *GetNetMessageParams( void ) = 0;
+
+	virtual const netmsg_t *FindNetworkMessage( int iNetMessageType ) = 0;
+	virtual const netmsg_t *FindNetworkMessage( const char *pszName ) = 0;
+	virtual const usermsg_t *FindUserMessage( const char *pszName ) = 0;
 
 	virtual void			DrawSetTextColor( float r, float g, float b ) = 0;
 	virtual int				DrawConsoleString( int x, int y, const char *pszFormat, ... ) = 0;
