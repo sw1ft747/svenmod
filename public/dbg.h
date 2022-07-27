@@ -28,7 +28,7 @@
 
 #ifdef DBG_ASSERT
 
-#define Assert(exp) __AssertMsg( exp, "Assertion Failed: " #exp, false )
+#define Assert(exp) __AssertMsg( exp, #exp, false )
 #define AssertMsg(exp, msg) __AssertMsg( exp, msg, false )
 
 #else
@@ -40,7 +40,7 @@
 
 #ifdef DBG_ASSERT_FATAL
 
-#define AssertFatal(exp) __AssertMsg( exp, "Assertion Failed: " #exp, true )
+#define AssertFatal(exp) __AssertMsg( exp, #exp, true )
 #define AssertFatalMsg(exp, msg) __AssertMsg( exp, msg, true )
 
 #else
