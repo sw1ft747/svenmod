@@ -53,3 +53,4 @@ SvenMod provides several important console commands:
 
 # Plugins
 - [Improved Mute Manager](https://github.com/sw1ft747/ImprovedMuteManager)
+- [Soundcache Autosave](https://github.com/sw1ft747/soundcache)
