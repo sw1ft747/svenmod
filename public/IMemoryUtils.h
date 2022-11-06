@@ -12,7 +12,7 @@
 #include "memutils/moduleinfo.h"
 #include "udis86/udis86.h"
 
-#ifdef PLATFORM_LINUX
+#ifdef PLATFORM_LINUX // Linux
 #include <sys/mman.h>
 
 #ifndef PAGE_SIZE

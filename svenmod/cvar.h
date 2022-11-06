@@ -11,6 +11,10 @@
 
 #include <vector>
 
+//-----------------------------------------------------------------------------
+// Signatures
+//-----------------------------------------------------------------------------
+
 typedef void (__cdecl *Z_FreeFn)(void *);
 typedef void (__cdecl *Cvar_DirectSetFn)(cvar_t *, const char *);
 typedef void (__thiscall *RichText__InsertColorChangeFn)(void *, Color);
@@ -55,7 +59,7 @@ protected:
 
 	enum
 	{
-		NUM_BUCKETS = 48,
+		NUM_BUCKETS = 511,
 		NUM_BUCKETS_MASK = NUM_BUCKETS
 	};
 
@@ -68,6 +72,8 @@ protected:
 
 class CCvar : public ICvar
 {
+	friend class CHooks;
+
 public:
 	bool Init();
 	void Shutdown();
@@ -143,6 +149,9 @@ public:
 	virtual int					GetIntFromCvar(const char *pszName);
 	virtual bool				GetBoolFromCvar(const char *pszName);
 	virtual Color				GetColorFromCvar(const char *pszName);
+
+private:
+	Cvar_DirectSetFn GetCvar_DirectSet();
 
 private:
 	// pointers to functions

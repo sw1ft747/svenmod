@@ -17,6 +17,7 @@
 
 #include "ICommandLine.h"
 #include "ICvar.h"
+#include "IDebug.h"
 #include "IEngineClient.h"
 #include "IFileSystem.h"
 #include "IRegistry.h"
@@ -39,7 +40,7 @@
 // Struct declaration
 //-----------------------------------------------------------------------------
 
-struct client_version_s
+typedef struct client_version_s
 {
 	const char *string;
 
@@ -47,9 +48,9 @@ struct client_version_s
 
 	int major_version;
 	int minor_version;
-};
+} client_version_t;
 
-struct modules_s
+typedef struct modules_s
 {
 	HMODULE SvenMod = 0;
 	HMODULE Hardware = 0;
@@ -63,7 +64,7 @@ struct modules_s
 	HMODULE Tier0 = 0;
 	HMODULE OpenGL = 0;
 	HMODULE SteamAPI = 0;
-};
+} modules_t;
 
 //-----------------------------------------------------------------------------
 // Bind SvenMod's API to global variables
@@ -90,7 +91,7 @@ public:
 	// Engine's build number, protocol version and client's version
 	virtual int						GetEngineBuild() = 0;
 	virtual int						GetProtocolVersion() = 0;
-	virtual client_version_s		*GetClientVersion() = 0;
+	virtual client_version_t		*GetClientVersion() = 0;
 
 	virtual client_state_t			GetClientState() = 0;
 
@@ -114,9 +115,10 @@ public:
 	virtual IConfigManager			*ConfigManager() = 0;
 	virtual IPluginHelpers			*PluginHelpers() = 0;
 
-	virtual modules_s				*Modules() = 0;
+	virtual modules_t				*Modules() = 0;
 
 	virtual ICvar					*CVar() = 0;
+	virtual IDebug					*Debug() = 0;
 	virtual IHooks					*Hooks() = 0;
 
 	virtual IClient					*Client() = 0;
@@ -154,9 +156,9 @@ public:
 };
 
 // Interface version! Not an API's version!
-#define SVENMOD_API_INTERFACE_VERSION "SvenModAPI002"
+#define SVENMOD_API_INTERFACE_VERSION "SvenModAPI003"
 
-extern modules_s *g_pModules;
+extern modules_t *g_pModules;
 extern ISvenModAPI *g_pSvenModAPI;
 PLATFORM_INTERFACE ISvenModAPI *SvenModAPI();
 

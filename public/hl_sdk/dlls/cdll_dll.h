@@ -34,7 +34,13 @@ constexpr int MAX_PLAYERS = 32;
 #define MAX_WEAPONS 256 // Sven Co-op specific
 
 #define MAX_WEAPON_SLOTS 10	 // hud item selection slots (5 for original Half-Life)
+
+#if defined(SC_5_25) || defined(SC_NEWEST)
 #define MAX_WEAPON_POSITIONS 25 // this is the max number of items in each bucket
+#else
+#define MAX_WEAPON_POSITIONS 20 // SC 5.23 <
+#endif
+
 #define MAX_ITEM_TYPES 6   // hud item selection slots
 
 #define MAX_ITEMS 5 // hard coded item types

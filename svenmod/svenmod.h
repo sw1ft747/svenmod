@@ -17,13 +17,13 @@ extern double *g_pFrametime;
 
 extern const char *g_pszBaseDirectory;
 
-extern client_version_s g_ClientVersion;
+extern client_version_t g_ClientVersion;
 extern int g_iEngineBuild;
 extern int g_iProtocolVersion;
 
 extern int *g_pClientState;
 
-extern modules_s g_Modules;
+extern modules_t g_Modules;
 
 //-----------------------------------------------------------------------------
 // Main class
@@ -41,7 +41,7 @@ public:
 
 private:
 	// Callbacks
-	void SystemPostInit();
+	void InitSystems();
 	bool StartSystems();
 
 	// Utilities

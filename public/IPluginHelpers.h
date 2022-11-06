@@ -12,7 +12,7 @@
 // Plugin's info
 //-----------------------------------------------------------------------------
 
-struct plugin_info_s
+typedef struct plugin_info_s
 {
 	const char *name;
 	const char *author;
@@ -24,10 +24,10 @@ struct plugin_info_s
 	const char *log_tag;
 
 	int iface_version;
-	api_version_s api_version;
+	api_version_t api_version;
 
 	bool running;
-};
+} plugin_info_t;
 
 //-----------------------------------------------------------------------------
 // Purpose: helpers for loaded plugins
@@ -47,8 +47,8 @@ public:
 	virtual bool			IsPluginRunning( int index ) = 0;
 
 	// Query information about a plugin
-	virtual plugin_info_s	*QueryPluginInfo( int index ) = 0;
-	virtual plugin_info_s	*QueryPluginInfo( const char *pszPluginName ) = 0;
+	virtual plugin_info_t	*QueryPluginInfo( int index ) = 0;
+	virtual plugin_info_t	*QueryPluginInfo( const char *pszPluginName ) = 0;
 };
 
 extern IPluginHelpers *g_pPluginHelpers;

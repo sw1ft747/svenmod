@@ -119,7 +119,7 @@ inline bool CHashTable<KeyT, ValueT>::Insert(const KeyT key, const ValueT &value
 	{
 		if ( m_Buckets[index][i].key == key )
 		{
-			if (pfnOnInsertFailed)
+			if ( pfnOnInsertFailed != NULL )
 				pfnOnInsertFailed(const_cast<ValueT *>(&m_Buckets[index][i].value), const_cast<ValueT *>(&value));
 
 			return false;

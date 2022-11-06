@@ -35,7 +35,7 @@ public:
 	//-----------------------------------------------------------------------------
 
 	// By default hash table have 64 buckets. Won't be changed if you call the function during import/export
-	virtual int					GetHashTableSize() = 0;
+	virtual int					GetHashTableSize( void ) = 0;
 	virtual bool				ReinitializeHashTable( int iBuckets ) = 0;
 
 	// It's 10 by default, when you start import or export

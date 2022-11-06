@@ -1,8 +1,20 @@
 Changelog for SvenMod
 
 06/11/2022 - Version 1.2.1 (API v4.0) RC:
+- As always some improvements in the code
+- Project configurations for game version 5.22 (<3), 5.25 and Newest
 - New 'IDebug' interface
+- Updated sample plugin
+- Fixed wrong pad in class 'CGameConsoleDialog'
+- Fixed completely wrong struct 'extra_player_info_t'
+- Fixed incorrect method 'Reject' in Vector class
+- Added new methods for 'IClientPlugin' interface
 - Added symbol signatures for Linux
+- Added methods 'HookCvarChange' and 'HookEvent' (EventHook) for interface 'IHooks'
+- Added methods 'ApplyReadToNetMessageBuffer', 'FindEventHook' and 'PrintChatText' for interface 'IUtils'
+- Added more methods and constructors for 'Color' class
+- Added math functions 'VectorRotate', 'VectorITransform' and 'VectorIRotate'
+- Used better parser of keyvalues
 
 03/05/2022, 11/07/2022 - Version 1.2.0 (API v3.0):
 - Minor improvements in the code

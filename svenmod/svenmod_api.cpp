@@ -18,7 +18,7 @@ public:
 
 	virtual int						GetEngineBuild();
 	virtual int						GetProtocolVersion();
-	virtual client_version_s		*GetClientVersion();
+	virtual client_version_t		*GetClientVersion();
 
 	virtual client_state_t			GetClientState();
 
@@ -42,9 +42,10 @@ public:
 	virtual IConfigManager			*ConfigManager();
 	virtual IPluginHelpers			*PluginHelpers();
 
-	virtual modules_s				*Modules();
+	virtual modules_t				*Modules();
 
 	virtual ICvar					*CVar();
+	virtual IDebug					*Debug();
 	virtual IHooks					*Hooks();
 
 	virtual IClient					*Client();
@@ -104,7 +105,7 @@ int CSvenModAPI::GetProtocolVersion()
 	return g_iProtocolVersion;
 }
 
-client_version_s *CSvenModAPI::GetClientVersion()
+client_version_t *CSvenModAPI::GetClientVersion()
 {
 	return &g_ClientVersion;
 }
@@ -167,7 +168,7 @@ IPluginHelpers *CSvenModAPI::PluginHelpers()
 	return g_pPluginHelpers;
 }
 
-modules_s *CSvenModAPI::Modules()
+modules_t *CSvenModAPI::Modules()
 {
 	return &g_Modules;
 }
@@ -180,6 +181,11 @@ ICvar *CSvenModAPI::CVar()
 IHooks *CSvenModAPI::Hooks()
 {
 	return g_pHooks;
+}
+
+IDebug *CSvenModAPI::Debug()
+{
+	return g_pDebug;
 }
 
 IClient *CSvenModAPI::Client()

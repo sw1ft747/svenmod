@@ -17,7 +17,7 @@
 
 #define CONSOLE_PRINT_MESSAGE_LENGTH 8192
 
-extern client_version_s g_ClientVersion;;
+extern client_version_t g_ClientVersion;
 
 //-----------------------------------------------------------------------------
 // Colors
@@ -65,7 +65,7 @@ bool CCvar::Init()
 	if ( m_bInitialized )
 		return true;
 
-	if ( g_ClientVersion.version != 5025 )
+	if ( g_ClientVersion.version > 525 )
 		LogWarning("Developer: Validate paddings of class \"CGameConsoleDialog\"");
 
 	void *pfnRichText__InsertColorChange = NULL;
@@ -1060,6 +1060,15 @@ Color CCvar::GetColorFromCvar(const char *pszName)
 		return GetColorFromCvar(pCvar);
 
 	return { 255, 255, 255, 255 };
+}
+
+//-----------------------------------------------------------------------------
+// Get Cvar_DirectSet
+//-----------------------------------------------------------------------------
+
+Cvar_DirectSetFn CCvar::GetCvar_DirectSet()
+{
+	return Cvar_DirectSet;
 }
 
 //-----------------------------------------------------------------------------

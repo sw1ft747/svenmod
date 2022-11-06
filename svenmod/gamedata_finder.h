@@ -26,6 +26,7 @@ public:
 	void FindPlayerMove(playermove_t **pPlayerMove, void *pfnClientDLL_Init = NULL);
 	void FindVideoMode(IVideoMode ***ppVideoMode, IVideoMode **pVideoMode, void *pVideoMode_Create = NULL);
 	void FindUserMessages(usermsg_t ***ppClientUserMsgs);
+	void FindEventHooks(event_t **ppEventHooks);
 	void FindNetworkMessages(netmsg_t **pNetworkMessages, sizebuf_t **pNetMesasge, int **pReadCount, int **pBadRead);
 	void FindExtraPlayerInfo(extra_player_info_t **pPlayerExtraInfo);
 	void FindWeaponsResource(WeaponsResource **pWeaponsResource);
@@ -38,6 +39,13 @@ public:
 	void FindCmdList(cmd_t ***ppCmdList);
 	void FindCommandArgs(int **pArgC, const char ***ppArgV);
 	void FindConsolePrint(void **pRichText__InsertColorChange, void **pRichText__InsertString);
+
+	// etc
+
+	void *FindSCR_BeginLoadingPlaque();
+	void *FindSCR_EndLoadingPlaque();
+	void *FindCL_Disconnect();
+	void *FindR_RenderScene();
 };
 
 extern CGameDataFinder g_GameDataFinder;

@@ -25,15 +25,14 @@ void CGameDataFinder::FindClientVersion(const char **pClientVersion)
 
 	MemoryUtils()->InitDisasm(&g_inst, p__MsgFuncServerVer, 32, 48);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Ipush && g_inst.operand[0].type == UD_OP_IMM)
 		{
 			*pClientVersion = reinterpret_cast<const char *>(g_inst.operand[0].lval.udword);
 			break;
 		}
-
-	} while ( MemoryUtils()->Disassemble(&g_inst) );
+	}
 #else
 #error Implement Linux equivalent
 #endif
@@ -44,15 +43,14 @@ void CGameDataFinder::FindClientState(int **pClientState)
 #ifdef PLATFORM_WINDOWS
 	MemoryUtils()->InitDisasm(&g_inst, g_pEngineFuncs->pNetAPI->Status, 32, 36);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Icmp && g_inst.operand[0].type == UD_OP_MEM && g_inst.operand[0].size == 32 && g_inst.operand[1].type == UD_OP_IMM)
 		{
 			*pClientState = reinterpret_cast<int *>(g_inst.operand[0].lval.udword);
 			break;
 		}
-
-	} while ( MemoryUtils()->Disassemble(&g_inst) );
+	}
 
 	if ( !(*pClientState) )
 	{
@@ -108,7 +106,7 @@ void CGameDataFinder::FindClientFuncs(cl_clientfuncs_t **pClientFuncs, void *pfn
 
 		bool bFoundKeyInstruction = false;
 
-		do
+		while ( MemoryUtils()->Disassemble(&g_inst) )
 		{
 			if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_MEM && g_inst.operand[1].type == UD_OP_IMM && g_inst.operand[1].lval.ubyte == 1)
 			{
@@ -124,8 +122,7 @@ void CGameDataFinder::FindClientFuncs(cl_clientfuncs_t **pClientFuncs, void *pfn
 					break;
 				}
 			}
-
-		} while ( MemoryUtils()->Disassemble(&g_inst) );
+		}
 	}
 	else
 	{
@@ -146,7 +143,7 @@ void CGameDataFinder::FindFrametime(double **pRealtime, double **pClientTime, do
 #ifdef PLATFORM_WINDOWS
 	if ( pfnHost_FilterTime == NULL )
 	{
-		pfnHost_FilterTime = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::Host_FilterTime);
+		pfnHost_FilterTime = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::Host_FilterTime );
 	}
 
 	if ( pfnHost_FilterTime )
@@ -180,7 +177,7 @@ void CGameDataFinder::FindFrametime(double **pRealtime, double **pClientTime, do
 
 		if ( MemoryUtils()->Disassemble(&g_inst) )
 		{
-			if (g_inst.mnemonic == UD_Ifld)
+			if ( g_inst.mnemonic == UD_Ifld )
 			{
 				*pClientTime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
 			}
@@ -215,7 +212,7 @@ void CGameDataFinder::FindEngineStudio(engine_studio_api_t **pEngineStudio, r_st
 #ifdef PLATFORM_WINDOWS
 	if ( pEngineStudioInit == NULL )
 	{
-		pEngineStudioInit = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::V_EngineStudio_Init);
+		pEngineStudioInit = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::V_EngineStudio_Init );
 	}
 
 	if ( pEngineStudioInit )
@@ -225,7 +222,7 @@ void CGameDataFinder::FindEngineStudio(engine_studio_api_t **pEngineStudio, r_st
 
 		MemoryUtils()->InitDisasm(&g_inst, pEngineStudioInit, 32, 70);
 
-		do
+		while ( MemoryUtils()->Disassemble(&g_inst) )
 		{
 			if ( !bFoundFirstPush )
 			{
@@ -263,8 +260,7 @@ void CGameDataFinder::FindEngineStudio(engine_studio_api_t **pEngineStudio, r_st
 
 				break;
 			}
-
-		} while ( MemoryUtils()->Disassemble(&g_inst) );
+		}
 	}
 	else
 	{
@@ -314,7 +310,7 @@ void CGameDataFinder::FindStudioModelRenderer(CStudioModelRenderer **pStudioRend
 
 	MemoryUtils()->InitDisasm(&g_inst, g_pClientFuncs->HUD_GetStudioModelInterface, 32, 128);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_ECX && g_inst.operand[1].type == UD_OP_IMM)
 		{
@@ -328,8 +324,7 @@ void CGameDataFinder::FindStudioModelRenderer(CStudioModelRenderer **pStudioRend
 				break;
 			}
 		}
-
-	} while (MemoryUtils()->Disassemble(&g_inst));
+	}
 
 	if ( !(*pStudioRenderer) )
 	{
@@ -345,22 +340,21 @@ void CGameDataFinder::FindPlayerMove(playermove_t **pPlayerMove, void *pfnClient
 #ifdef PLATFORM_WINDOWS
 	if ( pfnClientDLL_Init == NULL )
 	{
-		pfnClientDLL_Init = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::ClientDLL_Init);
+		pfnClientDLL_Init = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::ClientDLL_Init );
 	}
 
 	if ( pfnClientDLL_Init )
 	{
 		MemoryUtils()->InitDisasm(&g_inst, pfnClientDLL_Init, 32, 32);
 
-		do
+		while ( MemoryUtils()->Disassemble(&g_inst) )
 		{
 			if (g_inst.mnemonic == UD_Ipush && g_inst.operand[0].type == UD_OP_IMM)
 			{
 				*pPlayerMove = reinterpret_cast<playermove_t *>(g_inst.operand[0].lval.udword);
 				break;
 			}
-
-		} while ( MemoryUtils()->Disassemble(&g_inst) );
+		}
 	}
 	else
 	{
@@ -381,22 +375,21 @@ void CGameDataFinder::FindVideoMode(IVideoMode ***ppVideoMode, IVideoMode **pVid
 #ifdef PLATFORM_WINDOWS
 	if ( pVideoMode_Create == NULL )
 	{
-		pVideoMode_Create = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::V_VideoMode_Create);
+		pVideoMode_Create = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::V_VideoMode_Create );
 	}
 
 	if ( pVideoMode_Create )
 	{
 		MemoryUtils()->InitDisasm(&g_inst, pVideoMode_Create, 32, 64);
 
-		do
+		while ( MemoryUtils()->Disassemble(&g_inst) )
 		{
 			if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_MEM && g_inst.operand[1].type == UD_OP_REG && g_inst.operand[1].base == UD_R_EAX)
 			{
 				*ppVideoMode = reinterpret_cast<IVideoMode **>(g_inst.operand[0].lval.udword);
 				break;
 			}
-
-		} while ( MemoryUtils()->Disassemble(&g_inst) );
+		}
 	}
 	else
 	{
@@ -426,7 +419,7 @@ void CGameDataFinder::FindUserMessages(usermsg_t ***ppClientUserMsgs)
 
 	MemoryUtils()->InitDisasm(&g_inst, pfnHookUserMsg, 32, 32);
 
-	do
+	while ( iDisassembledBytes = MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Icall)
 		{
@@ -434,7 +427,7 @@ void CGameDataFinder::FindUserMessages(usermsg_t ***ppClientUserMsgs)
 
 			MemoryUtils()->InitDisasm(&g_inst, pfnHookServerMsg, 32, 48);
 
-			do
+			while ( MemoryUtils()->Disassemble(&g_inst) )
 			{
 				if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_ESI && g_inst.operand[1].type == UD_OP_MEM)
 				{
@@ -442,18 +435,70 @@ void CGameDataFinder::FindUserMessages(usermsg_t ***ppClientUserMsgs)
 					break;
 				}
 
-			} while ( MemoryUtils()->Disassemble(&g_inst) );
+			}
 
 			break;
 		}
 
 		pfnHookUserMsg += iDisassembledBytes;
-
-	} while ( iDisassembledBytes = MemoryUtils()->Disassemble(&g_inst) );
+	}
 
 	if ( !(*ppClientUserMsgs) )
 	{
 		Sys_Error("[SvenMod] Failed to get \"client's user messages\"");
+	}
+#else
+#error Implement Linux equivalent
+#endif
+}
+
+void CGameDataFinder::FindEventHooks(event_t **ppEventHooks)
+{
+#ifdef PLATFORM_WINDOWS
+	unsigned char *pfnHookEvent = (unsigned char *)g_pEngineFuncs->HookEvent;
+
+	MemoryUtils()->InitDisasm(&g_inst, pfnHookEvent, 32, 16);
+
+	if ( MemoryUtils()->Disassemble(&g_inst) )
+	{
+		if ( g_inst.mnemonic == UD_Ijmp )
+		{
+			DEFINE_PATTERN(g_pEventHooks_sig, "56 8B 35 ? ? ? ? 85 F6 74 ? 8B 46 04");
+
+			void *pHookEvent = MemoryUtils()->CalcAbsoluteAddress( pfnHookEvent );
+			pHookEvent = MemoryUtils()->FindPatternWithin( SvenModAPI()->Modules()->Hardware, g_pEventHooks_sig, pHookEvent, (unsigned char *)pHookEvent + 128 );
+
+			if ( pHookEvent != NULL )
+			{
+				MemoryUtils()->InitDisasm(&g_inst, pHookEvent, 32, 32);
+
+				while ( MemoryUtils()->Disassemble(&g_inst) )
+				{
+					if ( g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_ESI && g_inst.operand[1].type == UD_OP_MEM )
+					{
+						*ppEventHooks = reinterpret_cast<event_t *>(g_inst.operand[1].lval.udword);
+						break;
+					}
+				}
+
+				if ( *ppEventHooks == NULL )
+				{
+					Sys_Error("[SvenMod] Failed to get \"g_pEventHooks\"");
+				}
+			}
+			else
+			{
+				Sys_Error("[SvenMod] Failed to locate \"g_pEventHooks\"");
+			}
+		}
+		else
+		{
+			Sys_Error("[SvenMod] Failed to locate JMP op-code on function \"HookEvent\"");
+		}
+	}
+	else
+	{
+		Sys_Error("[SvenMod] Failed to disassemble \"HookEvent\"");
 	}
 #else
 #error Implement Linux equivalent
@@ -495,7 +540,7 @@ void CGameDataFinder::FindNetworkMessages(netmsg_t **pNetworkMessages, sizebuf_t
 
 	MemoryUtils()->InitDisasm(&g_inst, pfnMSG_ReadByte, 32, 32);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if ( g_inst.mnemonic == UD_Imov )
 		{
@@ -522,8 +567,7 @@ void CGameDataFinder::FindNetworkMessages(netmsg_t **pNetworkMessages, sizebuf_t
 				*pNetMesasge = reinterpret_cast<sizebuf_t *>(g_inst.operand[1].lval.udword - sizeof(void *) * 4);
 			}
 		}
-
-	} while (MemoryUtils()->Disassemble(&g_inst));
+	}
 
 	if ( !(*pReadCount) )
 	{
@@ -557,15 +601,14 @@ void CGameDataFinder::FindExtraPlayerInfo(extra_player_info_t **pPlayerExtraInfo
 
 	MemoryUtils()->InitDisasm(&g_inst, pfnGetClientColor, 32, 48);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Imovsx && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_EAX && g_inst.operand[1].type == UD_OP_MEM)
 		{
-			*pPlayerExtraInfo = reinterpret_cast<extra_player_info_t *>(g_inst.operand[1].lval.udword);
+			*pPlayerExtraInfo = reinterpret_cast<extra_player_info_t *>(g_inst.operand[1].lval.udword - 0xA);
 			break;
 		}
-
-	} while ( MemoryUtils()->Disassemble(&g_inst) );
+	}
 
 	if ( !(*pPlayerExtraInfo) )
 	{
@@ -589,15 +632,14 @@ void CGameDataFinder::FindWeaponsResource(WeaponsResource **pWeaponsResource)
 
 	MemoryUtils()->InitDisasm(&g_inst, pfmWeaponsResource__GetFirstPos, 32, 24);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Iadd && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_EDX && g_inst.operand[1].type == UD_OP_IMM)
 		{
 			*pWeaponsResource = reinterpret_cast<WeaponsResource *>(g_inst.operand[1].lval.udword);
 			break;
 		}
-
-	} while ( MemoryUtils()->Disassemble(&g_inst) );
+	}
 
 	if ( !(*pWeaponsResource) )
 	{
@@ -616,6 +658,9 @@ void *CGameDataFinder::FindZ_Free()
 {
 #ifdef PLATFORM_WINDOWS
 	void *pfnZ_Free = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::Z_Free );
+#else
+	void *pfnZ_Free = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::Z_Free );
+#endif
 
 	if ( pfnZ_Free == NULL )
 	{
@@ -623,15 +668,15 @@ void *CGameDataFinder::FindZ_Free()
 	}
 
 	return pfnZ_Free;
-#else
-#error Implement Linux equivalent
-#endif
 }
 
 void *CGameDataFinder::FindCvar_DirectSet()
 {
 #ifdef PLATFORM_WINDOWS
 	void *pfnCvar_DirectSet = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::Cvar_DirectSet );
+#else
+	void *pfnCvar_DirectSet = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::Cvar_DirectSet );
+#endif
 
 	if ( pfnCvar_DirectSet == NULL )
 	{
@@ -639,15 +684,15 @@ void *CGameDataFinder::FindCvar_DirectSet()
 	}
 
 	return pfnCvar_DirectSet;
-#else
-#error Implement Linux equivalent
-#endif
 }
 
 void CGameDataFinder::FindCvarList(cvar_t ***ppCvarList)
 {
 #ifdef PLATFORM_WINDOWS
 	void *pfnCvar_RemoveClientDLLCvars = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::Cvar_RemoveClientDLLCvars );
+#else
+	void *pfnCvar_RemoveClientDLLCvars = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::Cvar_RemoveClientDLLCvars );
+#endif
 
 	if ( pfnCvar_RemoveClientDLLCvars == NULL )
 	{
@@ -657,29 +702,28 @@ void CGameDataFinder::FindCvarList(cvar_t ***ppCvarList)
 
 	MemoryUtils()->InitDisasm(&g_inst, pfnCvar_RemoveClientDLLCvars, 32, 32);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_ESI && g_inst.operand[1].type == UD_OP_MEM)
 		{
 			*ppCvarList = reinterpret_cast<cvar_t **>(g_inst.operand[1].lval.udword);
 			break;
 		}
-
-	} while ( MemoryUtils()->Disassemble(&g_inst) );
+	}
 
 	if ( !(*ppCvarList) )
 	{
 		Sys_Error("[SvenMod] Failed to get \"g_ppCvarList\"");
 	}
-#else
-#error Implement Linux equivalent
-#endif
 }
 
 void CGameDataFinder::FindCmdList(cmd_t ***ppCmdList)
 {
 #ifdef PLATFORM_WINDOWS
-	void *pfnCvar_RemoveClientDLLCmds = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::Cvar_RemoveClientDLLCmds );
+	void *pfnCvar_RemoveClientDLLCmds = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::Cmd_RemoveClientDLLCmds );
+#else
+	void *pfnCvar_RemoveClientDLLCmds = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::Cmd_RemoveClientDLLCmds );
+#endif
 
 	if ( pfnCvar_RemoveClientDLLCmds == NULL )
 	{
@@ -689,23 +733,19 @@ void CGameDataFinder::FindCmdList(cmd_t ***ppCmdList)
 
 	MemoryUtils()->InitDisasm(&g_inst, pfnCvar_RemoveClientDLLCmds, 32, 32);
 
-	do
+	while ( MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_EAX && g_inst.operand[1].type == UD_OP_MEM)
 		{
 			*ppCmdList = reinterpret_cast<cmd_t **>(g_inst.operand[1].lval.udword);
 			break;
 		}
-
-	} while ( MemoryUtils()->Disassemble(&g_inst) );
+	}
 
 	if ( !(*ppCmdList) )
 	{
 		Sys_Error("[SvenMod] Failed to get \"g_ppCmdList\"");
 	}
-#else
-#error Implement Linux equivalent
-#endif
 }
 
 void CGameDataFinder::FindCommandArgs(int **pArgC, const char ***ppArgV)
@@ -717,15 +757,14 @@ void CGameDataFinder::FindCommandArgs(int **pArgC, const char ***ppArgV)
 
 		MemoryUtils()->InitDisasm(&g_inst, pCmd_Argc, 32, 16);
 
-		do
+		while ( MemoryUtils()->Disassemble(&g_inst) )
 		{
 			if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_EAX && g_inst.operand[1].type == UD_OP_MEM)
 			{
 				*pArgC = reinterpret_cast<int *>(g_inst.operand[1].lval.udword);
 				break;
 			}
-
-		} while ( MemoryUtils()->Disassemble(&g_inst) );
+		}
 	}
 
 	if ( !(*pArgC) )
@@ -739,7 +778,7 @@ void CGameDataFinder::FindCommandArgs(int **pArgC, const char ***ppArgV)
 
 		MemoryUtils()->InitDisasm(&g_inst, pCmd_Argv, 32, 96);
 
-		do
+		while ( MemoryUtils()->Disassemble(&g_inst) )
 		{
 			if (g_inst.mnemonic == UD_Imov && g_inst.operand[0].type == UD_OP_REG && g_inst.operand[0].base == UD_R_EAX && g_inst.operand[1].type == UD_OP_MEM &&
 				g_inst.operand[1].index == UD_R_EAX && g_inst.operand[1].scale == 4 && g_inst.operand[1].offset == 32)
@@ -747,8 +786,7 @@ void CGameDataFinder::FindCommandArgs(int **pArgC, const char ***ppArgV)
 				*ppArgV = reinterpret_cast<const char **>(g_inst.operand[1].lval.udword);
 				break;
 			}
-
-		} while ( MemoryUtils()->Disassemble(&g_inst) );
+		}
 	}
 
 	if ( !(*ppArgV) )
@@ -767,6 +805,7 @@ void CGameDataFinder::FindConsolePrint(void **pRichText__InsertColorChange, void
 	int iDisassembledBytes = 0;
 
 	void *pCGameConsoleDialog__DPrint = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->GameUI, Patterns::GameUI::CGameConsoleDialog__DPrint );
+	//void *pCGameConsoleDialog__DPrint = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->GameUI, Symbols::Hardware::CGameConsoleDialog__DPrint );
 
 	if ( !pCGameConsoleDialog__DPrint )
 	{
@@ -778,7 +817,7 @@ void CGameDataFinder::FindConsolePrint(void **pRichText__InsertColorChange, void
 
 	MemoryUtils()->InitDisasm(&g_inst, pCGameConsoleDialog__DPrint, 32, 128);
 
-	do
+	while ( iDisassembledBytes = MemoryUtils()->Disassemble(&g_inst) )
 	{
 		if (g_inst.mnemonic == UD_Icall && g_inst.operand[0].type == UD_OP_JIMM)
 		{
@@ -795,8 +834,7 @@ void CGameDataFinder::FindConsolePrint(void **pRichText__InsertColorChange, void
 		}
 
 		p += iDisassembledBytes;
-
-	} while ( iDisassembledBytes = MemoryUtils()->Disassemble(&g_inst) );
+	}
 
 	if ( !(*pRichText__InsertColorChange) )
 	{
@@ -810,4 +848,73 @@ void CGameDataFinder::FindConsolePrint(void **pRichText__InsertColorChange, void
 #else
 #error Implement Linux equivalent
 #endif
+}
+
+
+//-----------------------------------------------------------------------------
+// etc
+//-----------------------------------------------------------------------------
+
+void *CGameDataFinder::FindSCR_BeginLoadingPlaque()
+{
+#ifdef PLATFORM_WINDOWS
+	void *pfnSCR_BeginLoadingPlaque = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::SCR_BeginLoadingPlaque );
+#else
+	void *pfnSCR_BeginLoadingPlaque = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::SCR_BeginLoadingPlaque );
+#endif
+
+	if ( pfnSCR_BeginLoadingPlaque == NULL )
+	{
+		Sys_Error("[SvenMod] Couldn't find function \"SCR_BeginLoadingPlaque\"");
+	}
+
+	return pfnSCR_BeginLoadingPlaque;
+}
+
+void *CGameDataFinder::FindSCR_EndLoadingPlaque()
+{
+#ifdef PLATFORM_WINDOWS
+	void *pfnSCR_EndLoadingPlaque = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::SCR_EndLoadingPlaque );
+#else
+	void *pfnSCR_EndLoadingPlaque = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::SCR_EndLoadingPlaque );
+#endif
+
+	if ( pfnSCR_EndLoadingPlaque == NULL )
+	{
+		Sys_Error("[SvenMod] Couldn't find function \"SCR_EndLoadingPlaque\"");
+	}
+
+	return pfnSCR_EndLoadingPlaque;
+}
+
+void *CGameDataFinder::FindCL_Disconnect()
+{
+#ifdef PLATFORM_WINDOWS
+	void *pfnCL_Disconnect = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::CL_Disconnect );
+#else
+	void *pfnCL_Disconnect = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::CL_Disconnect );
+#endif
+
+	if ( pfnCL_Disconnect == NULL )
+	{
+		Sys_Error("[SvenMod] Couldn't find function \"CL_Disconnect\"");
+	}
+
+	return pfnCL_Disconnect;
+}
+
+void *CGameDataFinder::FindR_RenderScene()
+{
+#ifdef PLATFORM_WINDOWS
+	void *pfnR_RenderScene = MemoryUtils()->FindPattern( SvenModAPI()->Modules()->Hardware, Patterns::Hardware::R_RenderScene );
+#else
+	void *pfnR_RenderScene = MemoryUtils()->ResolveSymbol( SvenModAPI()->Modules()->Hardware, Symbols::Hardware::R_RenderScene );
+#endif
+
+	if ( pfnR_RenderScene == NULL )
+	{
+		Sys_Error("[SvenMod] Couldn't find function \"R_RenderScene\"");
+	}
+
+	return pfnR_RenderScene;
 }

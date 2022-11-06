@@ -5,10 +5,10 @@
 #pragma once
 #endif
 
-struct api_version_s
+typedef struct api_version_s
 {
 	int major_version;
 	int minor_version;
-};
+} api_version_t;
 
 #endif // API_VERSION_H

@@ -17,6 +17,7 @@
 #include <memutils/patterns.h>
 
 #include <hl_sdk/engine/APIProxy.h>
+#include <hl_sdk/common/event.h>
 #include <hl_sdk/common/netmsg.h>
 #include <hl_sdk/common/sizebuf.h>
 #include <hl_sdk/common/r_studioint.h>
@@ -34,6 +35,7 @@
 #include "plugins_manager.h"
 #include "gamedata_finder.h"
 #include "game_hooks.h"
+#include "hooks.h"
 #include "patterns.h"
 
 // Game interfaces
@@ -55,6 +57,7 @@ playermove_t *g_pPlayerMove = NULL;
 IVideoMode *g_pVideoMode = NULL;
 IVideoMode **g_ppVideoMode = NULL;
 usermsg_t **g_ppClientUserMsgs = NULL;
+event_t *g_pEventHooks = NULL;
 netmsg_t *g_pNetworkMessages = NULL;
 
 WeaponsResource *g_pWeaponsResource = NULL;
@@ -73,12 +76,12 @@ double *g_pFrametime = NULL;
 const char *g_pszBaseDirectory = NULL;
 
 static const char *s_pszClientVersion = NULL;
-client_version_s g_ClientVersion;
+client_version_t g_ClientVersion;
 int g_iEngineBuild = 0;
 int g_iProtocolVersion = 0;
 
 int *g_pClientState = NULL;
-modules_s g_Modules;
+modules_t g_Modules;
 
 // Disassemble struct
 ud_t g_inst;
@@ -119,7 +122,7 @@ DECLARE_FUNC(int, __cdecl, HOOKED_Sys_InitGame, CreateInterfaceFn appSystemFacto
 	if ( initialized )
 	{
 		g_pszBaseDirectory = strdup(pBaseDir);
-		g_SvenMod.SystemPostInit();
+		g_SvenMod.InitSystems();
 	}
 	else
 	{
@@ -197,7 +200,7 @@ DECLARE_FUNC(void, __cdecl, HOOKED_LoadClientDLL, char *pszLibFileName)
 bool CSvenMod::Init(ICommandLine *pCommandLine, IFileSystem *pFileSystem, IRegistry *pRegistry)
 {
 	// Sequence of calls
-	// Launcher >> CSvenMod::Init >> LoadClientDLL (hook) >> cl_clientfuncs_s::Initialize (hook) >> Sys_InitGame (hook) >> CSvenMod::SystemPostInit >> CSvenMod::StartSystems
+	// Launcher >> CSvenMod::Init >> LoadClientDLL (hook) >> cl_clientfuncs_s::Initialize (hook) >> Sys_InitGame (hook) >> CSvenMod::InitSystems >> CSvenMod::StartSystems
 
 	g_pCommandLine = pCommandLine;
 	g_pFileSystem = pFileSystem;
@@ -220,7 +223,7 @@ bool CSvenMod::Init(ICommandLine *pCommandLine, IFileSystem *pFileSystem, IRegis
 }
 
 // Initialize the rest part
-void CSvenMod::SystemPostInit()
+void CSvenMod::InitSystems()
 {
 	// Collect modules
 #ifdef PLATFORM_WINDOWS
@@ -269,11 +272,12 @@ void CSvenMod::SystemPostInit()
 	g_GameDataFinder.FindClientState( &g_pClientState );
 
 	g_GameDataFinder.FindEngineStudio( &g_pEngineStudio, &g_pStudioAPI, m_pfnEngineStudioInit );
-	g_GameDataFinder.FindEngineClient( &g_pEngineClient);
+	g_GameDataFinder.FindEngineClient( &g_pEngineClient );
 	g_GameDataFinder.FindStudioModelRenderer( &g_pStudioRenderer );
 	g_GameDataFinder.FindPlayerMove( &g_pPlayerMove );
 	g_GameDataFinder.FindVideoMode( &g_ppVideoMode, &g_pVideoMode, m_pfnVideoMode_Create );
 	g_GameDataFinder.FindUserMessages( &g_ppClientUserMsgs );
+	g_GameDataFinder.FindEventHooks( &g_pEventHooks );
 	g_GameDataFinder.FindNetworkMessages( &g_pNetworkMessages, &g_pNetMessage, &g_pNetMessageReadCount, &g_pNetMessageBadRead );
 	g_GameDataFinder.FindExtraPlayerInfo( &g_pPlayerExtraInfo );
 	g_GameDataFinder.FindWeaponsResource( &g_pWeaponsResource );
@@ -290,6 +294,7 @@ void CSvenMod::SystemPostInit()
 	g_Inventory.Init();
 	g_Utils.Init();
 	g_CVar.Init();
+	g_Hooks.Init();
 
 #ifdef PLATFORM_WINDOWS
 	// Let's not change engine functions so easily.. Just detour them for proper work of the game and SvenMod
@@ -305,8 +310,8 @@ void CSvenMod::SystemPostInit()
 	MemoryUtils()->VirtualProtect( g_pNetAPI, sizeof(net_api_t), PAGE_EXECUTE_READ, NULL );
 	MemoryUtils()->VirtualProtect( g_pVoiceTweak, sizeof(IVoiceTweak), PAGE_EXECUTE_READ, NULL );
 
-	MemoryUtils()->VirtualProtect( &g_ClientVersion, sizeof(client_version_s), PAGE_EXECUTE_READ, NULL );
-	MemoryUtils()->VirtualProtect( &g_Modules, sizeof(modules_s), PAGE_EXECUTE_READ, NULL );
+	MemoryUtils()->VirtualProtect( &g_ClientVersion, sizeof(client_version_t), PAGE_EXECUTE_READ, NULL );
+	MemoryUtils()->VirtualProtect( &g_Modules, sizeof(modules_t), PAGE_EXECUTE_READ, NULL );
 #endif
 
 	g_iEngineBuild = build_number();
@@ -338,6 +343,7 @@ void CSvenMod::Shutdown()
 
 	ConVar_Unregister();
 
+	g_Hooks.Shutdown();
 	g_CVar.Shutdown();
 	g_pLoggingSystem->Shutdown();
 
@@ -359,13 +365,21 @@ bool CSvenMod::FindSignatures()
 
 	g_Modules.Hardware = hHardwareDLL;
 
+#ifdef PLATFORM_WINDOWS
 	if ( (build_number = (build_numberFn)MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::build_number )) == NULL )
+#else // Linux
+	if ( (build_number = (build_numberFn)MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::build_number )) == NULL )
+#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"build_number\"");
 		return false;
 	}
 	
+#ifdef PLATFORM_WINDOWS
 	if ( (m_pfnLoadClientDLL = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::LoadClientDLL )) == NULL )
+#else // Linux
+	if ( (m_pfnLoadClientDLL = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::LoadClientDLL )) == NULL )
+#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"LoadClientDLL\"");
 		return false;
@@ -377,19 +391,31 @@ bool CSvenMod::FindSignatures()
 		return false;
 	}
 	
+#ifdef PLATFORM_WINDOWS
 	if ( (m_pfnSys_InitGame = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::Sys_InitGame )) == NULL )
+#else // Linux
+	if ( (m_pfnSys_InitGame = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::Sys_InitGame )) == NULL )
+#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"Sys_InitGame\"");
 		return false;
 	}
 	
+#ifdef PLATFORM_WINDOWS
 	if ( (m_pfnHost_FilterTime = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::Host_FilterTime )) == NULL )
+#else // Linux
+	if ( (m_pfnHost_FilterTime = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::Host_FilterTime )) == NULL )
+#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"Host_FilterTime\"");
 		return false;
 	}
 	
+#ifdef PLATFORM_WINDOWS
 	if ( (m_pfnHost_Shutdown = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::Host_Shutdown )) == NULL )
+#else // Linux
+	if ( (m_pfnHost_Shutdown = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::Host_Shutdown )) == NULL )
+#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"Host_Shutdown\"");
 		return false;
@@ -479,7 +505,7 @@ void CSvenMod::CheckClientVersion()
 
 	if ( !pszFirstSeparator )
 	{
-		LogWarning("Tried to find client's version in format 'XX.XX' but got this: '%s'.\n", g_ClientVersion.string);
+		LogWarning("Tried to find client's version in format 'X.XX' but got this: '%s'.\n", g_ClientVersion.string);
 		g_ClientVersion.major_version = atoi(g_ClientVersion.string);
 	}
 	else
@@ -500,7 +526,7 @@ void CSvenMod::CheckClientVersion()
 		}
 	}
 
-	g_ClientVersion.version = g_ClientVersion.major_version * 1000 + g_ClientVersion.minor_version;
+	g_ClientVersion.version = g_ClientVersion.major_version * 100 + g_ClientVersion.minor_version;
 }
 
 //-----------------------------------------------------------------------------
@@ -524,6 +550,7 @@ IRegistry *Registry()
 
 IVideoMode *VideoMode()
 {
+#if 0
 	if ( *g_ppVideoMode )
 	{
 		return *g_ppVideoMode;
@@ -532,6 +559,9 @@ IVideoMode *VideoMode()
 	Sys_Error("[SvenMod] VideoMode is NULL");
 
 	return NULL;
+#else
+	return *g_ppVideoMode;
+#endif
 }
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CSvenMod, ISvenMod, SVENMOD_INTERFACE_VERSION, g_SvenMod);

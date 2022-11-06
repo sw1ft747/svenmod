@@ -94,13 +94,13 @@ public:
 	// Pause all registered detours
 	//-----------------------------------------------------------------------------
 
-	virtual bool		PauseAllDetours() = 0;
+	virtual bool			PauseAllDetours() = 0;
 
 	//-----------------------------------------------------------------------------
 	// Unpause all registered detours
 	//-----------------------------------------------------------------------------
 
-	virtual bool		UnpauseAllDetours() = 0;
+	virtual bool			UnpauseAllDetours() = 0;
 };
 
 #define DETOURS_API_INTERFACE_VERSION "DetoursAPI001"
