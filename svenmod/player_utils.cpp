@@ -48,7 +48,7 @@ float CPlayerUtils::GetHealth(int iPlayerIndex)
 {
 	if (iPlayerIndex > 0 && iPlayerIndex <= MAXCLIENTS)
 	{
-		return g_pPlayerExtraInfo[iPlayerIndex].GetHealth();
+		return g_pPlayerExtraInfo[iPlayerIndex].health;
 	}
 
 	return -1.f;
@@ -58,7 +58,7 @@ float CPlayerUtils::GetArmor(int iPlayerIndex)
 {
 	if (iPlayerIndex > 0 && iPlayerIndex <= MAXCLIENTS)
 	{
-		return g_pPlayerExtraInfo[iPlayerIndex].GetArmor();
+		return g_pPlayerExtraInfo[iPlayerIndex].armor;
 	}
 
 	return -1.f;

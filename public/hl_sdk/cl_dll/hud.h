@@ -443,21 +443,22 @@ protected:
 	float *m_pflNameColors[MAX_STATUSBAR_LINES];
 };
 
-struct extra_player_info_t
+struct extra_player_info_t // sizeof 88 * 33 = 2904
 {
-	inline float GetHealth() { return *(float *)((unsigned char *)this + 0x42); }
-	inline float GetArmor() { return *(float *)((unsigned char *)this + 0x46); }
-
-	short frags;
-	short deaths;
+	float frags;
+	int deaths;
 	short playerclass;
-	short health; // UNUSED currently, spectator UI would like this
-	bool dead; // UNUSED currently, spectator UI would like this
-	short teamnumber;
-	char teamname[16];
 
-	// Sven Co-op specific
-	char pad_1[60];
+	//short health; // UNUSED currently, spectator UI would like this
+	//bool dead; // UNUSED currently, spectator UI would like this
+
+	short teamnumber;
+	char teamname[64];
+
+	float health;
+	float armor;
+
+	char pad_1[4];
 };
 
 struct team_info_t
