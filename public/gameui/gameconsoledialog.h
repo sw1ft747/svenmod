@@ -12,7 +12,7 @@ class CGameConsoleDialog
 {
 public:
 #ifdef PLATFORM_WINDOWS
-	char pad_1[278];
+	char pad_1[280];
 #else
 	char pad_1[276];
 #endif
