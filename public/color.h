@@ -8,7 +8,16 @@
 class Color
 {
 public:
+	inline Color() { *(int *)&r = 0xFFFFFFFF; }
+	inline Color(const Color &clr) { SetColor(clr); }
 	inline Color(int r, int g, int b, int a) { SetColor(r, g, b, a); }
+	inline Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) { SetColor(r, g, b, a); }
+	inline Color(float r, float g, float b, float a) { SetColor(r, g, b, a); }
+
+	inline void SetColor(const Color &clr)
+	{
+		*(int *)&r = *(int *)(&clr.r);
+	}
 
 	inline void SetColor(int r, int g, int b, int a)
 	{
@@ -16,6 +25,22 @@ public:
 		this->g = g;
 		this->b = b;
 		this->a = a;
+	}
+
+	inline void SetColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+	{
+		this->r = r;
+		this->g = g;
+		this->b = b;
+		this->a = a;
+	}
+
+	inline void SetColor(float r, float g, float b, float a)
+	{
+		this->r = int(255.f * r);
+		this->g = int(255.f * g);
+		this->b = int(255.f * b);
+		this->a = int(255.f * a);
 	}
 
 	inline void GetColor(int &r, int &g, int &b, int &a)
