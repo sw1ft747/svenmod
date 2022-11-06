@@ -111,7 +111,7 @@ public:
 	inline Vector2D Normalize() const { return *this * (1.0f / (Length() + FLT_EPSILON)); }
 
 	inline Vector2D Project(const Vector2D &vOther) const { return vOther * (Dot(vOther) / (vOther.LengthSqr() + FLT_EPSILON)); }
-	inline Vector2D Reject(const Vector2D &vOther) const { return *this - Reject(vOther); }
+	inline Vector2D Reject(const Vector2D &vOther) const { return *this - Project(vOther); }
 	inline Vector2D Reflect(const Vector2D &vOther, float flFactor = 2.0f) const { return *this - (Project(vOther) * flFactor); }
 
 	inline vec_t Dot(const Vector2D &vOther) const { return x * vOther.x + y * vOther.y; }
@@ -208,7 +208,7 @@ public:
 	inline Vector Normalize() const { return *this * (1.0f / (Length() + FLT_EPSILON)); }
 
 	inline Vector Project(const Vector &vOther) const { return vOther * (Dot(vOther) / (vOther.LengthSqr() + FLT_EPSILON)); }
-	inline Vector Reject(const Vector &vOther) const { return *this - Reject(vOther); }
+	inline Vector Reject(const Vector &vOther) const { return *this - Project(vOther); }
 	inline Vector Reflect(const Vector &vOther, float flFactor = 2.0f) const { return *this - (Project(vOther) * flFactor); }
 
 	inline Vector Cross(const Vector &vOther) const { return Vector(y * vOther.z - vOther.y * z, z * vOther.x - vOther.z * x, x * vOther.y - vOther.x * y); }
@@ -235,6 +235,7 @@ inline Vector Vector2D::ToVector() const
 	return Vector(x, y, 0.0f);
 }
 
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
 typedef Vector2D vec2_t;
