@@ -5,6 +5,7 @@
 #pragma once
 #endif
 
+#include "hl_sdk/common/event.h"
 #include "hl_sdk/common/usermsg.h"
 #include "hl_sdk/common/netmsg.h"
 #include "hl_sdk/common/sizebuf.h"
@@ -14,6 +15,16 @@
 #include "sys.h"
 
 #include "math/vector.h"
+
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+
+class CMessageBuffer;
+
+//-----------------------------------------------------------------------------
+// CNetMessageParams
+//-----------------------------------------------------------------------------
 
 class CNetMessageParams
 {
@@ -39,10 +50,15 @@ public:
 	virtual void			ScreenToWorld( Vector2D &vScreen, Vector &vWorldOrigin ) = 0;
 
 	virtual CNetMessageParams *GetNetMessageParams( void ) = 0;
+	virtual void			ApplyReadToNetMessageBuffer( CMessageBuffer *buffer ) = 0;
+	virtual void			ApplyReadToNetMessageBuffer( int readcount, int badread ) = 0;
 
 	virtual const netmsg_t *FindNetworkMessage( int iNetMessageType ) = 0;
 	virtual const netmsg_t *FindNetworkMessage( const char *pszName ) = 0;
 	virtual const usermsg_t *FindUserMessage( const char *pszName ) = 0;
+	virtual const event_t	*FindEventHook( const char *pszName ) = 0;
+
+	virtual void			PrintChatText( const char *pszMessage, ... ) = 0;
 
 	virtual void			DrawSetTextColor( float r, float g, float b ) = 0;
 	virtual int				DrawConsoleString( int x, int y, const char *pszFormat, ... ) = 0;

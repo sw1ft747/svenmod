@@ -1,12 +1,14 @@
 #include "utils.h"
 
 #include <dbg.h>
+#include <messagebuffer.h>
 #include <IVideoMode.h>
 
 #include <hl_sdk/common/protocol.h>
 #include <hl_sdk/engine/APIProxy.h>
 
 extern usermsg_t **g_ppClientUserMsgs;
+extern event_t *g_pEventHooks;
 extern netmsg_t *g_pNetworkMessages;
 
 extern sizebuf_t *g_pNetMessage;
@@ -73,9 +75,21 @@ CNetMessageParams *CUtils::GetNetMessageParams(void)
 {
 	m_NetMessageParams.buffer = g_pNetMessage;
 	m_NetMessageParams.readcount = *g_pNetMessageReadCount;
-	m_NetMessageParams.badread = (bool)*g_pNetMessageBadRead;
+	m_NetMessageParams.badread = !!(*g_pNetMessageBadRead);
 
 	return &m_NetMessageParams;
+}
+
+void CUtils::ApplyReadToNetMessageBuffer(CMessageBuffer *buffer)
+{
+	*g_pNetMessageReadCount = buffer->GetReadCount();
+	*g_pNetMessageBadRead = !buffer->ReadOK();
+}
+
+void CUtils::ApplyReadToNetMessageBuffer(int readcount, int badread)
+{
+	*g_pNetMessageReadCount = readcount;
+	*g_pNetMessageBadRead = badread;
 }
 
 const netmsg_t *CUtils::FindNetworkMessage(int iType)
@@ -131,6 +145,66 @@ const usermsg_t *CUtils::FindUserMessage(const char *pszName)
 }
 
 //-----------------------------------------------------------------------------
+// Event Hook
+//-----------------------------------------------------------------------------
+
+const event_t *CUtils::FindEventHook(const char *pszName)
+{
+	event_t *pEventHook = g_pEventHooks;
+
+	while (pEventHook)
+	{
+		if (pEventHook->name)
+		{
+			if ( !stricmp(pszName, pEventHook->name) )
+			{
+				return const_cast<const event_t *>(pEventHook);
+			}
+		}
+
+		pEventHook = pEventHook->next;
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Print to client's chat, not visible to others and when playing back demo
+//-----------------------------------------------------------------------------
+
+void CUtils::PrintChatText(const char *pszMessage, ...)
+{
+	size_t len;
+	CMessageBuffer msgbuffer;
+
+	static char buffer[1024];
+	static char szFormattedMsg[1024];
+	static const usermsg_t *pSayText = NULL;
+
+	if ( pszMessage == NULL || ( len = strlen(pszMessage) ) == 0 )
+		return;
+
+	if ( pSayText == NULL )
+		pSayText = FindUserMessage("SayText");
+
+	va_list args;
+	va_start(args, pszMessage);
+	vsnprintf(szFormattedMsg, sizeof(szFormattedMsg) / sizeof(*szFormattedMsg), pszMessage, args);
+	va_end(args);
+
+	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(*szFormattedMsg)) - 1] = 0;
+
+	msgbuffer.Init( buffer, sizeof(buffer) / sizeof(*buffer) );
+	msgbuffer.WriteByte( 0 );
+	msgbuffer.WriteString( szFormattedMsg );
+
+	buffer[(sizeof(buffer) / sizeof(*buffer)) - 1] = 0;
+
+	//Msg( pszMessage );
+	pSayText->function( "SayText", msgbuffer.GetBuffer()->cursize, msgbuffer.GetBuffer()->data );
+}
+
+//-----------------------------------------------------------------------------
 // Draw utilities
 //-----------------------------------------------------------------------------
 
@@ -148,7 +222,7 @@ int CUtils::DrawConsoleString(int x, int y, const char *pszFormat, ...)
 	vsnprintf(szFormattedMsg, sizeof(szFormattedMsg), pszFormat, args);
 	va_end(args);
 
-	szFormattedMsg[sizeof(szFormattedMsg) - 1] = 0;
+	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
 
 	return g_pEngineFuncs->DrawConsoleString(x, y, szFormattedMsg);
 }

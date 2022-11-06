@@ -25,10 +25,15 @@ public:
 	virtual void			ScreenToWorld( Vector2D &vScreen, Vector &vWorldOrigin );
 
 	virtual CNetMessageParams *GetNetMessageParams( void );
+	virtual void			ApplyReadToNetMessageBuffer(CMessageBuffer *buffer);
+	virtual void			ApplyReadToNetMessageBuffer(int readcount, int badread);
 
 	virtual const netmsg_t *FindNetworkMessage( int iNetMessageType );
 	virtual const netmsg_t *FindNetworkMessage( const char *pszName );
 	virtual const usermsg_t *FindUserMessage( const char *pszName );
+	virtual const event_t	*FindEventHook( const char *pszName );
+
+	virtual void			PrintChatText( const char *pszMessage, ... );
 
 	virtual void			DrawSetTextColor( float r, float g, float b );
 	virtual int				DrawConsoleString( int x, int y, const char *pszFormat, ... );
