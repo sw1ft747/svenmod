@@ -39,13 +39,13 @@ void AngleVectors(const Vector& angles, Vector* forward, Vector* right, Vector* 
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[1] * static_cast<float>(M_PI / 180.0);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[0] * static_cast<float>(M_PI / 180.0);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[2] * static_cast<float>(M_PI / 180.0);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -74,13 +74,13 @@ void AngleVectorsTranspose(const Vector& angles, Vector* forward, Vector* right,
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[1] * static_cast<float>(M_PI / 180.0);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[0] * static_cast<float>(M_PI / 180.0);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[2] * static_cast<float>(M_PI / 180.0);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -109,13 +109,13 @@ void AngleMatrix(const float* angles, float matrix[3][4])
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[1] * static_cast<float>(M_PI / 180.0);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[0] * static_cast<float>(M_PI / 180.0);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[2] * static_cast<float>(M_PI / 180.0);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -139,13 +139,13 @@ void AngleIMatrix(const Vector& angles, float matrix[3][4])
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[1] * static_cast<float>(M_PI / 180.0);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[0] * static_cast<float>(M_PI / 180.0);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * (static_cast<float>(M_PI) / 180.0f);
+	angle = angles[2] * static_cast<float>(M_PI / 180.0);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -247,6 +247,35 @@ void VectorTransform(const Vector &in1, float in2[3][4], Vector &out)
 	out[0] = DotProduct(in1, *reinterpret_cast<const Vector*>(in2[0])) + in2[0][3];
 	out[1] = DotProduct(in1, *reinterpret_cast<const Vector*>(in2[1])) + in2[1][3];
 	out[2] = DotProduct(in1, *reinterpret_cast<const Vector*>(in2[2])) + in2[2][3];
+}
+
+void VectorRotate(const Vector &in1, float in2[3][4], Vector &out)
+{
+	out[0] = DotProduct(in1, *reinterpret_cast<const Vector *>(in2[0]));
+	out[1] = DotProduct(in1, *reinterpret_cast<const Vector *>(in2[1]));
+	out[2] = DotProduct(in1, *reinterpret_cast<const Vector *>(in2[2]));
+}
+
+// translate and rotate by the inverse of the matrix
+void VectorITransform(const Vector &in1, float in2[3][4], Vector &out)
+{
+	float x, y, z;
+
+	x = in1[0] - in2[0][3];
+	y = in1[1] - in2[1][3];
+	z = in1[2] - in2[2][3];
+
+	out[0] = x * in2[0][0] + y * in2[1][0] + z * in2[2][0];
+	out[1] = x * in2[0][1] + y * in2[1][1] + z * in2[2][1];
+	out[2] = x * in2[0][2] + y * in2[1][2] + z * in2[2][2];
+}
+
+// rotate by the inverse of the matrix
+void VectorIRotate(const Vector &in1, float in2[3][4], Vector &out)
+{
+	out[0] = in1[0] * in2[0][0] + in1[1] * in2[1][0] + in1[2] * in2[2][0];
+	out[1] = in1[0] * in2[0][1] + in1[1] * in2[1][1] + in1[2] * in2[2][1];
+	out[2] = in1[0] * in2[0][2] + in1[1] * in2[1][2] + in1[2] * in2[2][2];
 }
 
 float VectorNormalize(Vector &v)
@@ -440,8 +469,8 @@ void QuaternionSlerp(vec4_t p, vec4_t q, float t, vec4_t qt)
 		qt[1] = q[0];
 		qt[2] = -q[3];
 		qt[3] = q[2];
-		sclp = sin((1.0f - t) * (0.5f * static_cast<float>(M_PI)));
-		sclq = sin(t * (0.5f * static_cast<float>(M_PI)));
+		sclp = sin((1.0f - t) * static_cast<float>(0.5 * M_PI));
+		sclq = sin(t * static_cast<float>(0.5 * M_PI));
 		for (i = 0; i < 3; i++)
 		{
 			qt[i] = sclp * p[i] + sclq * qt[i];

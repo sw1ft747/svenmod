@@ -178,6 +178,9 @@ void AngleVectorsTranspose(const Vector &angles, Vector *forward, Vector *right,
 void AngleMatrix(const float *angles, float matrix[3][4]);
 void AngleIMatrix(const Vector &angles, float matrix[3][4]);
 void VectorTransform(const Vector &in1, float in2[3][4], Vector &out);
+void VectorRotate(const Vector &in1, float in2[3][4], Vector &out);
+void VectorITransform(const Vector &in1, float in2[3][4], Vector &out);
+void VectorIRotate(const Vector &in1, float in2[3][4], Vector &out);
 
 float NormalizeAngle(float angle);
 void NormalizeAngles(float *angles);
