@@ -14,17 +14,18 @@ set(SVENMOD_SOURCE_FILES
 	svenmod/config_manager.cpp
 	svenmod/console.cpp
 	svenmod/cvar.cpp
-	svenmod/detours_api.cpp
 	svenmod/game_hooks.cpp
+	svenmod/debug.cpp
+	svenmod/detours_api.cpp
 	svenmod/gamedata_finder.cpp
 	svenmod/gameui_iface.cpp
 	svenmod/hooks.cpp
 	svenmod/inventory.cpp
+	svenmod/keyvalues_custom_parser.cpp
 	svenmod/logging_system.cpp
 	svenmod/memory_utils.cpp
 	svenmod/patterns.cpp
 	svenmod/player_utils.cpp
-	svenmod/plugins_loader.cpp
 	svenmod/plugins_manager.cpp
 	svenmod/svenmod.cpp
 	svenmod/svenmod_api.cpp
