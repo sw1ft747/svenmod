@@ -24,6 +24,10 @@ public:
 
 private:
 	DetourHandle_t m_hPaintTraverse;
+	DetourHandle_t m_hSCR_BeginLoadingPlaque;
+	DetourHandle_t m_hSCR_EndLoadingPlaque;
+	DetourHandle_t m_hCL_Disconnect;
+	DetourHandle_t m_hR_RenderScene;
 	DetourHandle_t m_hUserMsgHook_CurWeapon;
 };
 

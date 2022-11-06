@@ -30,7 +30,7 @@ public:
 	virtual						~IClientPlugin() {}
 
 	// Always add this in implementation: return SVENMOD_API_VER;
-	virtual api_version_s		GetAPIVersion( void ) = 0;
+	virtual api_version_t		GetAPIVersion( void ) = 0;
 
 	// Initialize the plugin to run
 	// Return 'false' if there is an error during startup
@@ -50,16 +50,26 @@ public:
 	// Called when the plugin should start executing again (sometime after a Pause() call)
 	virtual void				Unpause( void ) = 0;
 
+	// Called after loading when client received first clientdata from a server
+	virtual void				OnFirstClientdataReceived( client_data_t *pcldata, float flTime ) = 0;
+	
+	// Called when client started loading to the server, loading bar appears
+	virtual void				OnBeginLoading( void ) = 0;
+
+	// Called when client has finished loading to the server, game view appears
+	virtual void				OnEndLoading( void ) = 0;
+
+	// Called when client was disconnected from a server
+	virtual void				OnDisconnect( void ) = 0;
+
 	// Called on each game frame twice (if @bPostRunCmd is 'false', then none of inputs/commands were processed yet)
 	virtual void				GameFrame( client_state_t state, double frametime, bool bPostRunCmd ) = 0;
+
+	// Called to draw 2D paints after rendering the game view
+	virtual void				Draw( void ) = 0;
 	
-	// Called to draw 2D paints after rendering the game view, you can handle the callback to influence on other plugins
-	// @PLUGIN_CONTINUE - don't abort the call sequence
-	// @PLUGIN_STOP and @PLUGIN_CALL_STOP - don't call the further plugins callbacks
-	virtual PLUGIN_RESULT		Draw( void ) = 0;
-	
-	// Called to redraw client's HUD, the same callback as @Draw method
-	virtual PLUGIN_RESULT		DrawHUD( float time, int intermission ) = 0;
+	// Called to redraw client's HUD
+	virtual void				DrawHUD( float time, int intermission ) = 0;
 
 	// Name of the plugin
 	virtual const char			*GetName( void ) = 0;
@@ -86,6 +96,6 @@ public:
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-#define CLIENT_PLUGIN_INTERFACE_VERSION "ClientPlugin001"
+#define CLIENT_PLUGIN_INTERFACE_VERSION "ClientPlugin002"
 
 #endif // ICLIENTPLUGIN_H

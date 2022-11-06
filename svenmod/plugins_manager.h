@@ -92,6 +92,11 @@ public:
 	void PrintPluginInfo(int index);
 
 public:
+	// Callbacks
+	void OnFirstClientdataReceived(client_data_t *pcldata, float flTime);
+	void OnBeginLoading(void);
+	void OnEndLoading(void);
+	void OnDisconnect(void);
 	void Frame(int state, double frametime, bool bPostRunCmd);
 	void Draw(void);
 	void DrawHUD(float time, int intermission);

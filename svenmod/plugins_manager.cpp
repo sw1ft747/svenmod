@@ -1,7 +1,7 @@
 #pragma warning(disable : 4018)
 
 #include "plugins_manager.h"
-#include "plugins_loader.h"
+#include "keyvalues_custom_parser.h"
 
 #include <IPluginHelpers.h>
 #include <dbg.h>
@@ -11,7 +11,7 @@
 bool g_bAutoPauseDetours = false;
 
 CPluginsManager g_PluginsManager;
-static plugin_info_s s_PluginInfo;
+static plugin_info_t s_PluginInfo;
 
 //-----------------------------------------------------------------------------
 // CPluginHelpers
@@ -28,8 +28,8 @@ public:
 	virtual bool IsPluginRunning(int index);
 
 	// Query information about a plugin
-	virtual plugin_info_s *QueryPluginInfo(int index);
-	virtual plugin_info_s *QueryPluginInfo(const char *pszPluginName);
+	virtual plugin_info_t *QueryPluginInfo(int index);
+	virtual plugin_info_t *QueryPluginInfo(const char *pszPluginName);
 };
 
 int CPluginHelpers::PluginsCount(void)
@@ -56,13 +56,13 @@ bool CPluginHelpers::IsPluginRunning(int index)
 {
 	CPlugin *pPlugin = g_PluginsManager.FindPluginByIndex(index);
 
-	if (pPlugin)
+	if ( pPlugin != NULL )
 		return (pPlugin->GetStatus() == PLUGIN_RUNNING);
 
 	return false;
 }
 
-plugin_info_s *CPluginHelpers::QueryPluginInfo(int index)
+plugin_info_t *CPluginHelpers::QueryPluginInfo(int index)
 {
 	CPlugin *pPlugin = g_PluginsManager.FindPluginByIndex(index);
 
@@ -85,7 +85,7 @@ plugin_info_s *CPluginHelpers::QueryPluginInfo(int index)
 	return NULL;
 }
 
-plugin_info_s *CPluginHelpers::QueryPluginInfo(const char *pszPluginName)
+plugin_info_t *CPluginHelpers::QueryPluginInfo(const char *pszPluginName)
 {
 	return QueryPluginInfo( FindPlugin(pszPluginName) );
 }
@@ -153,9 +153,9 @@ bool CPlugin::Load(const char *pszFileName, bool bGlobalLoad)
 			return false;
 		}
 
-		api_version_s APIver = m_pPlugin->GetAPIVersion();
+		api_version_t APIver = m_pPlugin->GetAPIVersion();
 
-		if (APIver.major_version != SVENMOD_API_MAJOR_VERSION)
+		if ( APIver.major_version != SVENMOD_API_MAJOR_VERSION )
 		{
 			Sys_ErrorMessage("[SvenMod] API version of the plugin \"%s\" differs with SvenMod's API\n\nAPI version of SvenMod: %s\nAPI version of the plugin: %d.%d\n\nCheck \"svenmod.log\" for details",
 							 m_pPlugin->GetName(),
@@ -163,7 +163,7 @@ bool CPlugin::Load(const char *pszFileName, bool bGlobalLoad)
 							 APIver.major_version,
 							 APIver.minor_version);
 
-			if (APIver.major_version > SVENMOD_API_MAJOR_VERSION)
+			if ( APIver.major_version > SVENMOD_API_MAJOR_VERSION )
 			{
 				LogError("Your version of SvenMod is outdated, update it here: https://github.com/sw1ft747/svenmod\n");
 
@@ -183,7 +183,7 @@ bool CPlugin::Load(const char *pszFileName, bool bGlobalLoad)
 			return false;
 		}
 
-		if (APIver.minor_version != SVENMOD_API_MINOR_VERSION)
+		if ( APIver.minor_version != SVENMOD_API_MINOR_VERSION )
 		{
 			PluginLogWarning(m_pPlugin, "API version of the plugin differs with SvenMod's API.");
 		}
@@ -223,7 +223,7 @@ void CPlugin::Unload()
 
 bool CPlugin::Pause()
 {
-	if (m_Status == PLUGIN_RUNNING)
+	if ( m_Status == PLUGIN_RUNNING )
 	{
 		if ( m_pPlugin->Pause() )
 		{
@@ -239,7 +239,7 @@ bool CPlugin::Pause()
 
 bool CPlugin::Unpause()
 {
-	if (m_Status == PLUGIN_PAUSED)
+	if ( m_Status == PLUGIN_PAUSED )
 	{
 		m_pPlugin->Unpause();
 		m_Status = PLUGIN_RUNNING;
@@ -265,7 +265,7 @@ CPluginsManager::~CPluginsManager()
 
 CPlugin *CPluginsManager::FindPluginByIndex(int index)
 {
-	if (index >= 0 && index < m_Plugins.size())
+	if ( index >= 0 && index < m_Plugins.size() )
 	{
 		return m_Plugins[index];
 	}
@@ -282,40 +282,59 @@ void CPluginsManager::LoadPlugins()
 {
 	Assert( m_Plugins.size() == 0 );
 
-	PLUGIN_LOAD_RESULT loadResult;
-	plugins_s *pPluginsBase = g_PluginsLoader.LoadFromFile("svenmod/plugins.txt", &loadResult);
+	int result_code;
 
-	if (loadResult == LOAD_RESULT_MISSING_FILE)
-	{
-		LogWarning("Missing file \"../svenmod/plugins.txt\" to load plugins.\n");
-	}
-	else if (loadResult == LOAD_RESULT_FAILED)
-	{
-		Warning("[SvenMod] Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", g_PluginsLoader.GetLastErrorMessage(), g_PluginsLoader.GetLastErrorLine());
-		LogWarning("Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", g_PluginsLoader.GetLastErrorMessage(), g_PluginsLoader.GetLastErrorLine());
-	}
-	else
-	{
-		g_bAutoPauseDetours = true;
+	KeyValuesParser::KeyValues *kv_plugins = KeyValuesParser::LoadFromFile("svenmod/plugins.txt", &result_code);
 
-		for (plugins_s *pPlugin = pPluginsBase; pPlugin; pPlugin = pPlugin->next)
+	if ( result_code == KeyValuesParser::PARSE_FAILED )
+	{
+		Warning("[SvenMod] Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", KeyValuesParser::GetLastErrorMessage(), KeyValuesParser::GetLastErrorLine());
+		LogWarning("Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", KeyValuesParser::GetLastErrorMessage(), KeyValuesParser::GetLastErrorLine());
+		
+		return;
+	}
+
+	if ( kv_plugins == NULL )
+	{
+		Warning("[SvenMod] File \"../svenmod/plugins.txt\" is empty.\n");
+		LogWarning("File \"../svenmod/plugins.txt\" is empty.\n");
+		
+		return;
+	}
+
+	if ( kv_plugins->Key() != "Plugins" )
+	{
+		Warning("[SvenMod] Expected \"Plugins\" as main section in the file \"../svenmod/plugins.txt\".\n");
+		LogWarning("Expected \"Plugins\" as main section in the file \"../svenmod/plugins.txt\".\n");
+
+		delete kv_plugins;
+		return;
+	}
+
+	g_bAutoPauseDetours = true;
+
+	for (size_t i = 0; i < kv_plugins->GetList().size(); i++)
+	{
+		KeyValuesParser::KeyValues *plugin = kv_plugins->GetList()[i];
+
+		if ( !plugin->IsSection() )
 		{
-			if (pPlugin->load)
+			if ( !(plugin->Value() == "0" || plugin->Value() == "false") )
 			{
-				LoadPlugin(pPlugin->name, true);
+				LoadPlugin( plugin->Key().c_str(), true );
 			}
 		}
-
-		g_PluginsLoader.FreePlugins(pPluginsBase);
-
-		g_bAutoPauseDetours = false;
-		DetoursAPI()->UnpauseAllDetours(); // Attach detours
-
-		for (int i = 0; i < m_Plugins.size(); i++)
-		{
-			m_Plugins[i]->GetCallback()->PostLoad(true);
-		}
 	}
+
+	g_bAutoPauseDetours = false;
+	DetoursAPI()->UnpauseAllDetours(); // Attach detours
+
+	for (int i = 0; i < m_Plugins.size(); i++)
+	{
+		m_Plugins[i]->GetCallback()->PostLoad(true);
+	}
+
+	delete kv_plugins;
 }
 
 void CPluginsManager::UnloadPlugins()
@@ -359,7 +378,7 @@ bool CPluginsManager::UnloadPlugin(int index)
 {
 	LogMsg("Unloading plugin \"%d\".\n", index);
 
-	if (index >= 0 && index < m_Plugins.size())
+	if ( index >= 0 && index < m_Plugins.size() )
 	{
 		CPlugin *pPlugin = m_Plugins[index];
 
@@ -380,11 +399,11 @@ bool CPluginsManager::UnloadPlugin(int index)
 
 bool CPluginsManager::PausePlugin(int index)
 {
-	if (index >= 0 && index < m_Plugins.size())
+	if ( index >= 0 && index < m_Plugins.size() )
 	{
 		bool bPaused = m_Plugins[index]->Pause();
 
-		if (bPaused)
+		if ( bPaused )
 			Msg("[SvenMod] Plugin \"%s\" has been paused\n", m_Plugins[index]->GetCallback()->GetName());
 		else
 			Msg("[SvenMod] Unable to pause plugin \"%s\"\n", m_Plugins[index]->GetCallback()->GetName());
@@ -397,11 +416,11 @@ bool CPluginsManager::PausePlugin(int index)
 
 bool CPluginsManager::UnpausePlugin(int index)
 {
-	if (index >= 0 && index < m_Plugins.size())
+	if ( index >= 0 && index < m_Plugins.size() )
 	{
 		bool bUnpaused = m_Plugins[index]->Unpause();
 
-		if (bUnpaused)
+		if ( bUnpaused )
 			Msg("[SvenMod] Plugin \"%s\" has been unpaused\n", m_Plugins[index]->GetCallback()->GetName());
 		else
 			Msg("[SvenMod] Plugin \"%s\" is already running\n", m_Plugins[index]->GetCallback()->GetName());
@@ -418,7 +437,7 @@ bool CPluginsManager::PausePlugins()
 
 	FOR_EACH_PLUGIN(i)
 	{
-		if (m_Plugins[i]->GetStatus() == PLUGIN_RUNNING)
+		if ( m_Plugins[i]->GetStatus() == PLUGIN_RUNNING )
 		{
 			bPaused = PausePlugin(i) || bPaused;
 		}
@@ -433,7 +452,7 @@ bool CPluginsManager::UnpausePlugins()
 
 	for (int i = 0; i < m_Plugins.size(); i++)
 	{
-		if (m_Plugins[i]->GetStatus() == PLUGIN_PAUSED)
+		if ( m_Plugins[i]->GetStatus() == PLUGIN_PAUSED )
 		{
 			bUnpaused = UnpausePlugin(i) || bUnpaused;
 		}
@@ -488,7 +507,7 @@ void CPluginsManager::Frame(int state, double frametime, bool bPostRunCmd)
 	{
 		CPlugin *pPlugin = m_Plugins[i];
 
-		if (pPlugin->GetStatus() == PLUGIN_RUNNING)
+		if ( pPlugin->GetStatus() == PLUGIN_RUNNING )
 		{
 			pPlugin->GetCallback()->GameFrame( static_cast<client_state_t>(state), frametime, bPostRunCmd );
 		}
@@ -501,12 +520,9 @@ void CPluginsManager::Draw(void)
 	{
 		CPlugin *pPlugin = m_Plugins[i];
 
-		if (pPlugin->GetStatus() == PLUGIN_RUNNING)
+		if ( pPlugin->GetStatus() == PLUGIN_RUNNING )
 		{
-			PLUGIN_RESULT result = pPlugin->GetCallback()->Draw();
-
-			if (result >= PLUGIN_STOP)
-				break;
+			pPlugin->GetCallback()->Draw();
 		}
 	}
 }
@@ -517,12 +533,61 @@ void CPluginsManager::DrawHUD(float time, int intermission)
 	{
 		CPlugin *pPlugin = m_Plugins[i];
 
-		if (pPlugin->GetStatus() == PLUGIN_RUNNING)
+		if ( pPlugin->GetStatus() == PLUGIN_RUNNING )
 		{
-			PLUGIN_RESULT result = pPlugin->GetCallback()->DrawHUD( time, intermission );
+			pPlugin->GetCallback()->DrawHUD( time, intermission );
+		}
+	}
+}
 
-			if (result >= PLUGIN_STOP)
-				break;
+void CPluginsManager::OnFirstClientdataReceived(client_data_t *pcldata, float flTime)
+{
+	FOR_EACH_PLUGIN(i)
+	{
+		CPlugin *pPlugin = m_Plugins[i];
+
+		if ( pPlugin->GetStatus() == PLUGIN_RUNNING )
+		{
+			pPlugin->GetCallback()->OnFirstClientdataReceived( pcldata, flTime );
+		}
+	}
+}
+
+void CPluginsManager::OnBeginLoading(void)
+{
+	FOR_EACH_PLUGIN(i)
+	{
+		CPlugin *pPlugin = m_Plugins[i];
+
+		if ( pPlugin->GetStatus() == PLUGIN_RUNNING )
+		{
+			pPlugin->GetCallback()->OnBeginLoading();
+		}
+	}
+}
+
+void CPluginsManager::OnEndLoading(void)
+{
+	FOR_EACH_PLUGIN(i)
+	{
+		CPlugin *pPlugin = m_Plugins[i];
+
+		if ( pPlugin->GetStatus() == PLUGIN_RUNNING )
+		{
+			pPlugin->GetCallback()->OnEndLoading();
+		}
+	}
+}
+
+void CPluginsManager::OnDisconnect(void)
+{
+	FOR_EACH_PLUGIN(i)
+	{
+		CPlugin *pPlugin = m_Plugins[i];
+
+		if ( pPlugin->GetStatus() == PLUGIN_RUNNING )
+		{
+			pPlugin->GetCallback()->OnDisconnect();
 		}
 	}
 }

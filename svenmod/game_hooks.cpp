@@ -1,7 +1,9 @@
 #include "client.h"
 #include "client_weapon.h"
+#include "debug.h"
 #include "game_hooks.h"
 #include "plugins_manager.h"
+#include "gamedata_finder.h"
 #include "svenmod.h"
 
 #include <hl_sdk/engine/APIProxy.h> 
@@ -17,11 +19,6 @@
 
 extern extra_player_info_t *g_pPlayerExtraInfo;
 
-static CMessageBuffer CurWeaponBuffer;
-
-static bool s_bLoading = false;
-static float s_flClientDataLastUpdate = -1.f;
-
 //-----------------------------------------------------------------------------
 // Macro defenitions
 //-----------------------------------------------------------------------------
@@ -32,6 +29,10 @@ static float s_flClientDataLastUpdate = -1.f;
 //-----------------------------------------------------------------------------
 // Vars
 //-----------------------------------------------------------------------------
+
+static CMessageBuffer CurWeaponBuffer;
+
+static bool s_bLoading = false;
 
 static cl_clientfuncs_t s_ClientFuncsOriginal;
 static cl_clientfuncs_t s_ClientFuncsHooked;
@@ -65,6 +66,67 @@ DECLARE_CLASS_FUNC(void, HOOKED_PaintTraverse, vgui::IPanel *thisptr, vgui::VPAN
 }
 
 //-----------------------------------------------------------------------------
+// SCR_BeginLoadingPlaque hook
+//-----------------------------------------------------------------------------
+
+DECLARE_HOOK(void, __cdecl, SCR_BeginLoadingPlaque, int);
+
+DECLARE_FUNC(void, __cdecl, HOOKED_SCR_BeginLoadingPlaque, int unk)
+{
+	s_bLoading = false;
+
+	g_PluginsManager.OnBeginLoading();
+
+	ORIG_SCR_BeginLoadingPlaque(unk);
+}
+
+//-----------------------------------------------------------------------------
+// SCR_EndLoadingPlaque hook
+//-----------------------------------------------------------------------------
+
+DECLARE_HOOK(void, __cdecl, SCR_EndLoadingPlaque);
+
+DECLARE_FUNC(void, __cdecl, HOOKED_SCR_EndLoadingPlaque)
+{
+	s_bLoading = true;
+
+	g_PluginsManager.OnEndLoading();
+
+	ORIG_SCR_EndLoadingPlaque();
+}
+
+//-----------------------------------------------------------------------------
+// CL_Disconnect hook
+//-----------------------------------------------------------------------------
+
+DECLARE_HOOK(void, __cdecl, CL_Disconnect);
+
+DECLARE_FUNC(void, __cdecl, HOOKED_CL_Disconnect)
+{
+	s_bLoading = false;
+
+	g_PluginsManager.OnDisconnect();
+
+	ORIG_CL_Disconnect();
+}
+
+//-----------------------------------------------------------------------------
+// R_RenderScene hook
+//-----------------------------------------------------------------------------
+
+DECLARE_HOOK(void, __cdecl, R_RenderScene);
+
+DECLARE_FUNC(void, __cdecl, HOOKED_R_RenderScene)
+{
+	ORIG_R_RenderScene();
+
+	if ( *g_pClientState == CLS_ACTIVE )
+	{
+		g_Debug.Draw();
+	}
+}
+
+//-----------------------------------------------------------------------------
 // User's message "CurrentWeapon" hook
 //-----------------------------------------------------------------------------
 
@@ -94,6 +156,8 @@ static int HUD_VidInit(void)
 {
 	g_iCurrentWeaponID = -1;
 	g_bCurrentWeaponCustom = false;
+
+	g_Debug.DrawClear();
 
 	FOR_EACH_HOOK(i)
 	{
@@ -162,17 +226,13 @@ static int HUD_Redraw(float time, int intermission)
 	return func_result;
 }
 
-FORCEINLINE static void OnClientFinishLoading_Think(float flTime)
+static FORCEINLINE void CheckClientData(client_data_t *pcldata, float flTime)
 {
-	bool bLoading = (flTime < s_flClientDataLastUpdate) || (s_flClientDataLastUpdate == -1.f);
-	s_flClientDataLastUpdate = flTime;
-
-	if ( !bLoading && s_bLoading )
+	if ( s_bLoading )
 	{
-		//g_PluginsManager.OnClientFinishLoading();
+		g_PluginsManager.OnFirstClientdataReceived( pcldata, flTime );
+		s_bLoading = false;
 	}
-
-	s_bLoading = bLoading;
 }
 
 static int HOOK_RETURN_VALUE HUD_UpdateClientData(client_data_t *pcldata, float flTime)
@@ -198,13 +258,12 @@ static int HOOK_RETURN_VALUE HUD_UpdateClientData(client_data_t *pcldata, float 
 		}
 		else if (result == HOOK_STOP)
 		{
-			//OnClientFinishLoading_Think(flTime);
 			return changed;
 		}
 		else if (result == HOOK_CALL_STOP)
 		{
 			s_ClientFuncsOriginal.HUD_UpdateClientData(pcldata, flTime);
-			//OnClientFinishLoading_Think(flTime);
+			CheckClientData( pcldata, flTime );
 			return changed;
 		}
 	}
@@ -228,12 +287,13 @@ static int HOOK_RETURN_VALUE HUD_UpdateClientData(client_data_t *pcldata, float 
 		}
 		else if (result == HOOK_STOP)
 		{
-			//OnClientFinishLoading_Think(flTime);
+			CheckClientData( pcldata, flTime );
 			return dummy;
 		}
 	}
 
-	//OnClientFinishLoading_Think(flTime);
+	CheckClientData( pcldata, flTime );
+
 	return bRetValOverridden ? SavedRetVal : changed;
 }
 
@@ -1403,18 +1463,52 @@ void CGameHooksHandler::Init()
 	memcpy( &s_ClientFuncsOriginal, g_pClientFuncs, sizeof(cl_clientfuncs_t) );
 	memcpy( g_pClientFuncs, &s_ClientFuncsHooked, sizeof(cl_clientfuncs_t) );
 
+	void *m_pfnSCR_BeginLoadingPlaque = g_GameDataFinder.FindSCR_BeginLoadingPlaque();
+	void *m_pfnSCR_EndLoadingPlaque = g_GameDataFinder.FindSCR_EndLoadingPlaque();
+	void *m_pfnCL_Disconnect = g_GameDataFinder.FindCL_Disconnect();
+	void *m_pfnR_RenderScene = g_GameDataFinder.FindR_RenderScene();
+
 	m_hPaintTraverse = DetoursAPI()->DetourVirtualFunction( vgui::panel(), 41, HOOKED_PaintTraverse, GET_FUNC_PTR(ORIG_PaintTraverse) );
+	m_hSCR_BeginLoadingPlaque = DetoursAPI()->DetourFunction( m_pfnSCR_BeginLoadingPlaque, HOOKED_SCR_BeginLoadingPlaque, GET_FUNC_PTR(ORIG_SCR_BeginLoadingPlaque) );
+	m_hSCR_EndLoadingPlaque = DetoursAPI()->DetourFunction( m_pfnSCR_EndLoadingPlaque, HOOKED_SCR_EndLoadingPlaque, GET_FUNC_PTR(ORIG_SCR_EndLoadingPlaque) );
+	m_hCL_Disconnect = DetoursAPI()->DetourFunction( m_pfnCL_Disconnect, HOOKED_CL_Disconnect, GET_FUNC_PTR(ORIG_CL_Disconnect) );
+	m_hR_RenderScene = DetoursAPI()->DetourFunction( m_pfnR_RenderScene, HOOKED_R_RenderScene, GET_FUNC_PTR(ORIG_R_RenderScene) );
 	m_hUserMsgHook_CurWeapon = Hooks()->HookUserMessage( "CurWeapon", UserMsgHook_CurWeapon, &ORIG_UserMsgHook_CurWeapon );
 
 	if ( m_hPaintTraverse == DETOUR_INVALID_HANDLE )
 	{
-		Sys_Error("[SvenMod] Failed to hook virtual function PaintTraverse");
+		Sys_Error("[SvenMod] Failed to hook virtual function \"PaintTraverse\"");
+	}
+
+	if ( m_hSCR_BeginLoadingPlaque == DETOUR_INVALID_HANDLE )
+	{
+		Sys_Error("[SvenMod] Failed to hook function \"SCR_BeginLoadingPlaque\"");
+	}
+	
+	if ( m_hSCR_EndLoadingPlaque == DETOUR_INVALID_HANDLE )
+	{
+		Sys_Error("[SvenMod] Failed to hook function \"SCR_EndLoadingPlaque\"");
+	}
+
+	if ( m_hCL_Disconnect == DETOUR_INVALID_HANDLE )
+	{
+		Sys_Error("[SvenMod] Failed to hook function \"CL_Disconnect\"");
+	}
+
+	if ( m_hR_RenderScene == DETOUR_INVALID_HANDLE )
+	{
+		Sys_Error("[SvenMod] Failed to hook function \"R_RenderScene\"");
 	}
 }
 
 void CGameHooksHandler::Shutdown()
 {
 	DetoursAPI()->RemoveDetour( m_hPaintTraverse );
+	DetoursAPI()->RemoveDetour( m_hSCR_BeginLoadingPlaque );
+	DetoursAPI()->RemoveDetour( m_hSCR_EndLoadingPlaque );
+	DetoursAPI()->RemoveDetour( m_hCL_Disconnect );
+	DetoursAPI()->RemoveDetour( m_hR_RenderScene );
+
 	Hooks()->UnhookUserMessage( m_hUserMsgHook_CurWeapon );
 
 	memcpy( g_pClientFuncs, &s_ClientFuncsOriginal, sizeof(cl_clientfuncs_t) );
