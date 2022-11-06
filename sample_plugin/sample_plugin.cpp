@@ -6,6 +6,8 @@
 #include <convar.h>
 #include <messagebuffer.h>
 
+#include <hl_sdk/common/protocol.h>
+
 //-----------------------------------------------------------------------------
 // Export the global interface
 //-----------------------------------------------------------------------------
@@ -17,13 +19,35 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CSamplePlugin, IClientPlugin, CLIENT_PLUGIN_IN
 // Example hooks
 //-----------------------------------------------------------------------------
 
+CMessageBuffer SetAngleBuffer;
 CMessageBuffer VoteMenuBuffer;
+
+NetMsgHookFn ORIG_NetMsgHook_SetAngle = NULL;
+DetourHandle_t hNetMsgHook_SetAngle = 0;
 
 UserMsgHookFn ORIG_UserMsgHook_VoteMenu = NULL;
 DetourHandle_t hUserMsgHook_VoteMenu = 0;
 
 CommandCallbackFn ORIG_version_callback = NULL;
 DetourHandle_t hversion_callback = 0;
+
+void NetMsgHook_SetAngle(void)
+{
+	char buffer[512];
+
+	CNetMessageParams *params = Utils()->GetNetMessageParams();
+	SetAngleBuffer.Init( params->buffer, params->readcount, params->badread );
+
+	float pitch = SetAngleBuffer.ReadHiresAngle();
+	float yaw = SetAngleBuffer.ReadHiresAngle();
+	float roll = SetAngleBuffer.ReadHiresAngle();
+
+	snprintf(buffer, sizeof(buffer) / sizeof(*buffer), "Server tried to set your view angles to \"%.1f %.1f %.1f\"\n", pitch, yaw, roll);
+	Utils()->PrintChatText(buffer);
+
+	// Apply read to the buffer to do not call an original function SVC_SETANGLE
+	Utils()->ApplyReadToNetMessageBuffer( &SetAngleBuffer );
+}
 
 int UserMsgHook_VoteMenu(const char *pszName, int iSize, void *pBuffer)
 {
@@ -42,6 +66,18 @@ void version_callback(void)
 	Msg("Engine build: %d\n", SvenModAPI()->GetEngineBuild());
 	Msg("Client version: %s\n", SvenModAPI()->GetClientVersion()->string);
 }
+
+void CvarChangeHook_fps_max(cvar_t *pCvar, const char *pszOldValue, float flOldValue)
+{
+	char buffar[512];
+	snprintf(buffar, sizeof(buffar) / sizeof(char), "Cvar \"fps_max\" has been changed from %.1f to %.1f\n", flOldValue, pCvar->value);
+
+	Utils()->PrintChatText( buffar );
+}
+
+//-----------------------------------------------------------------------------
+// CVars and ConCommands
+//-----------------------------------------------------------------------------
 
 CON_COMMAND(sp_print_arg, "")
 {
@@ -75,7 +111,7 @@ CON_COMMAND(sp_get_player_info, "")
 // Implement plugin methods
 //-----------------------------------------------------------------------------
 
-api_version_s CSamplePlugin::GetAPIVersion()
+api_version_t CSamplePlugin::GetAPIVersion()
 {
 	return SVENMOD_API_VER;
 }
@@ -87,25 +123,13 @@ bool CSamplePlugin::Load(CreateInterfaceFn pfnSvenModFactory, ISvenModAPI *pSven
 	g_pHooks->RegisterClientHooks( &g_ClientHooks );
 	g_pHooks->RegisterClientPostHooks( &g_ClientPostHooks );
 
+	hNetMsgHook_SetAngle = g_pHooks->HookNetworkMessage( SVC_SETANGLE, NetMsgHook_SetAngle, &ORIG_NetMsgHook_SetAngle );
 	hUserMsgHook_VoteMenu = g_pHooks->HookUserMessage( "VoteMenu", UserMsgHook_VoteMenu, &ORIG_UserMsgHook_VoteMenu );
-
-	if ( !hUserMsgHook_VoteMenu )
-	{
-		Warning("Cannot hook user's message VoteMenu\n");
-		return false;
-	}
-
 	hversion_callback = g_pHooks->HookConsoleCommand( "version", version_callback, &ORIG_version_callback );
 
-	if ( !hversion_callback )
-	{
-		Warning("Cannot hook user's message VoteMenu\n");
-		g_pHooks->UnhookUserMessage( hUserMsgHook_VoteMenu );
-
-		return false;
-	}
-
 	ConVar_Register();
+
+	g_pHooks->HookCvarChange( CVar()->FindCvar("fps_max"), CvarChangeHook_fps_max );
 
 	Msg("CSamplePlugin::Load\n");
 	return true;
@@ -125,8 +149,11 @@ void CSamplePlugin::PostLoad(bool bGlobalLoad)
 
 void CSamplePlugin::Unload(void)
 {
+	g_pHooks->UnhookCvarChange( CVar()->FindCvar("fps_max"), CvarChangeHook_fps_max );
+
 	ConVar_Unregister();
 
+	g_pHooks->UnhookNetworkMessage( hNetMsgHook_SetAngle );
 	g_pHooks->UnhookUserMessage( hUserMsgHook_VoteMenu );
 	g_pHooks->UnhookConsoleCommand( hversion_callback );
 
@@ -147,6 +174,26 @@ void CSamplePlugin::Unpause(void)
 	Msg("CSamplePlugin::Unpause\n");
 }
 
+void CSamplePlugin::OnFirstClientdataReceived(client_data_t *pcldata, float flTime)
+{
+	Msg("CSamplePlugin::OnFirstClientdataReceived\n");
+}
+
+void CSamplePlugin::OnBeginLoading(void)
+{
+	Msg("CSamplePlugin::OnBeginLoading\n");
+}
+
+void CSamplePlugin::OnEndLoading(void)
+{
+	Msg("CSamplePlugin::OnEndLoading\n");
+}
+
+void CSamplePlugin::OnDisconnect(void)
+{
+	Msg("CSamplePlugin::OnDisconnect\n");
+}
+
 void CSamplePlugin::GameFrame(client_state_t state, double frametime, bool bPostRunCmd)
 {
 	if (bPostRunCmd) // called from HUD_Frame
@@ -159,14 +206,12 @@ void CSamplePlugin::GameFrame(client_state_t state, double frametime, bool bPost
 	}
 }
 
-PLUGIN_RESULT CSamplePlugin::Draw(void)
+void CSamplePlugin::Draw(void)
 {
-	return PLUGIN_CONTINUE;
 }
 
-PLUGIN_RESULT CSamplePlugin::DrawHUD(float time, int intermission)
+void CSamplePlugin::DrawHUD(float time, int intermission)
 {
-	return PLUGIN_CONTINUE;
 }
 
 const char *CSamplePlugin::GetName(void)
@@ -181,7 +226,7 @@ const char *CSamplePlugin::GetAuthor(void)
 
 const char *CSamplePlugin::GetVersion(void)
 {
-	return "1.0.1";
+	return "1.0.2";
 }
 
 const char *CSamplePlugin::GetDescription(void)
