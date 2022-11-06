@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="5.22 Debug|Win32">
+      <Configuration>5.22 Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="5.22 Release|Win32">
+      <Configuration>5.22 Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="5.25 Debug|Win32">
+      <Configuration>5.25 Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="5.25 Release|Win32">
+      <Configuration>5.25 Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -58,6 +74,7 @@
     <ClInclude Include="public\hl_sdk\common\entity_state.h" />
     <ClInclude Include="public\hl_sdk\common\entity_types.h" />
     <ClInclude Include="public\hl_sdk\common\enums.h" />
+    <ClInclude Include="public\hl_sdk\common\event.h" />
     <ClInclude Include="public\hl_sdk\common\event_api.h" />
     <ClInclude Include="public\hl_sdk\common\event_args.h" />
     <ClInclude Include="public\hl_sdk\common\event_flags.h" />
@@ -107,6 +124,7 @@
     <ClInclude Include="public\IClient.h" />
     <ClInclude Include="public\IClientHooks.h" />
     <ClInclude Include="public\IClientWeapon.h" />
+    <ClInclude Include="public\IDebug.h" />
     <ClInclude Include="public\IInventory.h" />
     <ClInclude Include="public\IClientPlugin.h" />
     <ClInclude Include="public\ICommandLine.h" />
@@ -165,14 +183,16 @@
     <ClInclude Include="shared\ISvenMod.h" />
     <ClInclude Include="svenmod\client.h" />
     <ClInclude Include="svenmod\client_weapon.h" />
+    <ClInclude Include="svenmod\debug.h" />
     <ClInclude Include="svenmod\gamedata_finder.h" />
     <ClInclude Include="svenmod\gameui_iface.h" />
     <ClInclude Include="svenmod\game_hooks.h" />
     <ClInclude Include="svenmod\cvar.h" />
+    <ClInclude Include="svenmod\hooks.h" />
     <ClInclude Include="svenmod\inventory.h" />
+    <ClInclude Include="svenmod\keyvalues_custom_parser.h" />
     <ClInclude Include="svenmod\patterns.h" />
     <ClInclude Include="svenmod\plugins_manager.h" />
-    <ClInclude Include="svenmod\plugins_loader.h" />
     <ClInclude Include="svenmod\svenmod.h" />
     <ClInclude Include="svenmod\utils.h" />
     <ClInclude Include="svenmod\vgui_iface.h" />
@@ -194,6 +214,7 @@
     <ClCompile Include="shared\messagebuffer.cpp" />
     <ClCompile Include="svenmod\client.cpp" />
     <ClCompile Include="svenmod\client_weapon.cpp" />
+    <ClCompile Include="svenmod\debug.cpp" />
     <ClCompile Include="svenmod\gamedata_finder.cpp" />
     <ClCompile Include="svenmod\game_hooks.cpp" />
     <ClCompile Include="svenmod\config_manager.cpp" />
@@ -203,12 +224,12 @@
     <ClCompile Include="svenmod\gameui_iface.cpp" />
     <ClCompile Include="svenmod\hooks.cpp" />
     <ClCompile Include="svenmod\inventory.cpp" />
+    <ClCompile Include="svenmod\keyvalues_custom_parser.cpp" />
     <ClCompile Include="svenmod\logging_system.cpp" />
     <ClCompile Include="svenmod\memory_utils.cpp" />
     <ClCompile Include="svenmod\patterns.cpp" />
     <ClCompile Include="svenmod\player_utils.cpp" />
     <ClCompile Include="svenmod\plugins_manager.cpp" />
-    <ClCompile Include="svenmod\plugins_loader.cpp" />
     <ClCompile Include="svenmod\svenmod.cpp" />
     <ClCompile Include="svenmod\svenmod_api.cpp" />
     <ClCompile Include="svenmod\utils.cpp" />
@@ -228,7 +249,33 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -243,7 +290,19 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -252,7 +311,27 @@
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>svenmod</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Debug|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>svenmod</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Debug|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>svenmod</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>svenmod</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Release|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>svenmod</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>svenmod</TargetName>
@@ -265,7 +344,53 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
-      <PreprocessorDefinitions>DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SC_NEWEST;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+      <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "movelib.bat" (
+    start movelib.bat
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PreprocessorDefinitions>SC_5_22;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+      <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "movelib.bat" (
+    start movelib.bat
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PreprocessorDefinitions>SC_5_25;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -289,7 +414,63 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
-      <PreprocessorDefinitions>DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SC_NEWEST;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "movelib.bat" (
+    start movelib.bat
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PreprocessorDefinitions>SC_5_22;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>NotSet</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "movelib.bat" (
+    start movelib.bat
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PreprocessorDefinitions>SC_5_25;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

@@ -333,9 +333,6 @@
     <ClInclude Include="public\data_struct\hashtable.h">
       <Filter>SvenMod\public\data_struct</Filter>
     </ClInclude>
-    <ClInclude Include="svenmod\plugins_loader.h">
-      <Filter>SvenMod\svenmod</Filter>
-    </ClInclude>
     <ClInclude Include="public\IVideoMode.h">
       <Filter>SvenMod\public</Filter>
     </ClInclude>
@@ -552,6 +549,21 @@
     <ClInclude Include="public\hl_sdk\common\sizebuf.h">
       <Filter>SvenMod\public\HL SDK\common</Filter>
     </ClInclude>
+    <ClInclude Include="public\hl_sdk\common\event.h">
+      <Filter>SvenMod\public\HL SDK\common</Filter>
+    </ClInclude>
+    <ClInclude Include="public\IDebug.h">
+      <Filter>SvenMod\public</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\debug.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\keyvalues_custom_parser.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
+    <ClInclude Include="svenmod\hooks.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="public\udis86\src\decode.c">
@@ -591,9 +603,6 @@
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\svenmod.cpp">
-      <Filter>SvenMod\svenmod</Filter>
-    </ClCompile>
-    <ClCompile Include="svenmod\plugins_loader.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\svenmod_api.cpp">
@@ -657,6 +666,12 @@
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\gamedata_finder.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\debug.cpp">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClCompile>
+    <ClCompile Include="svenmod\keyvalues_custom_parser.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
   </ItemGroup>
