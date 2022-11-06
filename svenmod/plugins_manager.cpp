@@ -115,7 +115,7 @@ CPlugin::~CPlugin()
 bool CPlugin::Load(const char *pszFileName, bool bGlobalLoad)
 {
 	int iInterfaceVersion = 1;
-	static char szPluginPath[1024];
+	static char szPluginPath[MAX_PATH];
 
 	snprintf(szPluginPath, sizeof(szPluginPath), "svenmod/plugins/%s", pszFileName);
 
@@ -138,7 +138,7 @@ bool CPlugin::Load(const char *pszFileName, bool bGlobalLoad)
 
 	if ( pfnPluginFactory )
 	{
-		m_iInterfaceVersion = 1;
+		m_iInterfaceVersion = 2;
 		m_pPlugin = reinterpret_cast<IClientPlugin *>(pfnPluginFactory(CLIENT_PLUGIN_INTERFACE_VERSION, NULL));
 
 		if ( !m_pPlugin )
