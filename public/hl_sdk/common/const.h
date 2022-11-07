@@ -123,10 +123,16 @@
 #define EF_NOINTERP 32		// don't interpolate the next frame
 #define EF_LIGHT 64			// rocket flare glow sprite
 #define EF_NODRAW 128		// don't draw entity
-#define EF_NIGHTVISION 256	// player nightvision
-#define EF_SNIPERLASER 512	// sniper laser effect
-#define EF_FIBERCAMERA 1024 // fiber camera
 
+// Must be wrong? effects in original half life
+//#define EF_NIGHTVISION 256	// player nightvision
+//#define EF_SNIPERLASER 512	// sniper laser effect
+//#define EF_FIBERCAMERA 1024	// fiber camera
+
+// Must be correct? effects in sven cope
+#define EF_NOANIMTEXTURES 256		// Never animate a texture on given brush.
+#define EF_FRAMEANIMTEXTURES 512	// If the brush has a "frame" value, the corresponding animating texture index is used.
+#define EF_SPRITE_CUSTOM_VP 1024	// If the entity is a sprite it should override the viewport draw mode with the type specified in key "sequence".
 
 // entity flags
 #define EFLAG_SLERP 1 // do studio interpolation of this entity
