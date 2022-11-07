@@ -42,7 +42,7 @@ For example, how it should look:
 Note, everything that goes after these symbols `//` is a comment
 
 # Console Commands
-SvenMod provides several important console commands:
+SvenMod provides several useful console commands:
 ```
 - sm <command> <arg1> <arg2>... - type "sm" in the console to get very detailed information about SvenMod related commands
 - help <cvarname> - will print a description about the given convar/concommand that was registered through SvenMod
