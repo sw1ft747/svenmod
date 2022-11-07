@@ -39,7 +39,7 @@ static CDefaultAccessor s_DefaultAccessor;
 // Called by the framework to register ConCommandBases with the ICVar
 //-----------------------------------------------------------------------------
 
-void ConVar_Register( int nCVarFlag, IConCommandBaseAccessor *pAccessor )
+void ConVar_Register(int nCVarFlag, IConCommandBaseAccessor *pAccessor)
 {
 	if ( s_bRegistered )
 		return;
@@ -68,7 +68,7 @@ void ConVar_Register( int nCVarFlag, IConCommandBaseAccessor *pAccessor )
 	ConCommandBase::s_pConCommandBases = NULL;
 }
 
-void ConVar_Unregister( )
+void ConVar_Unregister(void)
 {
 	if ( !s_bRegistered )
 		return;
@@ -140,7 +140,7 @@ void ConVar_PrintDescription(const ConCommandBase *pVar)
 // ConCommandBase
 //-----------------------------------------------------------------------------
 
-ConCommandBase::ConCommandBase()
+ConCommandBase::ConCommandBase(void)
 {
 	m_bRegistered = false;
 	m_pszName = NULL;
@@ -159,12 +159,12 @@ ConCommandBase::ConCommandBase(const char *pszName, const char *pszHelpString /*
 	Create(pszName, pszHelpString, flags);
 }
 
-bool ConCommandBase::IsCommand() const
+bool ConCommandBase::IsCommand(void) const
 {
 	return true;
 }
 
-CVarDLLIdentifier_t ConCommandBase::GetDLLIdentifier() const
+CVarDLLIdentifier_t ConCommandBase::GetDLLIdentifier(void) const
 {
 	return s_nDLLIdentifier;
 }
@@ -187,15 +187,15 @@ void ConCommandBase::Create(const char *pszName, const char *pszHelpString /* = 
 	}
 }
 
-void ConCommandBase::Init()
+void ConCommandBase::Init(void)
 {
-	if (s_pAccessor)
+	if ( s_pAccessor != NULL )
 	{
 		s_pAccessor->RegisterConCommandBase(this);
 	}
 }
 
-void ConCommandBase::Shutdown()
+void ConCommandBase::Shutdown(void)
 {
 	if ( CVar() )
 	{
@@ -203,7 +203,7 @@ void ConCommandBase::Shutdown()
 	}
 }
 
-const char *ConCommandBase::GetName() const
+const char *ConCommandBase::GetName(void) const
 {
 	return m_pszName;
 }
@@ -223,27 +223,27 @@ void ConCommandBase::RemoveFlags(int flags)
 	m_nFlags &= ~flags;
 }
 
-int ConCommandBase::GetFlags() const
+int ConCommandBase::GetFlags(void) const
 {
 	return m_nFlags;
 }
 
-const ConCommandBase *ConCommandBase::GetNext() const
+const ConCommandBase *ConCommandBase::GetNext(void) const
 {
 	return m_pNext;
 }
 
-ConCommandBase *ConCommandBase::GetNext()
+ConCommandBase *ConCommandBase::GetNext(void)
 {
 	return m_pNext;
 }
 
-const char *ConCommandBase::GetHelpText() const
+const char *ConCommandBase::GetHelpText(void) const
 {
 	return m_pszHelpString;
 }
 
-bool ConCommandBase::IsRegistered() const
+bool ConCommandBase::IsRegistered(void) const
 {
 	return m_bRegistered;
 }
@@ -252,7 +252,7 @@ bool ConCommandBase::IsRegistered() const
 // Tokenizer class
 //-----------------------------------------------------------------------------
 
-CCommand::CCommand()
+CCommand::CCommand(void)
 {
 	m_nArgc = 0;
 	m_ppArgv = NULL;
@@ -306,14 +306,14 @@ ConCommand::~ConCommand()
 {
 }
 
-bool ConCommand::IsCommand() const
+bool ConCommand::IsCommand(void) const
 {
 	return true;
 }
 
 bool ConCommand::IsFlagSet(int flag) const
 {
-	if (IsRegistered() && m_pCommand)
+	if ( IsRegistered() && m_pCommand != NULL )
 	{
 		return (flag & m_pCommand->flags) ? true : false;
 	}
@@ -323,7 +323,7 @@ bool ConCommand::IsFlagSet(int flag) const
 
 void ConCommand::AddFlags(int flags)
 {
-	if (IsRegistered() && m_pCommand)
+	if ( IsRegistered() && m_pCommand != NULL )
 	{
 		m_pCommand->flags |= flags;
 	}
@@ -335,7 +335,7 @@ void ConCommand::AddFlags(int flags)
 
 void ConCommand::RemoveFlags(int flags)
 {
-	if (IsRegistered() && m_pCommand)
+	if ( IsRegistered() && m_pCommand != NULL )
 	{
 		m_pCommand->flags &= ~flags;
 	}
@@ -345,9 +345,9 @@ void ConCommand::RemoveFlags(int flags)
 	}
 }
 
-int ConCommand::GetFlags() const
+int ConCommand::GetFlags(void) const
 {
-	if (IsRegistered() && m_pCommand)
+	if ( IsRegistered() && m_pCommand != NULL )
 	{
 		return m_pCommand->flags;
 	}
@@ -355,13 +355,18 @@ int ConCommand::GetFlags() const
 	return m_nFlags;
 }
 
+cmd_t *ConCommand::GetCmdPointer(void) const
+{
+	return m_pCommand;
+}
+
 //-----------------------------------------------------------------------------
 // ConVar
 //-----------------------------------------------------------------------------
 
-ConVar::ConVar(const char *pszName, const char *pszHelpString, int flags /* = 0 */)
+ConVar::ConVar(const char *pszName, const char *pszDefaultValue, int flags /* = 0 */)
 {
-	Create(pszName, NULL, flags, pszHelpString);
+	Create(pszName, pszDefaultValue, flags, NULL);
 }
 
 ConVar::ConVar(const char *pszName, const char *pszDefaultValue, int flags, const char *pszHelpString)
@@ -378,8 +383,8 @@ ConVar::~ConVar()
 {
 }
 
-void ConVar::Create(const char *pszName, const char *pszDefaultValue, int flags /*= 0*/,
-	const char *pszHelpString /*= NULL*/, bool bMin /*= false*/, float fMin /*= 0.0*/, bool bMax /*= false*/, float fMax /*= false*/)
+void ConVar::Create(const char *pszName, const char *pszDefaultValue, int flags /* = 0 */, const char *pszHelpString /* = NULL */,
+					bool bMin /* = false */, float fMin /* = 0.0 */, bool bMax /* = false */, float fMax /* = false */)
 {
 	static const char *empty_string = "";
 
@@ -397,14 +402,14 @@ void ConVar::Create(const char *pszName, const char *pszDefaultValue, int flags 
 	ConCommandBase::Create( pszName, pszHelpString, flags );
 }
 
-bool ConVar::IsCommand() const
+bool ConVar::IsCommand(void) const
 {
 	return false;
 }
 
 bool ConVar::IsFlagSet(int flag) const
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		return (flag & m_pCvar->flags) ? true : false;
 	}
@@ -414,7 +419,7 @@ bool ConVar::IsFlagSet(int flag) const
 
 void ConVar::AddFlags(int flags)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		m_pCvar->flags |= flags;
 	}
@@ -426,7 +431,7 @@ void ConVar::AddFlags(int flags)
 
 void ConVar::RemoveFlags(int flags)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		m_pCvar->flags &= ~flags;
 	}
@@ -436,9 +441,9 @@ void ConVar::RemoveFlags(int flags)
 	}
 }
 
-int ConVar::GetFlags() const
+int ConVar::GetFlags(void) const
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		return m_pCvar->flags;
 	}
@@ -446,13 +451,18 @@ int ConVar::GetFlags() const
 	return m_nFlags;
 }
 
+cvar_t *ConVar::GetCvarPointer(void) const
+{
+	return m_pCvar;
+}
+
 //-----------------------------------------------------------------------------
 // Get value
 //-----------------------------------------------------------------------------
 
-float ConVar::GetFloat() const
+float ConVar::GetFloat(void) const
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		return m_pCvar->value;
 	}
@@ -460,9 +470,9 @@ float ConVar::GetFloat() const
 	return 0.f;
 }
 
-int ConVar::GetInt() const
+int ConVar::GetInt(void) const
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		return int(m_pCvar->value);
 	}
@@ -470,9 +480,9 @@ int ConVar::GetInt() const
 	return 0;
 }
 
-Color ConVar::GetColor() const
+Color ConVar::GetColor(void) const
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		return CVar()->GetColorFromCvar(m_pCvar);
 	}
@@ -480,9 +490,9 @@ Color ConVar::GetColor() const
 	return { 255, 255, 255, 255 };
 }
 
-bool ConVar::GetBool() const
+bool ConVar::GetBool(void) const
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		return !!int(m_pCvar->value);
 	}
@@ -490,9 +500,9 @@ bool ConVar::GetBool() const
 	return false;
 }
 
-const char *ConVar::GetString() const
+const char *ConVar::GetString(void) const
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		return m_pCvar->string;
 	}
@@ -506,7 +516,7 @@ const char *ConVar::GetString() const
 
 void ConVar::SetValue(const char *value)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		CVar()->SetValue(m_pCvar, value);
 	}
@@ -514,7 +524,7 @@ void ConVar::SetValue(const char *value)
 
 void ConVar::SetValue(float value)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		CVar()->SetValue(m_pCvar, value);
 	}
@@ -522,7 +532,7 @@ void ConVar::SetValue(float value)
 
 void ConVar::SetValue(int value)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		CVar()->SetValue(m_pCvar, value);
 	}
@@ -530,7 +540,7 @@ void ConVar::SetValue(int value)
 
 void ConVar::SetValue(bool value)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		CVar()->SetValue(m_pCvar, value);
 	}
@@ -538,15 +548,15 @@ void ConVar::SetValue(bool value)
 
 void ConVar::SetValue(Color value)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		CVar()->SetValue(m_pCvar, value);
 	}
 }
 
-void ConVar::Revert()
+void ConVar::Revert(void)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		CVar()->SetValue(m_pCvar, m_pszDefaultValue);
 	}
@@ -556,12 +566,12 @@ void ConVar::Revert()
 // Min/max
 //-----------------------------------------------------------------------------
 
-bool ConVar::HasMin() const
+bool ConVar::HasMin(void) const
 {
 	return m_bHasMin;
 }
 
-bool ConVar::HasMax() const
+bool ConVar::HasMax(void) const
 {
 	return m_bHasMax;
 }
@@ -578,12 +588,12 @@ bool ConVar::GetMax(float &maxVal) const
 	return m_bHasMax;
 }
 
-float ConVar::GetMinValue() const
+float ConVar::GetMinValue(void) const
 {
 	return m_fMinVal;
 }
 
-float ConVar::GetMaxValue() const
+float ConVar::GetMaxValue(void) const
 {
 	return m_fMaxVal;
 }
@@ -591,7 +601,7 @@ float ConVar::GetMaxValue() const
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-const char *ConVar::GetDefault() const
+const char *ConVar::GetDefault(void) const
 {
 	return m_pszDefaultValue;
 }
@@ -600,22 +610,23 @@ void ConVar::SetDefault(const char *pszDefault)
 {
 	static const char *empty_string = "";
 	m_pszDefaultValue = pszDefault ? pszDefault : empty_string;
-	Assert(m_pszDefaultValue);
+
+	Assert( m_pszDefaultValue );
 }
 
-bool ConVar::Clamp()
+bool ConVar::Clamp(void)
 {
-	if (IsRegistered() && m_pCvar)
+	if ( IsRegistered() && m_pCvar != NULL )
 	{
 		float value = m_pCvar->value;
 
-		if (m_bHasMin && (value < m_fMinVal))
+		if ( m_bHasMin && (value < m_fMinVal) )
 		{
 			CVar()->SetValue(m_pCvar, m_fMinVal);
 			return true;
 		}
 
-		if (m_bHasMax && (value > m_fMaxVal))
+		if ( m_bHasMax && (value > m_fMaxVal) )
 		{
 			CVar()->SetValue(m_pCvar, m_fMaxVal);
 			return true;
@@ -627,13 +638,13 @@ bool ConVar::Clamp()
 
 bool ConVar::ClampValue(float &value)
 {
-	if (m_bHasMin && (value < m_fMinVal))
+	if ( m_bHasMin && (value < m_fMinVal) )
 	{
 		value = m_fMinVal;
 		return true;
 	}
 
-	if (m_bHasMax && (value > m_fMaxVal))
+	if ( m_bHasMax && (value > m_fMaxVal) )
 	{
 		value = m_fMaxVal;
 		return true;

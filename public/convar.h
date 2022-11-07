@@ -76,31 +76,31 @@ class ConCommandBase
 	friend void ConVar_Unregister();
 
 public:
-	ConCommandBase();
-	ConCommandBase(const char *pszName, const char *pszHelpString = NULL, int flags = 0);
+	ConCommandBase( void );
+	ConCommandBase( const char *pszName, const char *pszHelpString = NULL, int flags = 0 );
 
 	virtual						~ConCommandBase();
 
-	virtual void				Create(const char *pszName, const char *pszDescription, int flags);
+	virtual void				Create( const char *pszName, const char *pszDescription, int flags );
 
-	virtual bool				IsCommand() const;
+	virtual bool				IsCommand( void ) const;
 
-	virtual bool				IsFlagSet(int flag) const;
-	virtual void				AddFlags(int flags);
-	virtual void				RemoveFlags(int flags);
-	virtual int					GetFlags() const;
+	virtual bool				IsFlagSet( int flag ) const;
+	virtual void				AddFlags( int flags );
+	virtual void				RemoveFlags( int flags );
+	virtual int					GetFlags( void ) const;
 
-	virtual const char			*GetName() const;
-	virtual const char			*GetHelpText() const;
+	virtual const char			*GetName( void ) const;
+	virtual const char			*GetHelpText( void ) const;
 
-	virtual bool				IsRegistered() const;
+	virtual bool				IsRegistered( void ) const;
 
-	const ConCommandBase		*GetNext() const;
-	ConCommandBase				*GetNext();
+	const ConCommandBase		*GetNext( void ) const;
+	ConCommandBase				*GetNext( void );
 
 public:
 	// Returns the DLL identifier
-	virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
+	virtual CVarDLLIdentifier_t	GetDLLIdentifier( void ) const;
 
 	virtual void				Init();
 	void						Shutdown();
@@ -133,11 +133,11 @@ protected:
 class CCommand
 {
 public:
-	CCommand();
+	CCommand( void );
 	CCommand( int nArgC, const char **ppArgV );
 
-	int				ArgC() const;
-	const char		**ArgV() const;
+	int				ArgC( void ) const;
+	const char		**ArgV( void ) const;
 	const char		*operator[]( int nIndex ) const;	// Gets at arguments
 	const char		*Arg( int nIndex ) const;		// Gets at arguments
 	
@@ -150,17 +150,17 @@ private:
 	const char		**m_ppArgv;
 };
 
-inline int CCommand::ArgC() const
+inline int CCommand::ArgC(void) const
 {
 	return m_nArgc;
 }
 
-inline const char **CCommand::ArgV() const
+inline const char **CCommand::ArgV(void) const
 {
 	return m_nArgc ? (const char **)m_ppArgv : NULL;
 }
 
-inline const char *CCommand::Arg( int nIndex ) const
+inline const char *CCommand::Arg(int nIndex) const
 {
 	if ( nIndex < 0 || nIndex >= m_nArgc )
 		return "";
@@ -168,7 +168,7 @@ inline const char *CCommand::Arg( int nIndex ) const
 	return m_ppArgv[nIndex];
 }
 
-inline const char *CCommand::operator[]( int nIndex ) const
+inline const char *CCommand::operator[](int nIndex) const
 {
 	return Arg( nIndex );
 }
@@ -186,12 +186,14 @@ public:
 
 	virtual				~ConCommand();
 
-	virtual bool		IsCommand() const;
+	virtual bool		IsCommand( void ) const;
 
-	virtual bool		IsFlagSet(int flag) const;
-	virtual void		AddFlags(int flags);
-	virtual void		RemoveFlags(int flags);
-	virtual int			GetFlags() const;
+	virtual bool		IsFlagSet( int flag ) const;
+	virtual void		AddFlags( int flags );
+	virtual void		RemoveFlags( int flags );
+	virtual int			GetFlags( void ) const;
+
+	cmd_t				*GetCmdPointer( void ) const;
 
 private:
 	cmd_t				*m_pCommand;
@@ -216,18 +218,20 @@ public:
 	virtual void				Create( const char *pszName, const char *pszDefaultValue, int flags = 0,
 									   const char *pszHelpString = 0, bool bMin = false, float fMin = 0.0, bool bMax = false, float fMax = false );
 
-	virtual bool				IsCommand() const;
+	virtual bool				IsCommand( void ) const;
 
-	virtual bool				IsFlagSet(int flag) const;
-	virtual void				AddFlags(int flags);
-	virtual void				RemoveFlags(int flags);
-	virtual int					GetFlags() const;
+	virtual bool				IsFlagSet( int flag ) const;
+	virtual void				AddFlags( int flags );
+	virtual void				RemoveFlags( int flags );
+	virtual int					GetFlags( void ) const;
+
+	cvar_t						*GetCvarPointer( void ) const;
 
 	// Retrieve value
 	float						GetFloat( void ) const;
 	int							GetInt( void ) const;
 	Color						GetColor( void ) const;
-	bool						GetBool() const;
+	bool						GetBool( void ) const;
 	const char					*GetString( void ) const;
 	
 	// Set value
@@ -241,14 +245,14 @@ public:
 	void						Revert( void );
 
 	// True if it has a min/max setting
-	bool						HasMin() const;
-	bool						HasMax() const;
+	bool						HasMin( void ) const;
+	bool						HasMax( void ) const;
 
 	bool						GetMin( float &minVal ) const;
 	bool						GetMax( float &maxVal ) const;
 
-	float						GetMinValue() const;
-	float						GetMaxValue() const;
+	float						GetMinValue( void ) const;
+	float						GetMaxValue( void ) const;
 
 	const char					*GetDefault( void ) const;
 	void						SetDefault( const char *pszDefault );
