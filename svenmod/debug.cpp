@@ -94,6 +94,9 @@ void CDebug::DrawClear(void)
 
 void CDebug::Draw()
 {
+	if ( m_vDebugContext.empty() )
+		return;
+
 	for (size_t i = 0; i < m_vDebugContext.size(); i++)
 	{
 		CDebugDrawContext *pDebugContext = m_vDebugContext[i];
@@ -111,7 +114,7 @@ void CDebug::Draw()
 
 		glEnable( GL_BLEND );
 		glDisable( GL_ALPHA_TEST );
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		glDisable( GL_TEXTURE_2D );
 

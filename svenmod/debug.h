@@ -25,6 +25,7 @@ class CDebugDrawContext
 public:
 	CDebugDrawContext(const Color &color, float duration);
 
+	bool operator<(const CDebugDrawContext &r) const;
 public:
 	int m_type;
 
