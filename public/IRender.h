@@ -1,5 +1,5 @@
-#ifndef IDEBUG_H
-#define IDEBUG_H
+#ifndef IRENDER_H
+#define IRENDER_H
 
 #ifdef _WIN32
 #pragma once
@@ -11,13 +11,30 @@
 #include "color.h"
 
 //-----------------------------------------------------------------------------
-// Purpose: debug stuff
+// Purpose: draw interface
 //-----------------------------------------------------------------------------
 
-abstract_class IDebug
+abstract_class IDrawContext
 {
 public:
-	virtual			~IDebug() {}
+	virtual			~IDrawContext() {}
+
+	virtual void	Draw( void ) = 0;
+	virtual bool	ShouldStopDraw( void ) = 0;
+
+	virtual const Vector &GetDrawOrigin( void ) const = 0;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: render stuff
+//-----------------------------------------------------------------------------
+
+abstract_class IRender
+{
+public:
+	virtual			~IRender() {}
+
+	virtual void	AddDrawContext( IDrawContext *pContext, float duration = 0.f ) = 0;
 
 	virtual void	DrawPoint( const Vector &vPoint, const Color &color, float size = 24.f, float duration = 0.f ) = 0;
 	virtual void	DrawLine( const Vector &vStart, const Vector &vEnd, const Color &color, float width = 2.f, float duration = 0.f ) = 0;
@@ -47,7 +64,7 @@ public:
 // Export
 //-----------------------------------------------------------------------------
 
-extern IDebug *g_pDebug;
-PLATFORM_INTERFACE IDebug *Debug();
+extern IRender *g_pRender;
+PLATFORM_INTERFACE IRender *Render();
 
-#endif // IDEBUG_H
+#endif // IRENDER_H

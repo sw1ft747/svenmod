@@ -45,7 +45,7 @@ public:
 	virtual modules_t				*Modules();
 
 	virtual ICvar					*CVar();
-	virtual IDebug					*Debug();
+	virtual IRender					*Render();
 	virtual IHooks					*Hooks();
 
 	virtual IClient					*Client();
@@ -183,9 +183,9 @@ IHooks *CSvenModAPI::Hooks()
 	return g_pHooks;
 }
 
-IDebug *CSvenModAPI::Debug()
+IRender *CSvenModAPI::Render()
 {
-	return g_pDebug;
+	return g_pRender;
 }
 
 IClient *CSvenModAPI::Client()

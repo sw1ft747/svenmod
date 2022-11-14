@@ -11,7 +11,7 @@ IConfigManager *g_pConfigManager = NULL;
 IPluginHelpers *g_pPluginHelpers = NULL;
 modules_t *g_pModules = NULL;
 ICvar *g_pCVar = NULL;
-IDebug *g_pDebug = NULL;
+IRender *g_pRender = NULL;
 IHooks *g_pHooks = NULL;
 IClient *g_pClient = NULL;
 IClientWeapon *g_pClientWeapon = NULL;
@@ -48,7 +48,7 @@ void BindApiToGlobals(ISvenModAPI *pSvenModAPI)
 	g_pPluginHelpers = pSvenModAPI->PluginHelpers();
 	g_pModules = pSvenModAPI->Modules();
 	g_pCVar = pSvenModAPI->CVar();
-	g_pDebug = pSvenModAPI->Debug();
+	g_pRender = pSvenModAPI->Render();
 	g_pHooks = pSvenModAPI->Hooks();
 	g_pClient = pSvenModAPI->Client();
 	g_pClientWeapon = pSvenModAPI->ClientWeapon();

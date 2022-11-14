@@ -1,6 +1,6 @@
 #include "client.h"
 #include "client_weapon.h"
-#include "debug.h"
+#include "render.h"
 #include "game_hooks.h"
 #include "plugins_manager.h"
 #include "gamedata_finder.h"
@@ -122,7 +122,7 @@ DECLARE_FUNC(void, __cdecl, HOOKED_R_RenderScene)
 
 	if ( *g_pClientState == CLS_ACTIVE )
 	{
-		g_Debug.Draw();
+		g_Render.Draw();
 	}
 }
 
@@ -157,7 +157,7 @@ static int HUD_VidInit(void)
 	g_iCurrentWeaponID = -1;
 	g_bCurrentWeaponCustom = false;
 
-	g_Debug.DrawClear();
+	g_Render.DrawClear();
 
 	FOR_EACH_HOOK(i)
 	{
@@ -685,6 +685,8 @@ static void V_CalcRefdef(ref_params_t *pparams)
 
 		HOOK_RESULT result = pClientPostHooks->V_CalcRefdef(pparams);
 	}
+
+	g_Render.SetRenderOrigin( pparams->vieworg );
 }
 
 static int HOOK_RETURN_VALUE HUD_AddEntity(int type, cl_entity_t *ent, const char *modelname)

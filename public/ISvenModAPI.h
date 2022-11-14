@@ -17,7 +17,7 @@
 
 #include "ICommandLine.h"
 #include "ICvar.h"
-#include "IDebug.h"
+#include "IRender.h"
 #include "IEngineClient.h"
 #include "IFileSystem.h"
 #include "IRegistry.h"
@@ -118,7 +118,7 @@ public:
 	virtual modules_t				*Modules() = 0;
 
 	virtual ICvar					*CVar() = 0;
-	virtual IDebug					*Debug() = 0;
+	virtual IRender					*Render() = 0;
 	virtual IHooks					*Hooks() = 0;
 
 	virtual IClient					*Client() = 0;
