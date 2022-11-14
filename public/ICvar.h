@@ -80,7 +80,7 @@ public:
 	virtual const char			**ArgV( void ) const = 0;
 	virtual const char			*Arg( int nIndex ) const = 0;
 
-	// Directly set cvar's value (if cl_enginefuncs_t doesn't implement it, then we will)
+	// Directly set cvar's value
 	virtual void				SetValue( cvar_t *pCvar, const char *value ) = 0;
 	virtual void				SetValue( cvar_t *pCvar, float value ) = 0;
 	virtual void				SetValue( cvar_t *pCvar, int value ) = 0;

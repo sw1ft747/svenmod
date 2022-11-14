@@ -124,7 +124,7 @@
     <ClInclude Include="public\IClient.h" />
     <ClInclude Include="public\IClientHooks.h" />
     <ClInclude Include="public\IClientWeapon.h" />
-    <ClInclude Include="public\IDebug.h" />
+    <ClInclude Include="public\IRender.h" />
     <ClInclude Include="public\IInventory.h" />
     <ClInclude Include="public\IClientPlugin.h" />
     <ClInclude Include="public\ICommandLine.h" />
@@ -183,7 +183,7 @@
     <ClInclude Include="shared\ISvenMod.h" />
     <ClInclude Include="svenmod\client.h" />
     <ClInclude Include="svenmod\client_weapon.h" />
-    <ClInclude Include="svenmod\debug.h" />
+    <ClInclude Include="svenmod\render.h" />
     <ClInclude Include="svenmod\gamedata_finder.h" />
     <ClInclude Include="svenmod\gameui_iface.h" />
     <ClInclude Include="svenmod\game_hooks.h" />
@@ -214,7 +214,7 @@
     <ClCompile Include="shared\messagebuffer.cpp" />
     <ClCompile Include="svenmod\client.cpp" />
     <ClCompile Include="svenmod\client_weapon.cpp" />
-    <ClCompile Include="svenmod\debug.cpp" />
+    <ClCompile Include="svenmod\render.cpp" />
     <ClCompile Include="svenmod\gamedata_finder.cpp" />
     <ClCompile Include="svenmod\game_hooks.cpp" />
     <ClCompile Include="svenmod\config_manager.cpp" />

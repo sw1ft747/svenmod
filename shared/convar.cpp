@@ -260,7 +260,7 @@ CCommand::CCommand(void)
 
 CCommand::CCommand(int nArgC, const char **ppArgV)
 {
-	Assert(nArgC > 0);
+	Assert( nArgC > 0 );
 
 	m_nArgc = nArgC;
 	m_ppArgv = ppArgV;
@@ -283,7 +283,7 @@ int CCommand::FindArgInt(const char *pszName, int nDefaultVal) const
 {
 	const char *pVal = FindArg(pszName);
 
-	if (pVal)
+	if ( pVal != NULL )
 		return atoi(pVal);
 	else
 		return nDefaultVal;

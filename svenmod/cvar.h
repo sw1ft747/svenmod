@@ -122,8 +122,8 @@ public:
 	virtual void				ConsolePrintf(const char *pszFormat, ...) const;
 	virtual void				ConsoleDPrintf(const char *pszFormat, ...) const;
 
-	virtual int					ArgC() const;
-	virtual const char			**ArgV() const;
+	virtual int					ArgC(void) const;
+	virtual const char			**ArgV(void) const;
 	virtual const char			*Arg(int nIndex) const;
 
 	virtual void				SetValue(cvar_t *pCvar, const char *value);

@@ -842,12 +842,12 @@ void CCvar::ConsoleDPrintf(const char *pszFormat, ...) const
 // Commands args
 //-----------------------------------------------------------------------------
 
-int CCvar::ArgC() const
+int CCvar::ArgC(void) const
 {
 	return *m_pArgC;
 }
 
-const char **CCvar::ArgV() const
+const char **CCvar::ArgV(void) const
 {
 	return m_ppArgV;
 }

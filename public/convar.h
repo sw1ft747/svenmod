@@ -52,6 +52,16 @@ void ConVar_Unregister();
 void ConVar_PrintDescription(const ConCommandBase *pVar);
 
 //-----------------------------------------------------------------------------
+// Sources of console commands
+//-----------------------------------------------------------------------------
+
+enum cmd_source_t
+{
+	src_client = 0,	// came in over a net connection as a clc_stringcmd
+	src_command		// from the command buffer
+};
+
+//-----------------------------------------------------------------------------
 // Any executable that wants to use ConVars need to implement one of
 // these to hook up access to console variables.
 //-----------------------------------------------------------------------------
@@ -136,10 +146,10 @@ public:
 	CCommand( void );
 	CCommand( int nArgC, const char **ppArgV );
 
-	int				ArgC( void ) const;
-	const char		**ArgV( void ) const;
+	int				ArgC( void ) const;					// Count of arguments
+	const char		**ArgV( void ) const;				// Arguments pointer
 	const char		*operator[]( int nIndex ) const;	// Gets at arguments
-	const char		*Arg( int nIndex ) const;		// Gets at arguments
+	const char		*Arg( int nIndex ) const;			// Gets at arguments
 	
 	// Helper functions to parse arguments to commands.
 	const char		*FindArg( const char *pszName ) const;
@@ -179,7 +189,7 @@ inline const char *CCommand::operator[](int nIndex) const
 
 class ConCommand : public ConCommandBase
 {
-friend class CCvar;
+	friend class CCvar;
 
 public:
 	ConCommand( const char *pszName, FnCommandCallback_t pfnCallback, const char *pszHelpString = 0, int flags = 0 );
@@ -206,7 +216,7 @@ private:
 
 class ConVar : public ConCommandBase
 {
-friend class CCvar;
+	friend class CCvar;
 
 public:
 	ConVar( const char *pszName, const char *pszDefaultValue, int flags = 0);

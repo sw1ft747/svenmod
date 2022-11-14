@@ -64,7 +64,7 @@ public:
 	// Call this function when you've finished importing parameters from a specified section
 	virtual void				EndSectionImport( void ) = 0;
 
-	// Advanced way to import any variable: ConfigManager()->ImportParam( "MyProperty", &myValue, DeduceFieldType(myValue) );
+	// Advanced way to import any variable: ConfigManager()->ImportParam( "MyProperty", &myValue, DeduceValueFieldType(myValue) );
 	virtual bool				ImportParam( const char *pszPropertyName, void *value, int fieldtype ) = 0;
 
 	// CString will be duped, don't forget to call 'free()' if it's no longer needed 

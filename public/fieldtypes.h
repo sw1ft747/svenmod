@@ -76,8 +76,10 @@ DECLARE_DEDUCE_FIELDTYPE(FIELD_QANGLE, const struct QAngle &);
 DECLARE_DEDUCE_FIELDTYPE(FIELD_QUATERNION, vec4_t); // ToDo: implement Quaternion class
 DECLARE_DEDUCE_FIELDTYPE(FIELD_QUATERNION, const vec4_t &);
 
+#define DeduceFieldType(T) FieldTypeDeducer<T>::FIELD_TYPE
+
 template <typename T>
-inline constexpr int DeduceFieldType(T value)
+inline constexpr int DeduceValueFieldType(T value)
 {
 	return FieldTypeDeducer<T>::FIELD_TYPE;
 }

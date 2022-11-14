@@ -552,10 +552,10 @@
     <ClInclude Include="public\hl_sdk\common\event.h">
       <Filter>SvenMod\public\HL SDK\common</Filter>
     </ClInclude>
-    <ClInclude Include="public\IDebug.h">
+    <ClInclude Include="public\IRender.h">
       <Filter>SvenMod\public</Filter>
     </ClInclude>
-    <ClInclude Include="svenmod\debug.h">
+    <ClInclude Include="svenmod\render.h">
       <Filter>SvenMod\svenmod</Filter>
     </ClInclude>
     <ClInclude Include="svenmod\keyvalues_custom_parser.h">
@@ -668,7 +668,7 @@
     <ClCompile Include="svenmod\gamedata_finder.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
-    <ClCompile Include="svenmod\debug.cpp">
+    <ClCompile Include="svenmod\render.cpp">
       <Filter>SvenMod\svenmod</Filter>
     </ClCompile>
     <ClCompile Include="svenmod\keyvalues_custom_parser.cpp">
