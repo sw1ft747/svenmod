@@ -1,9 +1,9 @@
 Changelog for SvenMod
 
-06/11/2022 - Version 1.2.1 (API v4.0) RC:
+06/11/2022, 14/11/2022 - Version 1.2.1 (API v4.0):
 - As always some improvements in the code
 - Project configurations for game version 5.22 (<3), 5.25 and Newest
-- New 'IDebug' interface
+- New 'IRender' interface
 - Updated sample plugin
 - Fixed wrong pad in class 'CGameConsoleDialog'
 - Fixed completely wrong struct 'extra_player_info_t'
