@@ -117,7 +117,7 @@ bool CPlugin::Load(const char *pszFileName, bool bGlobalLoad)
 	int iInterfaceVersion = 1;
 	static char szPluginPath[MAX_PATH];
 
-	snprintf(szPluginPath, sizeof(szPluginPath), "svenmod/plugins/%s", pszFileName);
+	snprintf(szPluginPath, M_ARRAYSIZE(szPluginPath), "svenmod/plugins/%s", pszFileName);
 
 	m_hPluginModule = Sys_LoadModule(szPluginPath);
 

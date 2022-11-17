@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <link.h>
+#include <hl_sdk/common/Platform.h>
 #endif
 
 #define DUPE_SYMBOLS_NAME 0
@@ -1071,7 +1072,7 @@ int CMemoryUtils::ReadMemoryProtection(void *pAddress)
 	
 	FILE *file = fopen("/proc/self/maps", "r");
 	
-	while ( fgets(szBuffer, sizeof(szBuffer), file) )
+	while ( fgets(szBuffer, M_ARRAYSIZE(szBuffer), file) )
 	{
 		// Tokenize format: [START_ADDR]-[END_ADDR] [PAGE_PROT] ....
 	

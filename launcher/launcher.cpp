@@ -304,7 +304,7 @@ static int LauncherMain(HINSTANCE hInstance, int argc, char *argv[])
 #endif
 
 	// Get executable name
-	if ( !Sys_GetExecutableName(szFileName, sizeof(szFileName)) )
+	if ( !Sys_GetExecutableName(szFileName, M_ARRAYSIZE(szFileName)) )
 	{
 		Sys_ErrorMessage("Failed to get executable name.");
 		return 0;

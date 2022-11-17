@@ -39,10 +39,10 @@ void Sys_Error(const char *pszMessageFormat, ...)
 	va_list args;
 
 	va_start(args, pszMessageFormat);
-	vsnprintf(buffer, sizeof(buffer), pszMessageFormat, args);
+	vsnprintf(buffer, M_ARRAYSIZE(buffer), pszMessageFormat, args);
 	va_end(args);
 
-	buffer[sizeof(buffer) - 1] = 0;
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 #ifdef PLATFORM_WINDOWS
 	MessageBoxA(NULL, buffer, "Fatal Error", MB_ICONERROR);
@@ -64,10 +64,10 @@ void Sys_ErrorMessage(const char *pszMessageFormat, ...)
 	va_list args;
 
 	va_start(args, pszMessageFormat);
-	vsnprintf(buffer, sizeof(buffer), pszMessageFormat, args);
+	vsnprintf(buffer, M_ARRAYSIZE(buffer), pszMessageFormat, args);
 	va_end(args);
 
-	buffer[sizeof(buffer) - 1] = 0;
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 #ifdef PLATFORM_WINDOWS
 	MessageBoxA(NULL, buffer, "Fatal Error", MB_ICONERROR);
@@ -248,13 +248,13 @@ HMODULE Sys_LoadModule(const char *pszModuleName)
 		if (szCwd[strlen(szCwd) - 1] == '/')
 			szCwd[strlen(szCwd) - 1] = 0;
 
-		snprintf(szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/%s", szCwd, pszModuleName);
+		snprintf(szAbsoluteModuleName, M_ARRAYSIZE(szAbsoluteModuleName), "%s/%s", szCwd, pszModuleName);
 
 		hDLL = dlopen(szAbsoluteModuleName, RTLD_NOW);
 	}
 	else
 	{
-		snprintf(szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s", pszModuleName);
+		snprintf(szAbsoluteModuleName, M_ARRAYSIZE(szAbsoluteModuleName), "%s", pszModuleName);
 		hDLL = dlopen(pszModuleName, RTLD_NOW);
 	}
 #endif
@@ -263,11 +263,11 @@ HMODULE Sys_LoadModule(const char *pszModuleName)
 	{
 		char str[512];
 #ifdef PLATFORM_WINDOWS
-		snprintf(str, sizeof(str), "%s.dll", pszModuleName);
+		snprintf(str, M_ARRAYSIZE(str), "%s.dll", pszModuleName);
 		hDLL = LoadLibraryA(str);
 #elif defined(PLATFORM_LINUX)
 		printf("Sys_LoadModule Error: %s\n", dlerror());
-		snprintf(str, sizeof(str), "%s.so", szAbsoluteModuleName);
+		snprintf(str, M_ARRAYSIZE(str), "%s.so", szAbsoluteModuleName);
 		hDLL = dlopen(str, RTLD_NOW);
 #endif
 	}

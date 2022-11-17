@@ -458,7 +458,7 @@ char *CMessageBuffer::ReadString(void) const
 			break;
 		string[l] = c;
 		l++;
-	} while (l < sizeof(string) - 1);
+	} while (l < M_ARRAYSIZE(string) - 1);
 
 	string[l] = 0;
 
@@ -478,7 +478,7 @@ char *CMessageBuffer::ReadStringLine(void) const
 			break;
 		string[l] = c;
 		l++;
-	} while (l < sizeof(string) - 1);
+	} while (l < M_ARRAYSIZE(string) - 1);
 
 	string[l] = 0;
 

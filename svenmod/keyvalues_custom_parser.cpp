@@ -1,6 +1,7 @@
 #pragma warning(disable : 26812)
 
 #include "keyvalues_custom_parser.h"
+#include "hl_sdk/common/Platform.h"
 
 namespace KeyValuesParser
 {
@@ -372,7 +373,7 @@ namespace KeyValuesParser
 			SeekState seek_state = SEEK_NONE;
 			ParseResult parse_result = PARSE_OK;
 
-			while ( fgets(szBuffer, sizeof(szBuffer) / sizeof(char), file) )
+			while ( fgets(szBuffer, M_ARRAYSIZE(szBuffer), file) )
 			{
 				iLastErrorLine++;
 

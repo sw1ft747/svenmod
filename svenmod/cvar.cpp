@@ -786,10 +786,10 @@ void CCvar::ConsoleColorPrintf(const Color &clr, const char *pszFormat, ...) con
 
 		va_list args;
 		va_start(args, pszFormat);
-		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszFormat, args);
+		vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszFormat, args);
 		va_end(args);
 
-		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+		szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 		CGameConsoleDialog *pGameConsoleDialog = m_pGameConsole->GetGameConsoleDialog();
 
@@ -806,10 +806,10 @@ void CCvar::ConsolePrintf(const char *pszFormat, ...) const
 
 		va_list args;
 		va_start(args, pszFormat);
-		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszFormat, args);
+		vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszFormat, args);
 		va_end(args);
 
-		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+		szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 		CGameConsoleDialog *pGameConsoleDialog = m_pGameConsole->GetGameConsoleDialog();
 
@@ -826,10 +826,10 @@ void CCvar::ConsoleDPrintf(const char *pszFormat, ...) const
 
 		va_list args;
 		va_start(args, pszFormat);
-		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszFormat, args);
+		vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszFormat, args);
 		va_end(args);
 
-		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+		szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 		CGameConsoleDialog *pGameConsoleDialog = m_pGameConsole->GetGameConsoleDialog();
 
@@ -878,14 +878,14 @@ void CCvar::SetValue(cvar_t *pCvar, float value)
 
 	if (eps >= 0.000001)
 	{
-		snprintf(buffer, (sizeof(buffer) / sizeof(char)), "%f", eps);
+		snprintf(buffer, M_ARRAYSIZE(buffer), "%f", eps);
 	}
 	else
 	{
-		snprintf(buffer, (sizeof(buffer) / sizeof(char)), "%d", int(value));
+		snprintf(buffer, M_ARRAYSIZE(buffer), "%d", int(value));
 	}
 
-	buffer[(sizeof(buffer) / sizeof(char)) - 1] = 0;
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 	Cvar_DirectSet(pCvar, buffer);
 }
@@ -894,8 +894,8 @@ void CCvar::SetValue(cvar_t *pCvar, int value)
 {
 	char buffer[32];
 
-	snprintf(buffer, (sizeof(buffer) / sizeof(char)), "%d", value);
-	buffer[(sizeof(buffer) / sizeof(char)) - 1] = 0;
+	snprintf(buffer, M_ARRAYSIZE(buffer), "%d", value);
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 	Cvar_DirectSet(pCvar, buffer);
 }
@@ -904,8 +904,8 @@ void CCvar::SetValue(cvar_t *pCvar, bool value)
 {
 	char buffer[32];
 
-	snprintf(buffer, (sizeof(buffer) / sizeof(char)), "%d", int(value));
-	buffer[(sizeof(buffer) / sizeof(char)) - 1] = 0;
+	snprintf(buffer, M_ARRAYSIZE(buffer), "%d", int(value));
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 	Cvar_DirectSet(pCvar, buffer);
 }
@@ -914,8 +914,8 @@ void CCvar::SetValue(cvar_t *pCvar, Color value)
 {
 	char buffer[24];
 
-	snprintf(buffer, (sizeof(buffer) / sizeof(char)), "%hhu %hhu %hhu %hhu", value.r, value.g, value.b, value.a);
-	buffer[(sizeof(buffer) / sizeof(char)) - 1] = 0;
+	snprintf(buffer, M_ARRAYSIZE(buffer), "%hhu %hhu %hhu %hhu", value.r, value.g, value.b, value.a);
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 	SetValue(pCvar, buffer);
 }
@@ -944,8 +944,8 @@ void CCvar::SetValue(const char *pszCvar, Color value)
 {
 	char buffer[24];
 
-	snprintf(buffer, (sizeof(buffer) / sizeof(char)), "%hhu %hhu %hhu %hhu", value.r, value.g, value.b, value.a);
-	buffer[(sizeof(buffer) / sizeof(char)) - 1] = 0;
+	snprintf(buffer, M_ARRAYSIZE(buffer), "%hhu %hhu %hhu %hhu", value.r, value.g, value.b, value.a);
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 	g_pEngineFuncs->Cvar_Set(pszCvar, buffer);
 }
@@ -1199,10 +1199,10 @@ void Msg(const char *pszMessageFormat, ...)
 
 	va_list args;
 	va_start(args, pszMessageFormat);
-	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessageFormat, args);
 	va_end(args);
 
-	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+	szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 	g_pCVar->ConsolePrint(szFormattedMsg);
 }
@@ -1213,10 +1213,10 @@ void Warning(const char *pszMessageFormat, ...)
 
 	va_list args;
 	va_start(args, pszMessageFormat);
-	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessageFormat, args);
 	va_end(args);
 
-	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+	szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 	g_pCVar->ConsoleColorPrint(s_WarningPrintColor, szFormattedMsg);
 }
@@ -1229,10 +1229,10 @@ void DevMsg(const char *pszMessageFormat, ...)
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+		vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessageFormat, args);
 		va_end(args);
 
-		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+		szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 		g_pCVar->ConsoleDPrint(szFormattedMsg);
 	}
@@ -1246,10 +1246,10 @@ void DevWarning(const char *pszMessageFormat, ...)
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+		vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessageFormat, args);
 		va_end(args);
 
-		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+		szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 		g_pCVar->ConsoleColorPrint(s_WarningPrintColor, szFormattedMsg);
 	}
@@ -1261,10 +1261,10 @@ void ConColorMsg(const Color &clr, const char *pszMessageFormat, ...)
 
 	va_list args;
 	va_start(args, pszMessageFormat);
-	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessageFormat, args);
 	va_end(args);
 
-	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+	szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 	g_pCVar->ConsoleColorPrint(clr, szFormattedMsg);
 }
@@ -1275,10 +1275,10 @@ void ConMsg(const char *pszMessageFormat, ...)
 
 	va_list args;
 	va_start(args, pszMessageFormat);
-	vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+	vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessageFormat, args);
 	va_end(args);
 
-	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+	szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 	g_pCVar->ConsolePrint(szFormattedMsg);
 }
@@ -1291,10 +1291,10 @@ void ConDMsg(const char *pszMessageFormat, ...)
 	{
 		va_list args;
 		va_start(args, pszMessageFormat);
-		vsnprintf(szFormattedMsg, (sizeof(szFormattedMsg) / sizeof(char)), pszMessageFormat, args);
+		vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessageFormat, args);
 		va_end(args);
 
-		szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+		szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 		g_pCVar->ConsolePrint(szFormattedMsg);
 	}
