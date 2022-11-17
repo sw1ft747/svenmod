@@ -1,5 +1,10 @@
 Changelog for SvenMod
 
+17/11/2022 - Version 1.2.2 (API v4.0):
+- Used macro M_ARRAYSIZE
+- Used variable 'realtime' instead of function 'g_pEngineFuncs->GetClientTime' in the interface 'IRender'
+- Fixed crash in main menu when called method IUtils::PrintChatText
+
 06/11/2022, 14/11/2022 - Version 1.2.1 (API v4.0):
 - As always some improvements in the code
 - Project configurations for game version 5.22 (<3), 5.25 and Newest

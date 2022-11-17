@@ -1,3 +1,5 @@
+// SvenMod
+
 #include <interface.h>
 #include <ISvenModAPI.h>
 #include <ICommandLine.h>
