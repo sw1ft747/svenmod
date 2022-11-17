@@ -11,6 +11,8 @@
 
 #include <hl_sdk/engine/APIProxy.h>
 
+extern double *g_pRealtime;
+
 //-----------------------------------------------------------------------------
 // Draw point
 //-----------------------------------------------------------------------------
@@ -360,13 +362,16 @@ CRender::~CRender()
 
 void CRender::AddDrawContext(IDrawContext *pContext, float duration)
 {
+	if ( pContext == NULL )
+		return;
+
 	if ( duration < 0.f )
 		duration = 0.f;
 
 	draw_context_t draw_context;
-
+	
 	draw_context.pDrawContext = pContext;
-	draw_context.flDuration = g_pEngineFuncs->GetClientTime() + duration;
+	draw_context.flDuration = static_cast<float>(*g_pRealtime) + duration;
 	draw_context.flDistanceSqr = 0.f;
 
 	m_vDrawContext.push_back( draw_context );
@@ -382,7 +387,7 @@ void CRender::DrawPoint(const Vector &vPoint, const Color &color, float size, fl
 	IDrawContext *pDrawContext = new CDrawPoint(vPoint, color, size);
 
 	draw_context.pDrawContext = pDrawContext;
-	draw_context.flDuration = g_pEngineFuncs->GetClientTime() + duration;
+	draw_context.flDuration = static_cast<float>(*g_pRealtime) + duration;
 	draw_context.flDistanceSqr = 0.f;
 
 	m_vDrawContext.push_back( draw_context );
@@ -398,7 +403,7 @@ void CRender::DrawLine(const Vector &vStart, const Vector &vEnd, const Color &co
 	IDrawContext *pDrawContext = new CDrawLine(vStart, vEnd, color, width);
 
 	draw_context.pDrawContext = pDrawContext;
-	draw_context.flDuration = g_pEngineFuncs->GetClientTime() + duration;
+	draw_context.flDuration = static_cast<float>(*g_pRealtime) + duration;
 	draw_context.flDistanceSqr = 0.f;
 
 	m_vDrawContext.push_back( draw_context );
@@ -414,7 +419,7 @@ void CRender::DrawBox(const Vector &vOrigin, const Vector &vMins, const Vector &
 	IDrawContext *pDrawContext = new CDrawBox(vOrigin, vMins, vMaxs, color);
 
 	draw_context.pDrawContext = pDrawContext;
-	draw_context.flDuration = g_pEngineFuncs->GetClientTime() + duration;
+	draw_context.flDuration = static_cast<float>(*g_pRealtime) + duration;
 	draw_context.flDistanceSqr = 0.f;
 
 	m_vDrawContext.push_back( draw_context );
@@ -430,7 +435,7 @@ void CRender::DrawBoxAngles(const Vector &vOrigin, const Vector &vMins, const Ve
 	IDrawContext *pDrawContext = new CDrawBoxAngles(vOrigin, vMins, vMaxs, vAngles, color);
 
 	draw_context.pDrawContext = pDrawContext;
-	draw_context.flDuration = g_pEngineFuncs->GetClientTime() + duration;
+	draw_context.flDuration = static_cast<float>(*g_pRealtime) + duration;
 	draw_context.flDistanceSqr = 0.f;
 
 	m_vDrawContext.push_back( draw_context );
@@ -463,7 +468,7 @@ void CRender::Draw()
 	{
 		draw_context_t &draw_context = m_vDrawContext[i];
 
-		if ( draw_context.flDuration < g_pEngineFuncs->GetClientTime() || draw_context.pDrawContext->ShouldStopDraw() )
+		if ( draw_context.flDuration < static_cast<float>(*g_pRealtime) || draw_context.pDrawContext->ShouldStopDraw() )
 		{
 			delete draw_context.pDrawContext;
 
