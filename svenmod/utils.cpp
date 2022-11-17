@@ -2,10 +2,13 @@
 
 #include <dbg.h>
 #include <messagebuffer.h>
+#include <client_state.h>
 #include <IVideoMode.h>
 
 #include <hl_sdk/common/protocol.h>
 #include <hl_sdk/engine/APIProxy.h>
+
+extern int *g_pClientState;
 
 extern usermsg_t **g_ppClientUserMsgs;
 extern event_t *g_pEventHooks;
@@ -181,7 +184,7 @@ void CUtils::PrintChatText(const char *pszMessage, ...)
 	static char szFormattedMsg[1024];
 	static const usermsg_t *pSayText = NULL;
 
-	if ( pszMessage == NULL || ( len = strlen(pszMessage) ) == 0 )
+	if ( *g_pClientState < CLS_LOADING || pszMessage == NULL || ( len = strlen(pszMessage) ) == 0 )
 		return;
 
 	if ( pSayText == NULL )
@@ -189,16 +192,16 @@ void CUtils::PrintChatText(const char *pszMessage, ...)
 
 	va_list args;
 	va_start(args, pszMessage);
-	vsnprintf(szFormattedMsg, sizeof(szFormattedMsg) / sizeof(*szFormattedMsg), pszMessage, args);
+	vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszMessage, args);
 	va_end(args);
 
-	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(*szFormattedMsg)) - 1] = 0;
+	szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
-	msgbuffer.Init( buffer, sizeof(buffer) / sizeof(*buffer) );
+	msgbuffer.Init( buffer, M_ARRAYSIZE(buffer) );
 	msgbuffer.WriteByte( 0 );
 	msgbuffer.WriteString( szFormattedMsg );
 
-	buffer[(sizeof(buffer) / sizeof(*buffer)) - 1] = 0;
+	buffer[M_ARRAYSIZE(buffer) - 1] = 0;
 
 	//Msg( pszMessage );
 	pSayText->function( "SayText", msgbuffer.GetBuffer()->cursize, msgbuffer.GetBuffer()->data );
@@ -219,10 +222,10 @@ int CUtils::DrawConsoleString(int x, int y, const char *pszFormat, ...)
 
 	va_list args;
 	va_start(args, pszFormat);
-	vsnprintf(szFormattedMsg, sizeof(szFormattedMsg), pszFormat, args);
+	vsnprintf(szFormattedMsg, M_ARRAYSIZE(szFormattedMsg), pszFormat, args);
 	va_end(args);
 
-	szFormattedMsg[(sizeof(szFormattedMsg) / sizeof(char)) - 1] = 0;
+	szFormattedMsg[M_ARRAYSIZE(szFormattedMsg) - 1] = 0;
 
 	return g_pEngineFuncs->DrawConsoleString(x, y, szFormattedMsg);
 }
