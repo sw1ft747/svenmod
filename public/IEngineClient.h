@@ -27,15 +27,19 @@ public:
 
 	virtual void			ChangeSkymap( const char *pszSkyboxName ) = 0;
 
+#if !defined(SC_5_22) // Since 5.23
 	virtual void			*ChangeSkycolor( float r, float g, float b ) = 0;
+#endif
 
 	virtual int				QueueDemoSound( float *a1, int a2, const char *a3, float a4, float a5, int a6, int a7 ) = 0;
 
+#if !defined(SC_5_22) // Most likely since 5.23 too
 	virtual void			PushView( RenderTarget *a1, bool a2, bool a3 ) = 0;
 
 	virtual void			PopView( void ) = 0;
 
 	virtual void			**RenderView( struct ref_params_s *pparams, bool a2, bool a3, int a4 ) = 0;
+#endif
 };
 
 extern IEngineClient *g_pEngineClient;

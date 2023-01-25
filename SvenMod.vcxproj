@@ -314,12 +314,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Debug|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod</TargetName>
+    <TargetName>svenmod_522</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Debug|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod</TargetName>
+    <TargetName>svenmod_525</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.dll</TargetExt>
@@ -329,12 +329,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod</TargetName>
+    <TargetName>svenmod_522</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod</TargetName>
+    <TargetName>svenmod_525</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -349,7 +349,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
@@ -372,7 +372,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
@@ -395,7 +395,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
@@ -450,7 +450,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
@@ -478,7 +478,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>lib\public\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>

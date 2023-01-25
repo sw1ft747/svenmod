@@ -1,5 +1,13 @@
 Changelog for SvenMod
 
+25/01/2023 - Version 1.2.3 (API v4.0):
+- Renamed fieldtypes
+- Removed some methods of the interface 'IEngineClient' for game version 5.22
+- Added macro to define multiple patterns, see 'memutils/patterns.h'
+- Added inline function 'FindPattern' in the interface 'IMemoryUtils' to look over multiple patterns
+- Added a missing pattern for version 5.22
+- Fixed incorrect get of the struct 'r_studio_interface_t'
+
 17/11/2022 - Version 1.2.2 (API v4.0):
 - Used macro M_ARRAYSIZE
 - Used variable 'realtime' instead of function 'g_pEngineFuncs->GetClientTime' in the interface 'IRender'
