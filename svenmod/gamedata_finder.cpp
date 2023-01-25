@@ -238,7 +238,7 @@ void CGameDataFinder::FindEngineStudio(engine_studio_api_t **pEngineStudio, r_st
 			{
 				if (g_inst.mnemonic == UD_Ipush && g_inst.operand[0].type == UD_OP_IMM)
 				{
-					*pStudioAPI = reinterpret_cast<r_studio_interface_t *>(g_inst.operand[0].lval.udword);
+					*pStudioAPI = *reinterpret_cast<r_studio_interface_t **>(g_inst.operand[0].lval.udword);
 
 					bFoundSecondPush = true;
 					continue;
