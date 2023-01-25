@@ -23,6 +23,8 @@
 #include "../common/Platform.h"
 #include "../../math/vector.h"
 
+#include "../common/const.h"
+
 typedef struct
 {
 	float time;
