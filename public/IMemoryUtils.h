@@ -131,8 +131,8 @@ public:
 	// Find signature from pattern_s structure
 	//-----------------------------------------------------------------------------
 
-	virtual void *FindPattern(HMODULE hModule, pattern_s *pPattern, unsigned int offset = 0) = 0;
-	virtual void *FindPatternWithin(HMODULE hModule, pattern_s *pPattern, void *pSearchStart, void *pSearchEnd) = 0;
+	virtual void *FindPattern(HMODULE hModule, pattern_t *pPattern, unsigned int offset = 0) = 0;
+	virtual void *FindPatternWithin(HMODULE hModule, pattern_t *pPattern, void *pSearchStart, void *pSearchEnd) = 0;
 
 	//-----------------------------------------------------------------------------
 	// Find signature from string with given mask
@@ -171,6 +171,29 @@ public:
 
 	virtual void *FindAddress(HMODULE hModule, void *pAddress, unsigned int offset = 0) = 0;
 	virtual void *FindAddressWithin(HMODULE hModule, void *pAddress, void *pSearchStart, void *pSearchEnd) = 0;
+
+	//-----------------------------------------------------------------------------
+	// Wrappers
+	//-----------------------------------------------------------------------------
+
+	inline void *FindPattern(HMODULE hModule, pattern_reg_t *patterns, int *patternIndex)
+	{
+		for (int i = 0; patterns[i].name != NULL; i++)
+		{
+			void *pAddress = NULL;
+			pattern_t *pattern = patterns[i].pattern;
+
+			if ( (pAddress = FindPattern(hModule, pattern)) != NULL )
+			{
+				if ( patternIndex != NULL )
+					*patternIndex = i;
+
+				return pAddress;
+			}
+		}
+
+		return NULL;
+	}
 };
 
 #define MEMORYUTILS_INTERFACE_VERSION "MemoryUtils002"

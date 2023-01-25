@@ -49,8 +49,8 @@ public:
 
 	virtual void *ResolveSymbol(HMODULE hModule, const char *pszSymbol);
 
-	virtual void *FindPattern(HMODULE hModule, pattern_s *pPattern, unsigned int offset = 0);
-	virtual void *FindPatternWithin(HMODULE hModule, pattern_s *pPattern, void *pSearchStart, void *pSearchEnd);
+	virtual void *FindPattern(HMODULE hModule, pattern_t *pPattern, unsigned int offset = 0);
+	virtual void *FindPatternWithin(HMODULE hModule, pattern_t *pPattern, void *pSearchStart, void *pSearchEnd);
 
 	virtual void *FindPattern(HMODULE hModule, const char *pszPattern, char *pszMask, unsigned int offset = 0);
 	virtual void *FindPatternWithin(HMODULE hModule, const char *pszPattern, char *pszMask, void *pSearchStart, void *pSearchEnd);
@@ -667,7 +667,7 @@ void *CMemoryUtils::ResolveSymbol(HMODULE hModule, const char *pszSymbol)
 // Sig scanner
 //-----------------------------------------------------------------------------
 
-void *CMemoryUtils::FindPattern(HMODULE hModule, pattern_s *pPattern, unsigned int offset /* = 0 */)
+void *CMemoryUtils::FindPattern(HMODULE hModule, pattern_t *pPattern, unsigned int offset /* = 0 */)
 {
 	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
 	{
@@ -847,7 +847,7 @@ void *CMemoryUtils::FindAddress(HMODULE hModule, void *pAddress, unsigned int of
 // Find a pattern within a range
 //-----------------------------------------------------------------------------
 
-void *CMemoryUtils::FindPatternWithin(HMODULE hModule, pattern_s *pPattern, void *pSearchStart, void *pSearchEnd)
+void *CMemoryUtils::FindPatternWithin(HMODULE hModule, pattern_t *pPattern, void *pSearchStart, void *pSearchEnd)
 {
 	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
 	{
