@@ -635,40 +635,40 @@ bool CConfigManager::ImportParam(const char *pszPropertyName, void *value, int f
 {
 	switch (fieldtype)
 	{
-	case FIELD_INTEGER:
+	case FIELD_TYPE_INTEGER:
 		return ImportParam(pszPropertyName, *(int *)value);
 
-	case FIELD_FLOAT:
+	case FIELD_TYPE_FLOAT:
 		return ImportParam(pszPropertyName, *(float *)value);
 
-	case FIELD_CSTRING:
+	case FIELD_TYPE_CSTRING:
 		return ImportParam(pszPropertyName, *(const char **)value);
 
-	case FIELD_BOOLEAN:
+	case FIELD_TYPE_BOOLEAN:
 		return ImportParam(pszPropertyName, *(bool *)value);
 
-	case FIELD_DOUBLE:
+	case FIELD_TYPE_DOUBLE:
 		return ImportParam(pszPropertyName, *(double *)value);
 
-	case FIELD_BYTE:
+	case FIELD_TYPE_BYTE:
 		return ImportParam(pszPropertyName, *(unsigned char *)value);
 
-	case FIELD_CHARACTER:
+	case FIELD_TYPE_CHARACTER:
 		return ImportParam(pszPropertyName, *(char *)value);
 
-	case FIELD_SHORT:
+	case FIELD_TYPE_SHORT:
 		return ImportParam(pszPropertyName, *(short *)value);
 
-	case FIELD_INTEGER64:
+	case FIELD_TYPE_INTEGER64:
 		return ImportParam(pszPropertyName, *(int64 *)value);
 
-	case FIELD_UINT:
+	case FIELD_TYPE_UINT:
 		return ImportParam(pszPropertyName, *(uint32 *)value);
 
-	case FIELD_UINT16:
+	case FIELD_TYPE_UINT16:
 		return ImportParam(pszPropertyName, *(uint16 *)value);
 
-	case FIELD_UINT64:
+	case FIELD_TYPE_UINT64:
 		return ImportParam(pszPropertyName, *(uint64 *)value);
 
 	default:
@@ -1072,51 +1072,51 @@ void CConfigManager::ExportParam(const char *pszPropertyName, void *value, int f
 {
 	switch (fieldtype)
 	{
-	case FIELD_INTEGER:
+	case FIELD_TYPE_INTEGER:
 		ExportParam(pszPropertyName, *(int *)value);
 		break;
 
-	case FIELD_FLOAT:
+	case FIELD_TYPE_FLOAT:
 		ExportParam(pszPropertyName, *(float *)value);
 		break;
 
-	case FIELD_CSTRING:
+	case FIELD_TYPE_CSTRING:
 		ExportParam(pszPropertyName, *(const char **)value);
 		break;
 
-	case FIELD_BOOLEAN:
+	case FIELD_TYPE_BOOLEAN:
 		ExportParam(pszPropertyName, *(bool *)value);
 		break;
 
-	case FIELD_DOUBLE:
+	case FIELD_TYPE_DOUBLE:
 		ExportParam(pszPropertyName, *(double *)value);
 		break;
 
-	case FIELD_BYTE:
+	case FIELD_TYPE_BYTE:
 		ExportParam(pszPropertyName, *(unsigned char *)value);
 		break;
 
-	case FIELD_CHARACTER:
+	case FIELD_TYPE_CHARACTER:
 		ExportParam(pszPropertyName, *(char *)value);
 		break;
 
-	case FIELD_SHORT:
+	case FIELD_TYPE_SHORT:
 		ExportParam(pszPropertyName, *(short *)value);
 		break;
 
-	case FIELD_INTEGER64:
+	case FIELD_TYPE_INTEGER64:
 		ExportParam(pszPropertyName, *(int64 *)value);
 		break;
 
-	case FIELD_UINT:
+	case FIELD_TYPE_UINT:
 		ExportParam(pszPropertyName, *(uint32 *)value);
 		break;
 
-	case FIELD_UINT16:
+	case FIELD_TYPE_UINT16:
 		ExportParam(pszPropertyName, *(uint16 *)value);
 		break;
 
-	case FIELD_UINT64:
+	case FIELD_TYPE_UINT64:
 		ExportParam(pszPropertyName, *(uint64 *)value);
 		break;
 
