@@ -36,7 +36,7 @@ set(SVENMOD_SOURCE_FILES
 	shared/interface.cpp
 	shared/mathlib.cpp
 	shared/sys.cpp
-	shared/usermessages.cpp
+	shared/messagebuffer.cpp
 	
 	public/udis86/src/decode.c
 	public/udis86/src/itab.c
@@ -55,6 +55,8 @@ add_subdirectory(shared)
 add_subdirectory(launcher)
 
 add_library(${SVENMOD_DLL} SHARED ${SVENMOD_SOURCE_FILES})
+
+target_link_libraries(${SVENMOD_DLL} OpenGL32)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
 
