@@ -1,6 +1,6 @@
 Changelog for SvenMod
 
-11/03/2023 - Version 1.2.34 (API v4.0):
+11/03/2023 - Version 1.2.4 (API v4.0):
 - Updated math functions
 - Added QAngle and Quaternion classes
 - Added macro 'SVENMOD_DEBUG'
