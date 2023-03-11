@@ -24,7 +24,6 @@
 #include <cmath>
 #include "vector.h"
 
-typedef vec_t vec4_t[4]; // x,y,z,w
 typedef vec_t vec5_t[5];
 
 typedef short vec_s_t;
@@ -45,7 +44,7 @@ const Vector vec3_origin;
 const Vector g_vecZero;
 extern int nanmask;
 
-#define IS_NAN(x) !IsFloatFinite(x)
+#define IS_NAN(x) !Vec_IsFloatFinite(x)
 //#define IS_NAN(x) (((*(int*)&x) & nanmask) == nanmask)
 
 //-----------------------------------------------------------------------------
@@ -145,6 +144,11 @@ inline Vector CrossProduct(const Vector &a, const Vector &b)
 	return a.Cross(b);
 }
 
+inline float DotProduct(float *a, float *b)
+{
+	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
 inline float DotProduct(const Vector &a, const Vector &b)
 {
 	return a.Dot(b);
@@ -172,17 +176,20 @@ fixed16_t Invert24To16(fixed16_t val);
 int GreatestCommonDivisor(int i1, int i2);
 
 void AngleVectors(const Vector &angles, Vector *forward, Vector *right, Vector *up);
+void AngleVectors(const QAngle &angles, Vector *forward, Vector *right, Vector *up);
 void AngleVectorsTranspose(const Vector &angles, Vector *forward, Vector *right, Vector *up);
 #define AngleIVectors AngleVectorsTranspose
 
 void AngleMatrix(const float *angles, float matrix[3][4]);
 void AngleIMatrix(const Vector &angles, float matrix[3][4]);
+void MatrixAngles(float matrix[3][4], float *angles);
 void VectorTransform(const Vector &in1, float in2[3][4], Vector &out);
 void VectorRotate(const Vector &in1, float in2[3][4], Vector &out);
 void VectorITransform(const Vector &in1, float in2[3][4], Vector &out);
 void VectorIRotate(const Vector &in1, float in2[3][4], Vector &out);
 
 float NormalizeAngle(float angle);
+float NormalizeAnglePositive(float angle);
 void NormalizeAngles(float *angles);
 void InterpolateAngles(float *start, float *end, float *output, float frac);
 float AngleBetweenVectors(const Vector &v1, const Vector &v2);
@@ -191,7 +198,7 @@ float AngleBetweenVectors(const Vector &v1, const Vector &v2);
 void VectorMatrix(const Vector &forward, Vector &right, Vector &up);
 void VectorAngles(const float *forward, float *angles);
 
-int InvertMatrix(const float *m, float *out);
+void InvertMatrix(float in[3][4], float out[3][4]);
 
 int BoxOnPlaneSide(const Vector &emins, const Vector &emaxs, struct mplane_s *plane);
 float anglemod(float a);
@@ -200,6 +207,8 @@ void MatrixCopy(float in[3][4], float out[3][4]);
 void QuaternionMatrix(vec4_t quaternion, float(*matrix)[4]);
 void QuaternionSlerp(vec4_t p, vec4_t q, float t, vec4_t qt);
 void AngleQuaternion(float *angles, vec4_t quaternion);
+void AngleQuaternion(const QAngle &in, Quaternion &out);
+void QuaternionAngles(const Quaternion &in, QAngle &out);
 
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)                                                                 \

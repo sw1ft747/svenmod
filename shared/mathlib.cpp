@@ -34,18 +34,28 @@ float NormalizeAngle(float angle)
 	return angle;
 }
 
+float NormalizeAnglePositive(float angle)
+{
+	angle = std::fmod(angle, 360.0f);
+
+	if (angle < 0.0f)
+		angle += 360.0f;
+
+	return angle;
+}
+
 void AngleVectors(const Vector& angles, Vector* forward, Vector* right, Vector* up)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[1]);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[0]);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[2]);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -69,18 +79,23 @@ void AngleVectors(const Vector& angles, Vector* forward, Vector* right, Vector* 
 	}
 }
 
+void AngleVectors(const QAngle &angles, Vector *forward, Vector *right, Vector *up)
+{
+	AngleVectors( angles.AsVector(), forward, right, up);
+}
+
 void AngleVectorsTranspose(const Vector& angles, Vector* forward, Vector* right, Vector* up)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[1]);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[0]);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[2]);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -109,13 +124,13 @@ void AngleMatrix(const float* angles, float matrix[3][4])
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[1]);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[0]);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[2]);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -139,13 +154,13 @@ void AngleIMatrix(const Vector& angles, float matrix[3][4])
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
 
-	angle = angles[1] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[1]);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[0] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[0]);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[2] * static_cast<float>(M_PI / 180.0);
+	angle = VEC_DEG2RAD(angles[2]);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -162,6 +177,51 @@ void AngleIMatrix(const Vector& angles, float matrix[3][4])
 	matrix[0][3] = 0.0f;
 	matrix[1][3] = 0.0f;
 	matrix[2][3] = 0.0f;
+}
+
+void MatrixAngles(float matrix[3][4], float *angles)
+{ 
+	float forward[3];
+	float left[3];
+	float up[3];
+
+	//
+	// Extract the basis vectors from the matrix. Since we only need the Z
+	// component of the up vector, we don't get X and Y.
+	//
+	forward[0] = matrix[0][0];
+	forward[1] = matrix[1][0];
+	forward[2] = matrix[2][0];
+	left[0] = matrix[0][1];
+	left[1] = matrix[1][1];
+	left[2] = matrix[2][1];
+	up[2] = matrix[2][2];
+
+	float xyDist = sqrtf( forward[0] * forward[0] + forward[1] * forward[1] );
+	
+	// enough here to get angles?
+	if ( xyDist > 0.001f )
+	{
+		// (yaw)	y = ATAN( forward.y, forward.x );		-- in our space, forward is the X axis
+		angles[1] = VEC_RAD2DEG( atan2f( forward[1], forward[0] ) );
+
+		// (pitch)	x = ATAN( -forward.z, sqrt(forward.x*forward.x+forward.y*forward.y) );
+		angles[0] = VEC_RAD2DEG( atan2f( -forward[2], xyDist ) );
+
+		// (roll)	z = ATAN( left.z, up.z );
+		angles[2] = VEC_RAD2DEG( atan2f( left[2], up[2] ) );
+	}
+	else	// forward is mostly Z, gimbal lock-
+	{
+		// (yaw)	y = ATAN( -left.x, left.y );			-- forward is mostly z, so use right for yaw
+		angles[1] = VEC_RAD2DEG( atan2f( -left[0], left[1] ) );
+
+		// (pitch)	x = ATAN( -forward.z, sqrt(forward.x*forward.x+forward.y*forward.y) );
+		angles[0] = VEC_RAD2DEG( atan2f( -forward[2], xyDist ) );
+
+		// Assume no roll in this case as one degree of freedom has been lost (i.e. yaw == roll)
+		angles[2] = 0.f;
+	}
 }
 
 void NormalizeAngles(float* angles)
@@ -237,7 +297,7 @@ float AngleBetweenVectors(const Vector& v1, const Vector& v2)
 		return 0.0f;
 
 	angle = acos(DotProduct(v1, v2)) / (l1 * l2);
-	angle = (angle * 180.0f) / static_cast<float>(M_PI);
+	angle = VEC_RAD2DEG(angle);
 
 	return angle;
 }
@@ -329,12 +389,12 @@ void VectorAngles(const float* forward, float* angles)
 	}
 	else
 	{
-		yaw = (atan2(forward[1], forward[0]) * 180.f / static_cast<float>(M_PI));
+		yaw = VEC_RAD2DEG(atan2(forward[1], forward[0]));
 		if (yaw < 0.f)
 			yaw += 360.f;
 
 		tmp = sqrt(forward[0] * forward[0] + forward[1] * forward[1]);
-		pitch = (atan2(forward[2], tmp) * 180.f / static_cast<float>(M_PI));
+		pitch = VEC_RAD2DEG(atan2(forward[2], tmp));
 		if (pitch < 0.f)
 			pitch += 360.f;
 	}
@@ -342,6 +402,32 @@ void VectorAngles(const float* forward, float* angles)
 	angles[0] = pitch;
 	angles[1] = yaw;
 	angles[2] = 0.f;
+}
+
+void InvertMatrix(float in[3][4], float out[3][4])
+{
+	// transpose the matrix
+	out[0][0] = in[0][0];
+	out[0][1] = in[1][0];
+	out[0][2] = in[2][0];
+
+	out[1][0] = in[0][1];
+	out[1][1] = in[1][1];
+	out[1][2] = in[2][1];
+
+	out[2][0] = in[0][2];
+	out[2][1] = in[1][2];
+	out[2][2] = in[2][2];
+
+	// now fix up the translation to be in the other space
+	float tmp[3];
+	tmp[0] = in[0][3];
+	tmp[1] = in[1][3];
+	tmp[2] = in[2][3];
+
+	out[0][3] = -DotProduct(tmp, out[0]);
+	out[1][3] = -DotProduct(tmp, out[1]);
+	out[2][3] = -DotProduct(tmp, out[2]);
 }
 
 /*
@@ -412,6 +498,75 @@ void AngleQuaternion(float *angles, vec4_t quaternion)
 	quaternion[1] = cr * sp * cy + sr * cp * sy; // Y
 	quaternion[2] = cr * cp * sy - sr * sp * cy; // Z
 	quaternion[3] = cr * cp * cy + sr * sp * sy; // W
+}
+
+void AngleQuaternion(const QAngle &in, Quaternion &out)
+{
+	float angle;
+	float sr, sp, sy, cr, cp, cy;
+	float srXcp, crXsp, crXcp, srXsp;
+
+	angle = VEC_DEG2RAD(in.y) * 0.5f;
+	sy = sin(angle);
+	cy = cos(angle);
+	angle = VEC_DEG2RAD(in.x) * 0.5f;
+	sp = sin(angle);
+	cp = cos(angle);
+	angle = VEC_DEG2RAD(in.z) * 0.5f;
+	sr = sin(angle);
+	cr = cos(angle);
+
+	srXcp = sr * cp;
+	crXsp = cr * sp;
+	crXcp = cr * cp;
+	srXsp = sr * sp;
+
+	out.x = srXcp * cy - crXsp * sy; // X
+	out.y = crXsp * cy + srXcp * sy; // Y
+	out.z = crXcp * sy - srXsp * cy; // Z
+	out.w = crXcp * cy + srXsp * sy; // W
+}
+
+void QuaternionAngles(const Quaternion &in, QAngle &out)
+{
+#if 0
+	float matrix[3][4];
+
+	QuaternionMatrix(quaternion, matrix);
+	MatrixAngles(matrix, angles);
+#else
+	Vector forward;
+
+	forward[0] = 1.f - 2.f * in.y * in.y - 2.f * in.z * in.z;
+	forward[1] = 2.f * in.x * in.y + 2.f * in.w * in.z;
+	forward[2] = 2.f * in.x * in.z - 2.f * in.w * in.y;
+
+	float xyDist = sqrtf( forward[0] * forward[0] + forward[1] * forward[1] );
+	
+	// enough here to get angles?
+	if ( xyDist > 0.001f )
+	{
+		// (yaw)	y = ATAN( forward.y, forward.x );		-- in our space, forward is the X axis
+		out[1] = VEC_RAD2DEG( atan2f( forward[1], forward[0] ) );
+
+		// (pitch)	x = ATAN( -forward.z, sqrt(forward.x*forward.x+forward.y*forward.y) );
+		out[0] = VEC_RAD2DEG( atan2f( -forward[2], xyDist ) );
+
+		// (roll)	z = ATAN( left.z, up.z );
+		out[2] = VEC_RAD2DEG( atan2f( 2.f * in.y * in.z + 2.f * in.w * in.x, 1.f - 2.f * in.x * in.x - 2.f * in.y * in.y ) );
+	}
+	else	// forward is mostly Z, gimbal lock-
+	{
+		// (yaw)	y = ATAN( -left.x, left.y );			-- forward is mostly z, so use right for yaw
+		out[1] = VEC_RAD2DEG( atan2f( -(2.f * in.x * in.y - 2.f * in.w * in.z), 1.f - 2.f * in.x * in.x - 2.f * in.z * in.z ));
+
+		// (pitch)	x = ATAN( -forward.z, sqrt(forward.x*forward.x+forward.y*forward.y) );
+		out[0] = VEC_RAD2DEG( atan2f( -forward[2], xyDist ) );
+
+		// Assume no roll in this case as one degree of freedom has been lost (i.e. yaw == roll)
+		out[2] = 0.f;
+	}
+#endif
 }
 
 /*
