@@ -1,5 +1,15 @@
 Changelog for SvenMod
 
+11/03/2023 - Version 1.2.34 (API v4.0):
+- Updated math functions
+- Added QAngle and Quaternion classes
+- Added macro 'SVENMOD_DEBUG'
+- Added WeaponId 'WEAPON_CROWBAR_ELECTRIC'
+- Removed dynamic_cast on 'ConCommandBase'
+- Fixed 'msurface_s' structure
+- Fixed wrong read & write of coords in 'CMessageBuffer'
+- Fixed wrong definition of macro 'CHAR_TEX_SNOW'
+
 25/01/2023 - Version 1.2.3 (API v4.0):
 - Renamed fieldtypes
 - Removed some methods of the interface 'IEngineClient' for game version 5.22
