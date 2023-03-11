@@ -267,7 +267,7 @@ void CMessageBuffer::WriteString(char *s)
 
 void CMessageBuffer::WriteCoord(float f)
 {
-	WriteShort( (int)(f * 8.f) );
+	WriteLong( (int)(f * 8.f) );
 }
 
 void CMessageBuffer::WriteAngle(float f)
@@ -487,7 +487,7 @@ char *CMessageBuffer::ReadStringLine(void) const
 
 float CMessageBuffer::ReadCoord(void) const
 {
-	return (float)ReadShort() * (1.f / 8.f);
+	return (float)ReadLong() * (1.f / 8.f);
 }
 
 float CMessageBuffer::ReadAngle(void) const
