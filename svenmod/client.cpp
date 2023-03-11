@@ -10,11 +10,13 @@
 #include <convar.h>
 #include <IUtils.h>
 
+#ifdef SVENMOD_DEBUG
 ConVar sm_debug_new_line_height("sm_debug_new_line_height", "20", FCVAR_CLIENTDLL, "Height for each line when print anything");
 ConVar sm_debug_show_weapondata("sm_debug_show_weapondata", "0", FCVAR_CLIENTDLL, "Shows on the screen current weapon's data vars");
 ConVar sm_debug_show_clientdata("sm_debug_show_clientdata", "0", FCVAR_CLIENTDLL, "Shows on the screen client's data vars");
 ConVar sm_debug_show_entitystate("sm_debug_show_entitystate", "0", FCVAR_CLIENTDLL, "Shows on the screen client's entity state vars");
 ConVar sm_debug_show_playermove("sm_debug_show_playermove", "0", FCVAR_CLIENTDLL, "Shows on the screen player move vars");
+#endif
 
 //-----------------------------------------------------------------------------
 // CClient implementation
@@ -356,6 +358,7 @@ CClient::CClient()
 	m_afButtonReleased = 0;
 }
 
+#ifdef SVENMOD_DEBUG
 void CClient::ShowDebugInfo()
 {
 	ShowWeaponData();
@@ -363,6 +366,7 @@ void CClient::ShowDebugInfo()
 	ShowEntityState();
 	ShowPlayerMove();
 }
+#endif
 
 void CClient::Update(local_state_t *from, local_state_t *to, usercmd_t *cmd, double time, unsigned int random_seed)
 {
@@ -384,6 +388,7 @@ void CClient::Update(local_state_t *from, local_state_t *to, usercmd_t *cmd, dou
 	g_bCurrentWeaponCustom = ( to->client.m_iId == 0 );
 }
 
+#ifdef SVENMOD_DEBUG
 void CClient::ShowWeaponData()
 {
 	if ( sm_debug_show_weapondata.GetBool() )
@@ -395,7 +400,7 @@ void CClient::ShowWeaponData()
 
 		int id = g_iCurrentWeaponID;
 
-		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
+		g_pUtils->DrawSetTextColor(180.f / 255.f, 220.f / 255.f, 255.f / 255.f);
 
 		g_pUtils->DrawConsoleString(x, y, "Weapon ID: %d", g_iCurrentWeaponID);
 		y += offset; g_pUtils->DrawConsoleString(x, y, "Custom: %d", g_bCurrentWeaponCustom);
@@ -454,7 +459,7 @@ void CClient::ShowClientData()
 
 		int offset = sm_debug_new_line_height.GetInt();
 
-		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
+		g_pUtils->DrawSetTextColor(180.f / 255.f, 220.f / 255.f, 255.f / 255.f);
 
 		g_pUtils->DrawConsoleString(x, y, "client.origin: %.6f %.6f %.6f", VectorExpand(m_LocalState.client.origin));
 		y += offset; g_pUtils->DrawConsoleString(x, y, "client.velocity: %.6f %.6f %.6f", VectorExpand(m_LocalState.client.velocity));
@@ -507,7 +512,7 @@ void CClient::ShowEntityState()
 
 		int offset = sm_debug_new_line_height.GetInt();
 
-		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
+		g_pUtils->DrawSetTextColor(180.f / 255.f, 220.f / 255.f, 255.f / 255.f);
 
 		g_pUtils->DrawConsoleString(x, y, "playerstate.entityType: %d", m_LocalState.playerstate.entityType);
 		y += offset; g_pUtils->DrawConsoleString(x, y, "playerstate.number: %d", m_LocalState.playerstate.number);
@@ -571,7 +576,7 @@ void CClient::ShowPlayerMove()
 
 		int offset = sm_debug_new_line_height.GetInt();
 
-		g_pUtils->DrawSetTextColor(100.f / 255.f, 130.f / 255.f, 200.f / 255.f);
+		g_pUtils->DrawSetTextColor(180.f / 255.f, 220.f / 255.f, 255.f / 255.f);
 
 		g_pUtils->DrawConsoleString(x, y, "playermove.player_index: %d", g_pPlayerMove->player_index);
 		y += offset; g_pUtils->DrawConsoleString(x, y, "playermove.multiplayer: %d", g_pPlayerMove->multiplayer);
@@ -626,6 +631,7 @@ void CClient::ShowPlayerMove()
 		y += offset; g_pUtils->DrawConsoleString(x, y, "playermove.vuser4: %.6f %.6f %.6f", VectorExpand(g_pPlayerMove->vuser4));
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Export

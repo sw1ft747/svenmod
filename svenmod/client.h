@@ -102,15 +102,19 @@ public: // IClient
 
 public:
 	void Update(local_state_t *from, local_state_t *to, usercmd_t *cmd, double time, unsigned int random_seed);
+#ifdef SVENMOD_DEBUG
 	void ShowDebugInfo();
+#endif
 
 	FORCEINLINE local_state_t *GetLocalStateNV() { return &m_LocalState; };
 
 private:
+#ifdef SVENMOD_DEBUG
 	void ShowWeaponData();
 	void ShowClientData();
 	void ShowEntityState();
 	void ShowPlayerMove();
+#endif
 
 private:
 	local_state_t m_LocalState;
