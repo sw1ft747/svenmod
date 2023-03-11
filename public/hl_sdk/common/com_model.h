@@ -171,35 +171,80 @@ typedef struct mleaf_s
 	byte ambient_sound_level[NUM_AMBIENTS];
 } mleaf_t;
 
+//struct msurface_s
+//{
+//	int visframe; // should be drawn when node is crossed
+//
+//	int dlightframe; // last frame the surface was checked by an animated light
+//	int dlightbits;	 // dynamically generated. Indicates if the surface illumination
+//					 // is modified by an animated light.
+//
+//	mplane_t* plane; // pointer to shared plane
+//	int flags;		 // see SURF_ #defines
+//
+//	int firstedge; // look up in model->surfedges[], negative numbers
+//	int numedges;  // are backwards edges
+//
+//	// surface generation data
+//	struct surfcache_s* cachespots[MIPLEVELS];
+//
+//	short texturemins[2]; // smallest s/t position on the surface.
+//	short extents[2];	  // ?? s/t texture size, 1..256 for all non-sky surfaces
+//
+//	mtexinfo_t* texinfo;
+//
+//	// lighting info
+//	byte styles[MAXLIGHTMAPS]; // index into d_lightstylevalue[] for animated lights
+//							   // no one surface can be effected by more than 4
+//							   // animated lights.
+//	color24* samples;
+//
+//	decal_t* pdecals;
+//};
+
+#define VERTEXSIZE              7
+
+typedef struct glpoly_s
+{
+        struct glpoly_s *next;
+        struct glpoly_s *chain;
+        int             numverts;
+        int             flags;                          // for SURF_UNDERWATER
+        float           verts[4][VERTEXSIZE];   // variable sized (xyz s1t1 s2t2)
+} glpoly_t;
+
 struct msurface_s
 {
-	int visframe; // should be drawn when node is crossed
+	int             visframe;               // should be drawn when node is crossed
 
-	int dlightframe; // last frame the surface was checked by an animated light
-	int dlightbits;	 // dynamically generated. Indicates if the surface illumination
-					 // is modified by an animated light.
+	mplane_t                *plane;         // pointer to shared plane
+	int             flags;          // see SURF_ #defines
 
-	mplane_t* plane; // pointer to shared plane
-	int flags;		 // see SURF_ #defines
+	int             firstedge;      // look up in model->surfedges[], negative numbers
+	int             numedges;               // are backwards edges
 
-	int firstedge; // look up in model->surfedges[], negative numbers
-	int numedges;  // are backwards edges
+	short           texturemins[2];
+	short           extents[2];
 
-	// surface generation data
-	struct surfcache_s* cachespots[MIPLEVELS];
+	int             light_s, light_t;       // gl lightmap coordinates
 
-	short texturemins[2]; // smallest s/t position on the surface.
-	short extents[2];	  // ?? s/t texture size, 1..256 for all non-sky surfaces
+	glpoly_t                *polys;         // multiple if warped
+	struct msurface_s       *texturechain;
 
-	mtexinfo_t* texinfo;
+	mtexinfo_t      *texinfo;
 
 	// lighting info
-	byte styles[MAXLIGHTMAPS]; // index into d_lightstylevalue[] for animated lights
-							   // no one surface can be effected by more than 4
-							   // animated lights.
-	color24* samples;
+	int             dlightframe;    // last frame the surface was checked by an animated light
+	int             dlightbits;     // dynamically generated. Indicates if the surface illumination
+	// is modified by an animated light.
 
-	decal_t* pdecals;
+	int             lightmaptexturenum;
+	unsigned char            styles[MAXLIGHTMAPS];
+	int             cached_light[MAXLIGHTMAPS];     // values currently used in lightmap
+	struct msurface_s       *lightmapchain;         // for new dlights rendering (was cached_dlight)
+
+	color24         *samples;               // note: this is the actual lightmap data for this surface
+	decal_t         *pdecals;
 };
 
 typedef struct
@@ -320,9 +365,6 @@ typedef struct auxvert_s
 #define MAX_SCOREBOARDNAME 32
 typedef struct player_info_s
 {
-	// Part of member 'userinfo'
-	inline uint64 GetUserInfo_SteamID() { return *(uint64 *)((unsigned char *)this + 0x248); }
-
 	// User id on server
 	int userid;
 
