@@ -1,7 +1,4 @@
-#include <IMemoryUtils.h>
-#include <interface.h>
-#include <data_struct/hashtable.h>
-#include <data_struct/hash.h>
+#include "memory_utils.h"
 
 #ifdef PLATFORM_LINUX
 #include <stdio.h>
@@ -11,209 +8,11 @@
 #include <hl_sdk/common/Platform.h>
 #endif
 
-#define DUPE_SYMBOLS_NAME 0
-
-//-----------------------------------------------------------------------------
-// CMemoryUtils
-//-----------------------------------------------------------------------------
-
-class CMemoryUtils : public IMemoryUtils
-{
-public:
-	CMemoryUtils();
-	virtual ~CMemoryUtils();
-
-	virtual void InitDisasm(ud_t *instruction, void *buffer, uint8_t mode, size_t buffer_length = 128);
-
-	virtual int Disassemble(ud_t *instruction);
-
-	virtual bool VirtualProtect(void *pAddress, size_t size, int fNewProtect, int *pfOldProtect);
-	
-	virtual void *VirtualAlloc(void *pAddress, size_t size, int fAllocationType, int fProtection);
-	
-	virtual bool VirtualFree(void *pAddress, size_t size, int fFreeType = 0);
-	
-	virtual void PatchMemory(void *pAddress, unsigned char *pPatchBytes, int length);
-
-	virtual void MemoryNOP(void *pAddress, int length);
-
-	virtual void *CalcAbsoluteAddress(void *pCallOpcode);
-
-	virtual void *CalcRelativeAddress(void *pFrom, void *pTo);
-
-	virtual void *GetVTable(void *pClassInstance);
-	
-	virtual void *GetVirtualFunction(void *pClassInstance, int nFunctionIndex);
-
-	virtual bool RetrieveModuleInfo(HMODULE hModule, moduleinfo_s *pModInfo);
-
-	virtual void *ResolveSymbol(HMODULE hModule, const char *pszSymbol);
-
-	virtual void *FindPattern(HMODULE hModule, pattern_t *pPattern, unsigned int offset = 0);
-	virtual void *FindPatternWithin(HMODULE hModule, pattern_t *pPattern, void *pSearchStart, void *pSearchEnd);
-
-	virtual void *FindPattern(HMODULE hModule, const char *pszPattern, char *pszMask, unsigned int offset = 0);
-	virtual void *FindPatternWithin(HMODULE hModule, const char *pszPattern, char *pszMask, void *pSearchStart, void *pSearchEnd);
-
-	virtual void *FindPattern(HMODULE hModule, const char *pszPattern, unsigned int length, unsigned int offset = 0, char ignoreByte = '\x2A');
-	virtual void *FindPatternWithin(HMODULE hModule, const char *pszPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, char ignoreByte = '\x2A');
-
-	virtual void *FindPattern(HMODULE hModule, unsigned char *pPattern, unsigned int length, unsigned int offset = 0, unsigned char ignoreByte = 0x2A);
-	virtual void *FindPatternWithin(HMODULE hModule, unsigned char *pPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, unsigned char ignoreByte = 0x2A);
-
-	virtual void *FindString(HMODULE hModule, const char *pszString, unsigned int offset = 0);
-	virtual void *FindStringWithin(HMODULE hModule, const char *pszString, void *pSearchStart, void *pSearchEnd);
-
-	virtual void *FindAddress(HMODULE hModule, void *pAddress, unsigned int offset = 0);
-	virtual void *FindAddressWithin(HMODULE hModule, void *pAddress, void *pSearchStart, void *pSearchEnd);
-
-#ifdef PLATFORM_LINUX
-private:
-	typedef struct symbol_s
-	{
-		const char *name;
-		size_t length;
-		void *address;
-	} symbol_t;
-	
-	class CLookupFunctor
-	{
-	public:
-		CLookupFunctor() {}
-		
-		// Compare
-		bool operator()(const symbol_t &a, const symbol_t &b) const
-		{
-			return a.length == b.length && !strcmp(a.name, b.name);
-		}
-		
-		// Get hash
-		unsigned int operator()(const symbol_t &sym) const
-		{
-			return HashKey((unsigned char *)sym.name, sym.length);
-		}
-	};
-
-	class CSymbolTable
-	{
-	public:
-		CSymbolTable() : m_SymbolsTable(3, m_Functor, m_Functor)
-		{
-		}
-		
-		CSymbolTable(int tableSize) : m_SymbolsTable(tableSize, m_Functor, m_Functor)
-		{
-		}
-		
-		~CSymbolTable()
-		{
-		#if DUPE_SYMBOLS_NAME
-			for (int i = 0; i < m_SymbolsTable.Count(); i++)
-			{
-				HashIterator_t it = m_SymbolsTable.First(i);
-				
-				while ( m_SymbolsTable.IsValidIterator(it) )
-				{
-					symbol_t &sym = m_SymbolsTable.At(i, it);
-					
-					free( (void *)sym.name );
-					
-					it = m_SymbolsTable.Next(i, it);
-				}
-			}
-		#endif
-		}
-		
-		void ResizeTable(int tableSize)
-		{
-			m_SymbolsTable.Resize(tableSize);
-		}
-		
-		symbol_t *FindSymbol(const char *pszSymbol, int length)
-		{
-			symbol_t symbol_find =
-			{
-				pszSymbol,
-				(size_t)length,
-				NULL
-			};
-		
-			return m_SymbolsTable.Find( symbol_find );
-		}
-		
-		symbol_t *FindSymbol(const char *pszSymbol)
-		{
-			return FindSymbol( pszSymbol, strlen(pszSymbol) );
-		}
-		
-		symbol_t *InternSymbol(const char *pszSymbol, int length, void *pAddress)
-		{
-		#if DUPE_SYMBOLS_NAME
-			pszSymbol = strdup(pszSymbol);
-		#endif
-		
-			symbol_t symbol =
-			{
-				pszSymbol,
-				(size_t)length,
-				pAddress
-			};
-			
-			bool bInserted = m_SymbolsTable.Insert(symbol);
-			
-			if ( !bInserted )
-			{
-			#if DUPE_SYMBOLS_NAME
-				free( (void *)pszSymbol );
-			#endif
-			}
-			
-			return m_SymbolsTable.Find(symbol);
-		}
-		
-		symbol_t *InternSymbol(const char *pszSymbol, void *pAddress)
-		{
-			return InternSymbol(pszSymbol, strlen(pszSymbol), pAddress);
-		}
-		
-	private:
-		CLookupFunctor m_Functor;
-		CHash<symbol_t, CLookupFunctor &, CLookupFunctor &> m_SymbolsTable;
-	};
-	
-	class CModuleSymbolTable
-	{
-	public:
-		CModuleSymbolTable() : table()
-		{
-			handle = NULL;
-			last_pos = 0;
-		}
-	
-	public:
-		CSymbolTable table;
-		HMODULE handle;
-		size_t last_pos;
-	};
-
-private:
-	int ReadMemoryProtection(void *pAddress);
-#endif
-
-private:
-	moduleinfo_s m_ModuleInfo;
-	CHashTable<HMODULE, moduleinfo_s> m_ModuleInfoTable;
-	
-#ifdef PLATFORM_LINUX
-	std::vector<CModuleSymbolTable *> m_SymbolTables;
-#endif
-};
-
 //-----------------------------------------------------------------------------
 // CMemoryUtils implementation
 //-----------------------------------------------------------------------------
 
-CMemoryUtils::CMemoryUtils() : m_ModuleInfo(), m_ModuleInfoTable(15)
+CMemoryUtils::CMemoryUtils() : m_ModuleInfoTable(15)
 {
 }
 
@@ -365,12 +164,12 @@ void *CMemoryUtils::GetVirtualFunction(void *pClassInstance, int nFunctionIndex)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-bool CMemoryUtils::RetrieveModuleInfo(HMODULE hModule, moduleinfo_s *pModInfo)
+bool CMemoryUtils::RetrieveModuleInfo(HMODULE hModule, moduleinfo_t *pModInfo)
 {
 	if ( !hModule )
 		return false;
 
-	moduleinfo_s *pHashEntry = NULL;
+	moduleinfo_t *pHashEntry = NULL;
 
 	if ( pHashEntry = m_ModuleInfoTable.Find(hModule) )
 	{
@@ -500,7 +299,9 @@ void *CMemoryUtils::ResolveSymbol(HMODULE hModule, const char *pszSymbol)
 #ifdef PLATFORM_WINDOWS
 	return GetProcAddress(hModule, pszSymbol);
 #else
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
 		bool new_table = false;
 	
@@ -644,7 +445,7 @@ void *CMemoryUtils::ResolveSymbol(HMODULE hModule, const char *pszSymbol)
 			if (sym.st_shndx == SHN_UNDEF || (sym_type != STT_FUNC && sym_type != STT_OBJECT))
 				continue;
 			
-			symbol_t *current_symbol = table->InternSymbol(sym_name, strlen(sym_name), m_ModuleInfo.pBaseOfDll + sym.st_value);
+			symbol_t *current_symbol = table->InternSymbol(sym_name, strlen(sym_name), moduleInfo.pBaseOfDll + sym.st_value);
 			
 			if ( !strcmp(pszSymbol, sym_name) )
 			{
@@ -669,13 +470,15 @@ void *CMemoryUtils::ResolveSymbol(HMODULE hModule, const char *pszSymbol)
 
 void *CMemoryUtils::FindPattern(HMODULE hModule, pattern_t *pPattern, unsigned int offset /* = 0 */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
 		unsigned long nLength = pPattern->length;
 		unsigned char *pSignature = &pPattern->signature;
 
-		unsigned char *pSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll + offset;
-		unsigned char *pSearchEnd = pSearchStart + m_ModuleInfo.SizeOfImage - nLength;
+		unsigned char *pSearchStart = (unsigned char *)moduleInfo.pBaseOfDll + offset;
+		unsigned char *pSearchEnd = pSearchStart + moduleInfo.SizeOfImage - nLength;
 
 		while (pSearchStart < pSearchEnd)
 		{
@@ -702,12 +505,14 @@ void *CMemoryUtils::FindPattern(HMODULE hModule, pattern_t *pPattern, unsigned i
 
 void *CMemoryUtils::FindPattern(HMODULE hModule, const char *pszPattern, char *pszMask, unsigned int offset /* = 0 */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
 		unsigned long nMaskLength = strlen(pszMask);
 
-		unsigned char *pSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll + offset;
-		unsigned char *pSearchEnd = pSearchStart + m_ModuleInfo.SizeOfImage - nMaskLength;
+		unsigned char *pSearchStart = (unsigned char *)moduleInfo.pBaseOfDll + offset;
+		unsigned char *pSearchEnd = pSearchStart + moduleInfo.SizeOfImage - nMaskLength;
 
 		while (pSearchStart < pSearchEnd)
 		{
@@ -734,10 +539,12 @@ void *CMemoryUtils::FindPattern(HMODULE hModule, const char *pszPattern, char *p
 
 void *CMemoryUtils::FindPattern(HMODULE hModule, const char *pszPattern, unsigned int length, unsigned int offset /* = 0 */, char ignoreByte /* = '0x2A' */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
-		unsigned char *pSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll + offset;
-		unsigned char *pSearchEnd = pSearchStart + m_ModuleInfo.SizeOfImage - length;
+		unsigned char *pSearchStart = (unsigned char *)moduleInfo.pBaseOfDll + offset;
+		unsigned char *pSearchEnd = pSearchStart + moduleInfo.SizeOfImage - length;
 
 		while (pSearchStart < pSearchEnd)
 		{
@@ -764,10 +571,12 @@ void *CMemoryUtils::FindPattern(HMODULE hModule, const char *pszPattern, unsigne
 
 void *CMemoryUtils::FindPattern(HMODULE hModule, unsigned char *pPattern, unsigned int length, unsigned int offset /* = 0 */, unsigned char ignoreByte /* = 0x2A */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
-		unsigned char *pSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll + offset;
-		unsigned char *pSearchEnd = pSearchStart + m_ModuleInfo.SizeOfImage - length;
+		unsigned char *pSearchStart = (unsigned char *)moduleInfo.pBaseOfDll + offset;
+		unsigned char *pSearchEnd = pSearchStart + moduleInfo.SizeOfImage - length;
 
 		while (pSearchStart < pSearchEnd)
 		{
@@ -794,12 +603,14 @@ void *CMemoryUtils::FindPattern(HMODULE hModule, unsigned char *pPattern, unsign
 
 void *CMemoryUtils::FindString(HMODULE hModule, const char *pszString, unsigned int offset /* = 0 */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
 		unsigned long nLength = strlen(pszString);
 
-		unsigned char *pSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll + offset;
-		unsigned char *pSearchEnd = pSearchStart + m_ModuleInfo.SizeOfImage - nLength;
+		unsigned char *pSearchStart = (unsigned char *)moduleInfo.pBaseOfDll + offset;
+		unsigned char *pSearchEnd = pSearchStart + moduleInfo.SizeOfImage - nLength;
 
 		while (pSearchStart < pSearchEnd)
 		{
@@ -826,10 +637,12 @@ void *CMemoryUtils::FindString(HMODULE hModule, const char *pszString, unsigned 
 
 void *CMemoryUtils::FindAddress(HMODULE hModule, void *pAddress, unsigned int offset /* = 0 */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
-		unsigned char *pSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll + offset;
-		unsigned char *pSearchEnd = pSearchStart + m_ModuleInfo.SizeOfImage - sizeof(void *);
+		unsigned char *pSearchStart = (unsigned char *)moduleInfo.pBaseOfDll + offset;
+		unsigned char *pSearchEnd = pSearchStart + moduleInfo.SizeOfImage - sizeof(void *);
 
 		while (pSearchStart < pSearchEnd)
 		{
@@ -849,13 +662,15 @@ void *CMemoryUtils::FindAddress(HMODULE hModule, void *pAddress, unsigned int of
 
 void *CMemoryUtils::FindPatternWithin(HMODULE hModule, pattern_t *pPattern, void *pSearchStart, void *pSearchEnd)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
 		unsigned long nLength = pPattern->length;
 		unsigned char *pSignature = &pPattern->signature;
 
-		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
-		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - nLength;
+		unsigned char *pModuleSearchStart = (unsigned char *)moduleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + moduleInfo.SizeOfImage - nLength;
 
 		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
 			return NULL;
@@ -888,12 +703,14 @@ void *CMemoryUtils::FindPatternWithin(HMODULE hModule, pattern_t *pPattern, void
 
 void *CMemoryUtils::FindPatternWithin(HMODULE hModule, const char *pszPattern, char *pszMask, void *pSearchStart, void *pSearchEnd)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
 		unsigned long nMaskLength = strlen(pszMask);
 
-		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
-		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - nMaskLength;
+		unsigned char *pModuleSearchStart = (unsigned char *)moduleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + moduleInfo.SizeOfImage - nMaskLength;
 
 		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
 			return NULL;
@@ -926,10 +743,12 @@ void *CMemoryUtils::FindPatternWithin(HMODULE hModule, const char *pszPattern, c
 
 void *CMemoryUtils::FindPatternWithin(HMODULE hModule, const char *pszPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, char ignoreByte /* = '0x2A' */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
-		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
-		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - length;
+		unsigned char *pModuleSearchStart = (unsigned char *)moduleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + moduleInfo.SizeOfImage - length;
 
 		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
 			return NULL;
@@ -962,10 +781,12 @@ void *CMemoryUtils::FindPatternWithin(HMODULE hModule, const char *pszPattern, u
 
 void *CMemoryUtils::FindPatternWithin(HMODULE hModule, unsigned char *pPattern, unsigned int length, void *pSearchStart, void *pSearchEnd, unsigned char ignoreByte /* = 0x2A */)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
-		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
-		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - length;
+		unsigned char *pModuleSearchStart = (unsigned char *)moduleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + moduleInfo.SizeOfImage - length;
 
 		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
 			return NULL;
@@ -998,12 +819,14 @@ void *CMemoryUtils::FindPatternWithin(HMODULE hModule, unsigned char *pPattern, 
 
 void *CMemoryUtils::FindStringWithin(HMODULE hModule, const char *pszString, void *pSearchStart, void *pSearchEnd)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
 		unsigned long nLength = strlen(pszString);
 
-		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
-		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - nLength;
+		unsigned char *pModuleSearchStart = (unsigned char *)moduleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + moduleInfo.SizeOfImage - nLength;
 
 		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
 			return NULL;
@@ -1036,10 +859,12 @@ void *CMemoryUtils::FindStringWithin(HMODULE hModule, const char *pszString, voi
 
 void *CMemoryUtils::FindAddressWithin(HMODULE hModule, void *pSearchStart, void *pSearchEnd, void *pAddress)
 {
-	if ( RetrieveModuleInfo(hModule, &m_ModuleInfo) )
+	moduleinfo_t moduleInfo;
+
+	if ( RetrieveModuleInfo(hModule, &moduleInfo) )
 	{
-		unsigned char *pModuleSearchStart = (unsigned char *)m_ModuleInfo.pBaseOfDll;
-		unsigned char *pModuleSearchEnd = pModuleSearchStart + m_ModuleInfo.SizeOfImage - sizeof(void *);
+		unsigned char *pModuleSearchStart = (unsigned char *)moduleInfo.pBaseOfDll;
+		unsigned char *pModuleSearchEnd = pModuleSearchStart + moduleInfo.SizeOfImage - sizeof(void *);
 
 		if (pModuleSearchStart > (unsigned char *)pSearchStart || pModuleSearchEnd < (unsigned char *)pSearchEnd)
 			return NULL;

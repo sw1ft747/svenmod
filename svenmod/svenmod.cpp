@@ -36,6 +36,7 @@
 #include "inventory.h"
 #include "plugins_manager.h"
 #include "gamedata_finder.h"
+#include "memory_utils.h"
 #include "game_hooks.h"
 #include "hooks.h"
 #include "patterns.h"
@@ -142,6 +143,13 @@ DECLARE_FUNC(qboolean, __cdecl, HOOKED_Host_FilterTime, float time)
 
 	if ( simulate )
 	{
+		// Delayed load of plugins
+		if ( !g_PluginsManager.PluginsLoaded() )
+		{
+			if ( g_PluginsManager.GetLoadTime() <= g_pEngineFuncs->Sys_FloatTime() )
+				g_PluginsManager.LoadPluginsNow();
+		}
+
 		g_PluginsManager.Frame( *g_pClientState, *g_pFrametime, false );
 	}
 
@@ -196,7 +204,7 @@ DECLARE_FUNC(void, __cdecl, HOOKED_LoadClientDLL, char *pszLibFileName)
 }
 
 //-----------------------------------------------------------------------------
-// SvenMod implementation
+// Purpose: initialize SvenMod's basic functionality
 //-----------------------------------------------------------------------------
 
 bool CSvenMod::Init(ICommandLine *pCommandLine, IFileSystem *pFileSystem, IRegistry *pRegistry)
@@ -224,51 +232,18 @@ bool CSvenMod::Init(ICommandLine *pCommandLine, IFileSystem *pFileSystem, IRegis
 	return true;
 }
 
-// Initialize the rest part
+//-----------------------------------------------------------------------------
+// Purpose: initialize SvenMod guts
+//-----------------------------------------------------------------------------
+
 void CSvenMod::InitSystems()
 {
-	// Collect modules
-#ifdef PLATFORM_WINDOWS
-	HMODULE hSvenMod = Sys_GetModuleHandle("svenmod.dll");
-	HMODULE hClientDLL = Sys_GetModuleHandle("client.dll");
-	HMODULE hFileSystem = Sys_GetModuleHandle("filesystem_stdio.dll");
-	HMODULE hGameUI = Sys_GetModuleHandle("GameUI.dll");
-	HMODULE hVGUI = Sys_GetModuleHandle("vgui.dll");
-	HMODULE hVGUI2 = Sys_GetModuleHandle("vgui2.dll");
-	HMODULE hSDL2 = Sys_GetModuleHandle("SDL2.dll");
-	HMODULE hVSTDLib = Sys_GetModuleHandle("vstdlib.dll");
-	HMODULE hTier0 = Sys_GetModuleHandle("tier0.dll");
-	HMODULE hOpenGL = Sys_GetModuleHandle("opengl32.dll");
-	HMODULE hSteamAPI = Sys_GetModuleHandle("steam_api.dll");
-#else
-	HMODULE hSvenMod = Sys_GetModuleHandle("svenmod.so");
-	HMODULE hClientDLL = Sys_GetModuleHandle("client.so");
-	HMODULE hFileSystem = Sys_GetModuleHandle("filesystem_stdio.so");
-	HMODULE hGameUI = Sys_GetModuleHandle("gameui.so");
-	HMODULE hVGUI = Sys_GetModuleHandle("vgui.so");
-	HMODULE hVGUI2 = Sys_GetModuleHandle("vgui2.so");
-	HMODULE hSDL2 = Sys_GetModuleHandle("libSDL2-2.0.so.0");
-	HMODULE hVSTDLib = Sys_GetModuleHandle("libvstdlib.so");
-	HMODULE hTier0 = Sys_GetModuleHandle("libtier0.so");
-	HMODULE hOpenGL = Sys_GetModuleHandle("libGL.so");
-	HMODULE hSteamAPI = Sys_GetModuleHandle("steam_api.so");
-#endif
-
-	g_Modules.SvenMod = hSvenMod;
-	g_Modules.Client = hClientDLL;
-	g_Modules.FileSystem = hFileSystem;
-	g_Modules.GameUI = hGameUI;
-	g_Modules.VGUI = hVGUI;
-	g_Modules.VGUI2 = hVGUI2;
-	g_Modules.SDL2 = hSDL2;
-	g_Modules.VSTDLib = hVSTDLib;
-	g_Modules.Tier0 = hTier0;
-	g_Modules.OpenGL = hOpenGL;
-	g_Modules.SteamAPI = hSteamAPI;
+	CollectModules();
 
 	g_GameDataFinder.FindClientVersion( &s_pszClientVersion );
 	CheckClientVersion();
 
+	// async?
 	g_GameDataFinder.FindFrametime( &g_pRealtime, &g_pClientTime, &g_pFrametime, m_pfnHost_FilterTime );
 	g_GameDataFinder.FindProtocolVersion( &g_iProtocolVersion );
 	g_GameDataFinder.FindClientState( &g_pClientState );
@@ -323,20 +298,28 @@ void CSvenMod::InitSystems()
 	StartSystems();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: start SvenMod
+//-----------------------------------------------------------------------------
+
 bool CSvenMod::StartSystems()
 {
-	ConColorMsg({ 40, 255, 40, 255 }, "Loaded SvenMod v%s (API version: %s)\n", SVENMOD_VERSION_STRING, SVENMOD_API_VERSION_STRING);
-	LogMsg("SvenMod v%s.\n", SVENMOD_VERSION_STRING_FULL);
+	ConColorMsg( { 40, 255, 40, 255 }, "Loaded SvenMod v" SVENMOD_VERSION_STRING " (API version: " SVENMOD_API_VERSION_STRING ")\n" );
+	LogMsg( "SvenMod v" SVENMOD_VERSION_STRING_FULL ".\n" );
 
 	ConVar_Register();
 
 	g_GameHooksHandler.Init();
 	g_PluginsManager.LoadPlugins();
 
-	g_pEngineFuncs->ClientCmd("exec svenmod.cfg\n");
+	g_pEngineFuncs->ClientCmd("exec svenmod.cfg");
 
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: shutdown SvenMod functionality
+//-----------------------------------------------------------------------------
 
 void CSvenMod::Shutdown()
 {
@@ -354,34 +337,158 @@ void CSvenMod::Shutdown()
 }
 
 //-----------------------------------------------------------------------------
-//
+// Purpose: 
 //-----------------------------------------------------------------------------
 
-bool CSvenMod::FindSignatures()
+void CSvenMod::CollectHardwareModule()
 {
+	moduleinfo_t moduleInfo;
+
 #ifdef PLATFORM_WINDOWS
-	HMODULE hHardwareDLL = Sys_GetModuleHandle("hw.dll");
+	HMODULE hHardwareDLL = Sys_GetModuleHandle( "hw.dll" );
 #else
-	HMODULE hHardwareDLL = Sys_GetModuleHandle("hw.so");
+	HMODULE hHardwareDLL = Sys_GetModuleHandle( "hw.so" );
 #endif
 
 	g_Modules.Hardware = hHardwareDLL;
 
+	g_MemoryUtils.RetrieveModuleInfo( hHardwareDLL, &moduleInfo );
+}
+
+void CSvenMod::CollectModules()
+{
+	moduleinfo_t moduleInfo;
+
 #ifdef PLATFORM_WINDOWS
-	if ( (build_number = (build_numberFn)MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::build_number )) == NULL )
-#else // Linux
-	if ( (build_number = (build_numberFn)MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::build_number )) == NULL )
+	HMODULE hSvenMod = Sys_GetModuleHandle( "svenmod.dll" );
+	HMODULE hClientDLL = Sys_GetModuleHandle( "client.dll" );
+	HMODULE hFileSystem = Sys_GetModuleHandle( "filesystem_stdio.dll" );
+	HMODULE hGameUI = Sys_GetModuleHandle( "GameUI.dll" );
+	HMODULE hVGUI = Sys_GetModuleHandle( "vgui.dll" );
+	HMODULE hVGUI2 = Sys_GetModuleHandle( "vgui2.dll" );
+	HMODULE hSDL2 = Sys_GetModuleHandle( "SDL2.dll" );
+	HMODULE hVSTDLib = Sys_GetModuleHandle( "vstdlib.dll" );
+	HMODULE hTier0 = Sys_GetModuleHandle( "tier0.dll" );
+	HMODULE hOpenGL = Sys_GetModuleHandle( "opengl32.dll" );
+	HMODULE hSteamAPI = Sys_GetModuleHandle( "steam_api.dll" );
+#else
+	HMODULE hSvenMod = Sys_GetModuleHandle( "svenmod.so" );
+	HMODULE hClientDLL = Sys_GetModuleHandle( "client.so" );
+	HMODULE hFileSystem = Sys_GetModuleHandle( "filesystem_stdio.so" );
+	HMODULE hGameUI = Sys_GetModuleHandle( "gameui.so" );
+	HMODULE hVGUI = Sys_GetModuleHandle( "vgui.so" );
+	HMODULE hVGUI2 = Sys_GetModuleHandle( "vgui2.so" );
+	HMODULE hSDL2 = Sys_GetModuleHandle( "libSDL2-2.0.so.0" );
+	HMODULE hVSTDLib = Sys_GetModuleHandle( "libvstdlib.so" );
+	HMODULE hTier0 = Sys_GetModuleHandle( "libtier0.so" );
+	HMODULE hOpenGL = Sys_GetModuleHandle( "libGL.so" );
+	HMODULE hSteamAPI = Sys_GetModuleHandle( "steam_api.so" );
 #endif
+
+	g_Modules.SvenMod = hSvenMod;
+	g_Modules.Client = hClientDLL;
+	g_Modules.FileSystem = hFileSystem;
+	g_Modules.GameUI = hGameUI;
+	g_Modules.VGUI = hVGUI;
+	g_Modules.VGUI2 = hVGUI2;
+	g_Modules.SDL2 = hSDL2;
+	g_Modules.VSTDLib = hVSTDLib;
+	g_Modules.Tier0 = hTier0;
+	g_Modules.OpenGL = hOpenGL;
+	g_Modules.SteamAPI = hSteamAPI;
+
+	g_MemoryUtils.RetrieveModuleInfo( hSvenMod, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hClientDLL, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hFileSystem, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hGameUI, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hVGUI, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hVGUI2, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hSDL2, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hVSTDLib, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hTier0, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hOpenGL, &moduleInfo );
+	g_MemoryUtils.RetrieveModuleInfo( hSteamAPI, &moduleInfo );
+}
+
+bool CSvenMod::FindSignatures()
+{
+	CollectHardwareModule();
+
+	HMODULE hHardwareDLL = g_Modules.Hardware;
+
+#ifdef PLATFORM_WINDOWS
+
+	bool ScanOK = true;
+
+	auto fbuild_number = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::build_number );
+	auto fpfnLoadClientDLL = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::LoadClientDLL );
+	auto fpfnClientDLL_Init = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::ClientDLL_Init );
+	auto fpfnSys_InitGame = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::Sys_InitGame );
+	auto fpfnHost_FilterTime = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::Host_FilterTime );
+	auto fpfnHost_Shutdown = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::Host_Shutdown );
+	auto fpfnEngineStudioInit = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::V_EngineStudio_Init );
+	auto fpfnVideoMode_Create = MemoryUtils()->FindPatternAsync( hHardwareDLL, Patterns::Hardware::V_VideoMode_Create );
+
+	if ( ( build_number = (build_numberFn)fbuild_number.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Couldn't find function \"build_number\"" );
+		ScanOK = false;
+	}
+
+	if ( ( m_pfnLoadClientDLL = fpfnLoadClientDLL.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Couldn't find function \"LoadClientDLL\"" );
+		ScanOK = false;
+	}
+
+	if ( ( m_pfnClientDLL_Init = fpfnClientDLL_Init.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Can't locate \"playermove\"" );
+		ScanOK = false;
+	}
+
+	if ( ( m_pfnSys_InitGame = fpfnSys_InitGame.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Couldn't find function \"Sys_InitGame\"" );
+		ScanOK = false;
+	}
+
+	if ( ( m_pfnHost_FilterTime = fpfnHost_FilterTime.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Couldn't find function \"Host_FilterTime\"" );
+		ScanOK = false;
+	}
+
+	if ( ( m_pfnHost_Shutdown = fpfnHost_Shutdown.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Couldn't find function \"Host_Shutdown\"" );
+		ScanOK = false;
+	}
+
+	if ( ( m_pfnEngineStudioInit = fpfnEngineStudioInit.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Can't locate \"engine_studio_api\"" );
+		ScanOK = false;
+	}
+
+	if ( ( m_pfnVideoMode_Create = fpfnVideoMode_Create.get() ) == NULL )
+	{
+		Sys_ErrorMessage( "[SvenMod] Can't locate \"videomode\"" );
+		ScanOK = false;
+	}
+
+	if ( !ScanOK )
+		return false;
+
+#else // Linux
+
+	if ( (build_number = (build_numberFn)MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::build_number )) == NULL )
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"build_number\"");
 		return false;
 	}
 	
-#ifdef PLATFORM_WINDOWS
-	if ( (m_pfnLoadClientDLL = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::LoadClientDLL )) == NULL )
-#else // Linux
 	if ( (m_pfnLoadClientDLL = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::LoadClientDLL )) == NULL )
-#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"LoadClientDLL\"");
 		return false;
@@ -393,31 +500,19 @@ bool CSvenMod::FindSignatures()
 		return false;
 	}
 	
-#ifdef PLATFORM_WINDOWS
-	if ( (m_pfnSys_InitGame = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::Sys_InitGame )) == NULL )
-#else // Linux
 	if ( (m_pfnSys_InitGame = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::Sys_InitGame )) == NULL )
-#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"Sys_InitGame\"");
 		return false;
 	}
 	
-#ifdef PLATFORM_WINDOWS
-	if ( (m_pfnHost_FilterTime = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::Host_FilterTime )) == NULL )
-#else // Linux
 	if ( (m_pfnHost_FilterTime = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::Host_FilterTime )) == NULL )
-#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"Host_FilterTime\"");
 		return false;
 	}
 	
-#ifdef PLATFORM_WINDOWS
-	if ( (m_pfnHost_Shutdown = MemoryUtils()->FindPattern( hHardwareDLL, Patterns::Hardware::Host_Shutdown )) == NULL )
-#else // Linux
 	if ( (m_pfnHost_Shutdown = MemoryUtils()->ResolveSymbol( hHardwareDLL, Symbols::Hardware::Host_Shutdown )) == NULL )
-#endif
 	{
 		Sys_ErrorMessage("[SvenMod] Couldn't find function \"Host_Shutdown\"");
 		return false;
@@ -434,6 +529,8 @@ bool CSvenMod::FindSignatures()
 		Sys_ErrorMessage("[SvenMod] Can't locate \"videomode\"");
 		return false;
 	}
+
+#endif
 
 	return true;
 }

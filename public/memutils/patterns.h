@@ -134,7 +134,7 @@ if ( pfnbuild_number != NULL )
 #define _PATTERN_GET_POINTER(name) reinterpret_cast<struct pattern_t *>(&(name))
 
 #define _DEFINE_PATTERN_REG(name, pattern_name) { name, _PATTERN_GET_POINTER(pattern_name) }
-#define _DEFINE_PATTERNS_REG_BEGIN(name, count) pattern_reg_t name[count] = {
+#define _DEFINE_PATTERNS_REG_BEGIN(name, count) constexpr int name##__count = count - 1; pattern_reg_t name[count] = {
 #define _DEFINE_PATTERNS_REG_END() { 0, 0 } }
 
 #define _PATTERN_EXPAND(a) a
@@ -143,8 +143,10 @@ if ( pfnbuild_number != NULL )
 #define _PATTERN_CONCATENATE(a, b) _PATTERN_CONCATENATE_(a, b)
 #define _PATTERN_DEDUCE_NAME(name, counter) _PATTERN_CONCATENATE(name##__pattern_, _PATTERN_EXPAND(counter))
 
+#define DEFINE_PATTERNS_FUTURE(name) std::vector<std::future<void *>> name
 #define EXTERN_PATTERNS(name) extern pattern_reg_t name[]
 
+#define GET_PATTERNS_COUNT(name) name##__count
 #define GET_PATTERN_NAME_BY_INDEX(pattern_name, idx) pattern_name[idx].name
 
 // Uhh, macros are still pretty hard for me to automate the routine with __VA_ARGS__
