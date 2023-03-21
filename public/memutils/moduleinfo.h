@@ -5,10 +5,10 @@
 #pragma once
 #endif
 
-struct moduleinfo_s
+typedef struct moduleinfo_s
 {
 	void *pBaseOfDll;
 	unsigned int SizeOfImage;
-};
+} moduleinfo_t;
 
 #endif // MODULEINFO_H

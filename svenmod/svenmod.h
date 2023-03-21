@@ -45,6 +45,9 @@ private:
 	bool StartSystems();
 
 	// Utilities
+	void CollectHardwareModule();
+	void CollectModules();
+
 	bool FindSignatures();
 	bool AttachDetours();
 

@@ -145,6 +145,11 @@ int UserMsgHook_CurWeapon(const char *pszName, int iSize, void *pBuffer)
 	else if ( iId <= WEAPON_NONE )
 		g_iCurrentWeaponID = WEAPON_NONE;
 
+#ifdef SVENMOD_DEBUG
+	Msg("CurWeapon : iState = %d\n", iState);
+	Msg("CurWeapon : iId = %d\n", iId);
+#endif
+
 	return ORIG_UserMsgHook_CurWeapon(pszName, iSize, pBuffer);
 }
 

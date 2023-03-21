@@ -1,5 +1,9 @@
 Changelog for SvenMod
 
+21/03/2023 - Version 1.2.5 (API v4.0):
+- Added asynchronous pattern search
+- Added delayed load of plugins
+
 11/03/2023 - Version 1.2.4 (API v4.0):
 - Updated math functions
 - Added QAngle and Quaternion classes
