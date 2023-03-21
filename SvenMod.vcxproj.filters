@@ -564,6 +564,9 @@
     <ClInclude Include="svenmod\hooks.h">
       <Filter>SvenMod\svenmod</Filter>
     </ClInclude>
+    <ClInclude Include="svenmod\memory_utils.h">
+      <Filter>SvenMod\svenmod</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="public\udis86\src\decode.c">

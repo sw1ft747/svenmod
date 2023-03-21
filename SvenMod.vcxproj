@@ -183,6 +183,7 @@
     <ClInclude Include="shared\ISvenMod.h" />
     <ClInclude Include="svenmod\client.h" />
     <ClInclude Include="svenmod\client_weapon.h" />
+    <ClInclude Include="svenmod\memory_utils.h" />
     <ClInclude Include="svenmod\render.h" />
     <ClInclude Include="svenmod\gamedata_finder.h" />
     <ClInclude Include="svenmod\gameui_iface.h" />
