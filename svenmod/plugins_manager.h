@@ -10,6 +10,8 @@
 
 #include <vector>
 
+#include "keyvalues_custom_parser.h"
+
 typedef enum
 {
 	PLUGIN_RUNNING = 0,
@@ -73,10 +75,16 @@ public:
 	CPluginsManager();
 	~CPluginsManager();
 
-	CPlugin *FindPluginByIndex(int index);
-	int PluginsCount();
+	bool LoadPluginsFile();
+
+	inline bool PluginsLoaded() const { return m_bPluginsLoaded; }
+	inline float GetLoadTime() const { return m_flLoadTime; }
+
+	CPlugin *FindPluginByIndex(int index) const;
+	int PluginsCount() const;
 
 	void LoadPlugins();
+	void LoadPluginsNow();
 	void UnloadPlugins();
 
 	bool LoadPlugin(const char *pszFileName, bool bGlobalLoad);
@@ -102,7 +110,11 @@ public:
 	void DrawHUD(float time, int intermission);
 
 private:
+	bool m_bPluginsLoaded;
+	float m_flLoadTime;
+
 	std::vector<CPlugin *> m_Plugins;
+	KeyValuesParser::KeyValues *m_pPluginsKV;
 };
 
 extern CPluginsManager g_PluginsManager;

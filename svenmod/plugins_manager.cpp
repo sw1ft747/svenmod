@@ -1,7 +1,6 @@
 #pragma warning(disable : 4018)
 
 #include "plugins_manager.h"
-#include "keyvalues_custom_parser.h"
 
 #include <IPluginHelpers.h>
 #include <dbg.h>
@@ -254,7 +253,7 @@ bool CPlugin::Unpause()
 // CPluginsManager
 //-----------------------------------------------------------------------------
 
-CPluginsManager::CPluginsManager()
+CPluginsManager::CPluginsManager() : m_bPluginsLoaded(false), m_flLoadTime(-1.f), m_pPluginsKV(NULL)
 {
 }
 
@@ -263,7 +262,45 @@ CPluginsManager::~CPluginsManager()
 	UnloadPlugins();
 }
 
-CPlugin *CPluginsManager::FindPluginByIndex(int index)
+bool CPluginsManager::LoadPluginsFile()
+{
+	if ( m_pPluginsKV != NULL )
+		return true;
+
+	int result_code;
+
+	KeyValuesParser::KeyValues *kv_plugins = KeyValuesParser::LoadFromFile( "svenmod/plugins.txt", &result_code );
+
+	if ( result_code == KeyValuesParser::PARSE_FAILED )
+	{
+		Warning( "[SvenMod] Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", KeyValuesParser::GetLastErrorMessage(), KeyValuesParser::GetLastErrorLine() );
+		LogWarning( "Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", KeyValuesParser::GetLastErrorMessage(), KeyValuesParser::GetLastErrorLine() );
+
+		return false;
+	}
+
+	if ( kv_plugins == NULL )
+	{
+		Warning( "[SvenMod] File \"../svenmod/plugins.txt\" is empty.\n" );
+		LogWarning( "File \"../svenmod/plugins.txt\" is empty.\n" );
+
+		return false;
+	}
+
+	if ( kv_plugins->Key() != "Plugins" )
+	{
+		Warning( "[SvenMod] Expected \"Plugins\" as main section in the file \"../svenmod/plugins.txt\".\n" );
+		LogWarning( "Expected \"Plugins\" as main section in the file \"../svenmod/plugins.txt\".\n" );
+
+		delete kv_plugins;
+		return false;
+	}
+
+	m_pPluginsKV = kv_plugins;
+	return true;
+}
+
+CPlugin *CPluginsManager::FindPluginByIndex(int index) const
 {
 	if ( index >= 0 && index < m_Plugins.size() )
 	{
@@ -273,7 +310,7 @@ CPlugin *CPluginsManager::FindPluginByIndex(int index)
 	return NULL;
 }
 
-int CPluginsManager::PluginsCount()
+int CPluginsManager::PluginsCount() const
 {
 	return m_Plugins.size();
 }
@@ -282,59 +319,109 @@ void CPluginsManager::LoadPlugins()
 {
 	Assert( m_Plugins.size() == 0 );
 
-	int result_code;
-
-	KeyValuesParser::KeyValues *kv_plugins = KeyValuesParser::LoadFromFile("svenmod/plugins.txt", &result_code);
-
-	if ( result_code == KeyValuesParser::PARSE_FAILED )
-	{
-		Warning("[SvenMod] Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", KeyValuesParser::GetLastErrorMessage(), KeyValuesParser::GetLastErrorLine());
-		LogWarning("Failed to parse plugin-list file \"../svenmod/plugins.txt\". Reason: %s (%d).\n", KeyValuesParser::GetLastErrorMessage(), KeyValuesParser::GetLastErrorLine());
-		
+	if ( !LoadPluginsFile() )
 		return;
+
+	// Check for load delay
+	for (size_t i = 0; i < m_pPluginsKV->GetList().size(); i++)
+	{
+		KeyValuesParser::KeyValues *kv = m_pPluginsKV->GetList()[i];
+
+		if ( kv->IsSection() && !stricmp( kv->Key().c_str(), "settings" ) )
+		{
+			for ( size_t j = 0; j < kv->GetList().size(); j++ )
+			{
+				KeyValuesParser::KeyValues *settings = kv->GetList()[ j ];
+
+				if ( !settings->IsSection() && !stricmp( settings->Key().c_str(), "loaddelay" ) )
+				{
+					float delay = atof( settings->Value().c_str() );
+
+					if ( delay > 0.f )
+					{
+						m_flLoadTime = g_pEngineFuncs->Sys_FloatTime() + delay;
+						return;
+					}
+
+					break;
+				}
+			}
+
+			break;
+		}
 	}
 
-	if ( kv_plugins == NULL )
-	{
-		Warning("[SvenMod] File \"../svenmod/plugins.txt\" is empty.\n");
-		LogWarning("File \"../svenmod/plugins.txt\" is empty.\n");
-		
-		return;
-	}
-
-	if ( kv_plugins->Key() != "Plugins" )
-	{
-		Warning("[SvenMod] Expected \"Plugins\" as main section in the file \"../svenmod/plugins.txt\".\n");
-		LogWarning("Expected \"Plugins\" as main section in the file \"../svenmod/plugins.txt\".\n");
-
-		delete kv_plugins;
-		return;
-	}
-
+	// Now load plugins
 	g_bAutoPauseDetours = true;
 
-	for (size_t i = 0; i < kv_plugins->GetList().size(); i++)
+	for (size_t i = 0; i < m_pPluginsKV->GetList().size(); i++)
 	{
-		KeyValuesParser::KeyValues *plugin = kv_plugins->GetList()[i];
+		KeyValuesParser::KeyValues *plugin = m_pPluginsKV->GetList()[i];
 
 		if ( !plugin->IsSection() )
 		{
-			if ( !(plugin->Value() == "0" || plugin->Value() == "false") )
+			if ( !( plugin->Value() == "0" || !stricmp( plugin->Value().c_str(), "false" ) ) )
 			{
 				LoadPlugin( plugin->Key().c_str(), true );
 			}
 		}
 	}
 
-	g_bAutoPauseDetours = false;
-	DetoursAPI()->UnpauseAllDetours(); // Attach detours
+	//g_bAutoPauseDetours = false;
+	//DetoursAPI()->UnpauseAllDetours(); // Attach detours
 
 	for (int i = 0; i < m_Plugins.size(); i++)
 	{
 		m_Plugins[i]->GetCallback()->PostLoad(true);
 	}
 
-	delete kv_plugins;
+	g_bAutoPauseDetours = false;
+	DetoursAPI()->UnpauseAllDetours(); // Attach detours
+
+	delete m_pPluginsKV;
+	m_pPluginsKV = NULL;
+
+	m_bPluginsLoaded = true;
+}
+
+void CPluginsManager::LoadPluginsNow()
+{
+	Assert( m_Plugins.size() == 0 );
+
+	if ( !LoadPluginsFile() )
+		return;
+
+	g_bAutoPauseDetours = true;
+
+	// Load plugins
+	for (size_t i = 0; i < m_pPluginsKV->GetList().size(); i++)
+	{
+		KeyValuesParser::KeyValues *plugin = m_pPluginsKV->GetList()[i];
+
+		if ( !plugin->IsSection() )
+		{
+			if ( !( plugin->Value() == "0" || !stricmp( plugin->Value().c_str(), "false" ) ) )
+			{
+				LoadPlugin( plugin->Key().c_str(), true );
+			}
+		}
+	}
+
+	//g_bAutoPauseDetours = false;
+	//DetoursAPI()->UnpauseAllDetours(); // Attach detours
+
+	for (int i = 0; i < m_Plugins.size(); i++)
+	{
+		m_Plugins[i]->GetCallback()->PostLoad(true);
+	}
+
+	g_bAutoPauseDetours = false;
+	DetoursAPI()->UnpauseAllDetours(); // Attach detours
+
+	delete m_pPluginsKV;
+	m_pPluginsKV = NULL;
+
+	m_bPluginsLoaded = true;
 }
 
 void CPluginsManager::UnloadPlugins()
