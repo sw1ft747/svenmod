@@ -52,6 +52,7 @@ SvenMod provides several useful console commands:
 ```
 
 # Plugins
+- [Source Chat](https://github.com/0Reality/SourceChat)
 - [Improved Mute Manager](https://github.com/sw1ft747/ImprovedMuteManager)
 - [Client Menu](https://github.com/sw1ft747/clientmenu)
 - [Soundcache Autosave](https://github.com/sw1ft747/soundcache)
