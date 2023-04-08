@@ -58,6 +58,7 @@ add_library(${SVENMOD_DLL} SHARED ${SVENMOD_SOURCE_FILES})
 
 target_link_libraries(${SVENMOD_DLL} OpenGL32)
 
+add_definitions(-DSC_NEWEST)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
 
 target_compile_definitions(${SVENMOD_DLL} PRIVATE
