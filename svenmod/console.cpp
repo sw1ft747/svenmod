@@ -13,9 +13,10 @@
 
 FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 {
+	const int argCount = args.ArgC();
 	bool bPrintUsage = false;
 
-	if (args.ArgC() > 2)
+	if (argCount > 2)
 	{
 		const char *pszCommand = args[2];
 
@@ -25,41 +26,33 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 		}
 		else if ( !stricmp(pszCommand, "info") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				int nPluginIndex = atoi(args[3]);
 				g_PluginsManager.PrintPluginInfo(nPluginIndex);
 			}
 			else
-			{
 				ConMsg("Usage:  sm plugins info <index>\n");
-			}
 		}
 		else if ( !stricmp(pszCommand, "load") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				const char *pszFileName = args[3];
-
 				g_PluginsManager.LoadPlugin(pszFileName, false);
 			}
 			else
-			{
 				ConMsg("Usage:  sm plugins load <filename>\n");
-			}
 		}
 		else if ( !stricmp(pszCommand, "unload") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				int nPluginIndex = atoi(args[3]);
-
 				g_PluginsManager.UnloadPlugin(nPluginIndex);
 			}
 			else
-			{
 				ConMsg("Usage: sm plugins unload <index>\n");
-			}
 		}
 		else if ( !stricmp(pszCommand, "unload_all") )
 		{
@@ -68,29 +61,23 @@ FORCEINLINE void ConCommand_sm_plugins(const CCommand &args)
 		}
 		else if ( !stricmp(pszCommand, "pause") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				int nPluginIndex = atoi(args[3]);
-
 				g_PluginsManager.PausePlugin(nPluginIndex);
 			}
 			else
-			{
 				ConMsg("Usage:  sm plugins pause <index>\n");
-			}
 		}
 		else if ( !stricmp(pszCommand, "unpause") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				int nPluginIndex = atoi(args[3]);
-
 				g_PluginsManager.UnpausePlugin(nPluginIndex);
 			}
 			else
-			{
 				ConMsg("Usage:  sm plugins unpause <index>\n");
-			}
 		}
 		else if ( !stricmp(pszCommand, "pause_all") )
 		{
@@ -155,26 +142,23 @@ FORCEINLINE void ConCommand_sm_info(const CCommand &args)
 
 FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 {
+	const int argCount = args.ArgC();
 	bool bPrintUsage = false;
 
-	if (args.ArgC() > 2)
+	if (argCount > 2)
 	{
 		const char *pszArgument = args[2];
 
 		if ( !stricmp(pszArgument, "all") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				if ( !stricmp(args[3], "?") )
 				{
-					if (args.ArgC() > 4)
-					{
+					if (argCount > 4)
 						g_CVar.PrintCvars(0, args[4]);
-					}
 					else
-					{
 						ConMsg("Usage:  sm printcvars all ? <prefix>\n");
-					}
 				}
 			}
 			else
@@ -185,18 +169,14 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 		}
 		else if ( !stricmp(pszArgument, "cvar") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				if ( !stricmp(args[3], "?") )
 				{
-					if (args.ArgC() > 4)
-					{
+					if (argCount > 4)
 						g_CVar.PrintCvars(1, args[4]);
-					}
 					else
-					{
 						ConMsg("Usage:  sm printcvars cvar ? <prefix>\n");
-					}
 				}
 			}
 			else
@@ -207,18 +187,14 @@ FORCEINLINE void ConCommand_sm_printcvars(const CCommand &args)
 		}
 		else if ( !stricmp(pszArgument, "cmd") )
 		{
-			if (args.ArgC() > 3)
+			if (argCount > 3)
 			{
 				if ( !stricmp(args[3], "?") )
 				{
-					if (args.ArgC() > 4)
-					{
+					if (argCount > 4)
 						g_CVar.PrintCvars(2, args[4]);
-					}
 					else
-					{
 						ConMsg("Usage:  sm printcvars cmd ? <prefix>\n");
-					}
 				}
 			}
 			else
@@ -258,21 +234,13 @@ CON_COMMAND(sm, "Options for SvenMod")
 		const char *pszOption = args[1];
 
 		if ( !stricmp(pszOption, "plugins") )
-		{
 			ConCommand_sm_plugins(args);
-		}
 		else if ( !stricmp(pszOption, "info") )
-		{
 			ConCommand_sm_info(args);
-		}
 		else if ( !stricmp(pszOption, "printcvars") )
-		{
 			ConCommand_sm_printcvars(args);
-		}
 		else
-		{
 			bPrintUsage = true;
-		}
 	}
 	else
 	{
@@ -296,13 +264,9 @@ CON_COMMAND(help, "Find help about a convar/concommand registered through SvenMo
 		const ConCommandBase *var = CVar()->FindCommandBase( pszName );
 
 		if (var)
-		{
 			ConVar_PrintDescription(var);
-		}
 		else
-		{
 			ConMsg("help:  no cvar or command named \"%s\"\n", pszName);
-		}
 	}
 	else
 	{
@@ -312,23 +276,24 @@ CON_COMMAND(help, "Find help about a convar/concommand registered through SvenMo
 
 CON_COMMAND(toggle, "Toggle between values")
 {
-	int i;
+	const int argCount = args.ArgC();
 
-	if (args.ArgC() > 1)
+	if (argCount > 1)
 	{
 		const char *pszCvar = args[1];
 		cvar_t *pCvar = g_pEngineFuncs->GetCvarPointer(pszCvar);
 
 		if (pCvar)
 		{
-			if (args.ArgC() == 2)
+			if (argCount == 2)
 			{
 				bool bValue = static_cast<bool>(pCvar->value);
 				g_pEngineFuncs->Cvar_SetValue(pszCvar, float(!bValue));
 			}
 			else
 			{
-				for (i = 2; i < args.ArgC(); i++)
+				int i;
+				for (i = 2; i < argCount; i++)
 				{
 					if ( !strcmp(pCvar->string, args[i]) )
 						break;
@@ -336,10 +301,8 @@ CON_COMMAND(toggle, "Toggle between values")
 
 				i++;
 
-				if (i >= args.ArgC())
-				{
+				if (i >= argCount)
 					i = 2;
-				}
 
 				g_pEngineFuncs->Cvar_Set(pszCvar, args[i]);
 			}
@@ -353,9 +316,7 @@ CON_COMMAND(toggle, "Toggle between values")
 
 CON_COMMAND(incrementvar, "Increment a cvar")
 {
-	int argc = args.ArgC();
-
-	if (argc >= 5)
+	if (args.ArgC() >= 5)
 	{
 		const char *pszCvar = args[1];
 		cvar_t *pCvar = g_pEngineFuncs->GetCvarPointer(pszCvar);
@@ -363,19 +324,15 @@ CON_COMMAND(incrementvar, "Increment a cvar")
 		if (pCvar)
 		{
 			float currentValue = pCvar->value;
-			float startValue = strtof( args[2], NULL);
-			float endValue = strtof( args[3], NULL);
-			float delta = strtof( args[4], NULL);
+			float startValue = std::stof(args[2]);
+			float endValue = std::stof(args[3]);
+			float delta = std::stof(args[4]);
 			float newValue = currentValue + delta;
 
 			if (newValue > endValue)
-			{
 				newValue = startValue;
-			}
 			else if (newValue < startValue)
-			{
 				newValue = endValue;
-			}
 
 			g_pEngineFuncs->Cvar_SetValue(pszCvar, newValue);
 		}
@@ -388,9 +345,7 @@ CON_COMMAND(incrementvar, "Increment a cvar")
 
 CON_COMMAND(multvar, "Multiply a cvar")
 {
-	int argc = args.ArgC();
-
-	if (argc >= 5)
+	if (args.ArgC() >= 5)
 	{
 		const char *pszCvar = args[1];
 		cvar_t *pCvar = g_pEngineFuncs->GetCvarPointer(pszCvar);
@@ -398,19 +353,15 @@ CON_COMMAND(multvar, "Multiply a cvar")
 		if (pCvar)
 		{
 			float currentValue = pCvar->value;
-			float startValue = strtof( args[2], NULL);
-			float endValue = strtof( args[3], NULL);
-			float factor = strtof( args[4], NULL);
+			float startValue = std::stof(args[2]);
+			float endValue = std::stof(args[3]);
+			float factor = std::stof(args[4]);
 			float newValue = currentValue * factor;
 
 			if (newValue > endValue)
-			{
 				newValue = startValue;
-			}
 			else if (newValue < startValue)
-			{
 				newValue = endValue;
-			}
 
 			g_pEngineFuncs->Cvar_SetValue(pszCvar, newValue);
 		}

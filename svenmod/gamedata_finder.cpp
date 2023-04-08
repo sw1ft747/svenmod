@@ -70,12 +70,9 @@ void CGameDataFinder::FindProtocolVersion(int *pProtocolVersion)
 	{
 		MemoryUtils()->InitDisasm(&g_inst, pfnProtocolVersion, 32, 15);
 
-		if ( MemoryUtils()->Disassemble(&g_inst) )
+		if ( MemoryUtils()->Disassemble(&g_inst) && g_inst.mnemonic == UD_Ipush && g_inst.operand[0].type == UD_OP_IMM )
 		{
-			if (g_inst.mnemonic == UD_Ipush && g_inst.operand[0].type == UD_OP_IMM)
-			{
-				*pProtocolVersion = (int)g_inst.operand[0].lval.udword;
-			}
+			*pProtocolVersion = (int)g_inst.operand[0].lval.udword;
 		}
 	}
 	else
@@ -152,35 +149,24 @@ void CGameDataFinder::FindFrametime(double **pRealtime, double **pClientTime, do
 
 		MemoryUtils()->InitDisasm(&g_inst, pfnHost_FilterTime, 32, 128);
 
-		do
-		{
-			if (g_inst.mnemonic == UD_Ifst)
+		while (MemoryUtils()->Disassemble(&g_inst)) {
+			if (g_inst.mnemonic == UD_Ifst && g_inst.operand[0].type == UD_OP_MEM && !bFoundFST)
 			{
-				if ( g_inst.operand[0].type == UD_OP_MEM && !bFoundFST )
-				{
-					*pFrametime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
-					bFoundFST = true;
-				}
+				*pFrametime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
+				bFoundFST = true;
 			}
-			else if (g_inst.mnemonic == UD_Ifadd)
+			else if (g_inst.mnemonic == UD_Ifadd && g_inst.operand[0].type == UD_OP_MEM && bFoundFST)
 			{
-				if ( g_inst.operand[0].type == UD_OP_MEM && bFoundFST )
-				{
-					*pRealtime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
-					break;
-				}
+				*pRealtime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
+				break;
 			}
-
-		} while ( MemoryUtils()->Disassemble(&g_inst) );
+		}
 
 		MemoryUtils()->InitDisasm(&g_inst, g_pEngineFuncs->GetClientTime, 32, 16);
 
-		if ( MemoryUtils()->Disassemble(&g_inst) )
+		if ( MemoryUtils()->Disassemble(&g_inst) && g_inst.mnemonic == UD_Ifld )
 		{
-			if ( g_inst.mnemonic == UD_Ifld )
-			{
-				*pClientTime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
-			}
+			*pClientTime = reinterpret_cast<double *>(g_inst.operand[0].lval.udword);
 		}
 	}
 	else

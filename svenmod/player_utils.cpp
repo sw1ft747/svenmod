@@ -27,9 +27,7 @@ public:
 extra_player_info_t *CPlayerUtils::GetExtraInfo(int iPlayerIndex)
 {
 	if (iPlayerIndex > 0 && iPlayerIndex <= MAXCLIENTS)
-	{
 		return &g_pPlayerExtraInfo[iPlayerIndex];
-	}
 
 	return NULL;
 }
@@ -37,9 +35,7 @@ extra_player_info_t *CPlayerUtils::GetExtraInfo(int iPlayerIndex)
 extra_player_info_t *CPlayerUtils::GetExtraInfo(cl_entity_t *pPlayer)
 {
 	if (pPlayer->index > 0 && pPlayer->index <= MAXCLIENTS)
-	{
 		return &g_pPlayerExtraInfo[pPlayer->index];
-	}
 
 	return NULL;
 }
@@ -47,9 +43,7 @@ extra_player_info_t *CPlayerUtils::GetExtraInfo(cl_entity_t *pPlayer)
 float CPlayerUtils::GetHealth(int iPlayerIndex)
 {
 	if (iPlayerIndex > 0 && iPlayerIndex <= MAXCLIENTS)
-	{
 		return g_pPlayerExtraInfo[iPlayerIndex].health;
-	}
 
 	return -1.f;
 }
@@ -57,9 +51,7 @@ float CPlayerUtils::GetHealth(int iPlayerIndex)
 float CPlayerUtils::GetArmor(int iPlayerIndex)
 {
 	if (iPlayerIndex > 0 && iPlayerIndex <= MAXCLIENTS)
-	{
 		return g_pPlayerExtraInfo[iPlayerIndex].armor;
-	}
 
 	return -1.f;
 }
@@ -67,9 +59,7 @@ float CPlayerUtils::GetArmor(int iPlayerIndex)
 int CPlayerUtils::GetTeamNumber(int iPlayerIndex)
 {
 	if (iPlayerIndex > 0 && iPlayerIndex <= MAXCLIENTS)
-	{
 		return g_pPlayerExtraInfo[iPlayerIndex].teamnumber;
-	}
 
 	return -1;
 }
@@ -100,16 +90,11 @@ void CPlayerUtils::GetViewAngles(int iPlayerIndex, Vector &vOut)
 			vOut.x = pPlayer->curstate.angles.x * (89.0f / 9.8876953125f);
 			vOut.y = pPlayer->curstate.angles.y;
 			vOut.z = pPlayer->curstate.angles.z;
-		}
-		else
-		{
-			vOut.Zero();
+			return;
 		}
 	}
-	else
-	{
-		vOut.Zero();
-	}
+
+	vOut.Zero();
 }
 
 void CPlayerUtils::GetViewAngles(cl_entity_t *pPlayer, Vector &vOut)
@@ -119,11 +104,10 @@ void CPlayerUtils::GetViewAngles(cl_entity_t *pPlayer, Vector &vOut)
 		vOut.x = pPlayer->curstate.angles.x * (89.0f / 9.8876953125f);
 		vOut.y = pPlayer->curstate.angles.y;
 		vOut.z = pPlayer->curstate.angles.z;
+		return;
 	}
-	else
-	{
-		vOut.Zero();
-	}
+	
+	vOut.Zero();
 }
 
 //-----------------------------------------------------------------------------

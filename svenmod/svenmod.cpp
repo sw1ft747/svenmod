@@ -589,19 +589,8 @@ void CSvenMod::CheckClientVersion()
 	}
 
 	char *buffer = const_cast<char *>(g_ClientVersion.string);
-	char *pszFirstSeparator = NULL;
-
-	while (*buffer)
-	{
-		if ( *buffer == '.' )
-		{
-			pszFirstSeparator = buffer;
-			break;
-		}
-
-		buffer++;
-	}
-
+	char *pszFirstSeparator = strchr(buffer, '.');
+	
 	if ( !pszFirstSeparator )
 	{
 		LogWarning("Tried to find client's version in format 'X.XX' but got this: '%s'.\n", g_ClientVersion.string);
