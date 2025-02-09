@@ -5,8 +5,56 @@ namespace Patterns
 	namespace Hardware
 	{
 	#ifdef PLATFORM_WINDOWS
+	#if defined(SC_NEWEST) || defined(SC_5_26)
+		DEFINE_PATTERN(MSG_ReadByte, "8B 0D ? ? ? ? 8D 51 01 3B 15 ? ? ? ? 7E 0E C7 05 ? ? ? ? ? ? ? ? 83 C8 FF C3 A1 ? ? ? ? 0F B6");
 
-	#if defined(SC_NEWEST) || defined(SC_5_25)
+		DEFINE_PATTERN(Z_Free, "56 8B 74 24 08 85 F6 75 0D 68 ? ? ? ? E8 ? ? ? ? 83 C4 04 83");
+
+		DEFINE_PATTERN(build_number, "51 A1 ? ? ? ? 56 33 F6");
+
+		//the actual name for this function is LoadInsecureClient though
+		DEFINE_PATTERN(LoadClientDLL, "FF 74 24 04 E8 ? ? ? ? 83 C4 ? A3 ? ? ? ? 85 C0 75");
+
+		DEFINE_PATTERN(Sys_InitGame, "83 EC 08 C7 05");
+
+		DEFINE_PATTERN(SCR_BeginLoadingPlaque, "6A ? E8 ? ? ? ? A1 ? ? ? ? 83 C4 ? 83 F8");
+		DEFINE_PATTERN(SCR_EndLoadingPlaque, "C7 05 ? ? ? ? ? ? ? ? E8 ? ? ? ? 68 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 ? C7 05");
+
+		DEFINE_PATTERN(CL_Disconnect, "83 EC 18 A1 ? ? ? ? 33 C4 89 44 24 14 DD 05 ? ? ? ? 33");
+
+		DEFINE_PATTERN(Host_FilterTime, "D9 ? D9 ? ? ? ? ? 8B 0D");
+		DEFINE_PATTERN(Host_Shutdown, "83 3D ? ? ? ? ? 74 ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 ? C3 83 3D");
+
+		DEFINE_PATTERN(Cvar_DirectSet, "81 EC ? ? ? ? A1 ? ? ? ? 33 C4 89 84 24 08 04 00 00");
+		DEFINE_PATTERN(Cvar_RemoveClientDLLCvars, "56 8B 35 ? ? ? ? 57 33 FF 85 F6 74 ? 53");
+
+		//the actual name of this function is Cmd_RemoveMallocedCmds
+		DEFINE_PATTERN(Cmd_RemoveClientDLLCmds, "A1 ? ? ? ? 57 33 FF 85 C0 74");
+
+		/**
+		* Signatures that don't point to the beginning of functions
+		*/
+
+		DEFINE_PATTERN(V_EngineStudio_Init, "68 ? ? ? ? 68 ? ? ? ? 6A 01 FF D0 83 C4 0C 85 C0 75 12 68 ? ? ? ? E8 ? ? ? ? 83 C4 04 E8 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 04 A3 ? ? ? ? 5E");
+
+		DEFINE_PATTERN(V_protocol_version, "6A ? 68 ? ? ? ? FF D6 68 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 10 85 C0 75");
+
+		//_Z16VideoMode_Createv
+		DEFINE_PATTERN(V_VideoMode_Create, "A3 ? ? ? ? 8B 4D F4 64 89 0D 00 00 00 00 59 5E 5B 8B E5 5D C3");
+
+		DEFINE_PATTERN(ClientDLL_Init, "FF 15 ? ? ? ? A1 ? ? ? ? 83 C4 ? 85 C0");
+
+		//CL_HookEvent
+		DEFINE_PATTERN(g_pEventHooks, "56 8B 35 ? ? ? ? 85 F6 74 ? 8B 46 04");
+
+		//CL_ParseServerMessage
+		DEFINE_PATTERN(g_NetworkMessages, "8B 34 8D ? ? ? ? 85 F6 74");
+
+		//Since R_RenderScene is called ONLY in R_RenderView, it got inlined by the compiler for some reason, so we hook a call to S_ExtraUpdate (second one)
+		DEFINE_PATTERN(R_RenderScene, "E8 ? ? ? ? 85 FF 75 7F D9 05 ? ? ? ? D9 EE DD E1 DF E0 DD D9 F6 C4 44 7B 6A DD 05 ? ? ? ? DC 25 ? ? ? ? DD 54 24 0C D8 D1 DF E0 DD D9 F6 C4 41 75 0A D9 E8 DE F1 DD 5C 24 0C EB 02");
+		DEFINE_PATTERN(R_RenderScene_Post_S_ExtraUpdate, "85 FF 75 7F D9 05 ? ? ? ? D9 EE DD E1 DF E0 DD D9 F6 C4 44 7B 6A DD 05 ? ? ? ? DC 25 ? ? ? ? DD 54 24 0C D8 D1 DF E0 DD D9 F6 C4 41 75 0A D9 E8 DE F1 DD 5C 24 0C EB 02");
+		DEFINE_PATTERN(S_ExtraUpdate, "E8 ? ? ? ? 85 C0 75 0A E8");
+#elif defined(SC_5_25)
 		DEFINE_PATTERN(MSG_ReadByte, "8B 0D ? ? ? ? 8D 51 01 3B 15 ? ? ? ? 7E ? C7 05 ? ? ? ? ? ? ? ? 83 C8 ? C3 A1 ? ? ? ? 0F B6 04 08");
 
 		DEFINE_PATTERN(Z_Free, "56 8B 74 24 08 85 F6 75 ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 ? 83 C6");
@@ -45,7 +93,7 @@ namespace Patterns
 
 		DEFINE_PATTERN(g_pEventHooks, "56 8B 35 ? ? ? ? 85 F6 74 ? 8B 46 04");
 		DEFINE_PATTERN(g_NetworkMessages, "8B 34 8D ? ? ? ? 85 F6 74");
-	#else // 5.22
+	#elif defined(SC_5_22) // 5.22
 		DEFINE_PATTERN(MSG_ReadByte, "8B 0D ? ? ? ? 8D 51 01 3B 15 ? ? ? ? 7E ? C7 05 ? ? ? ? ? ? ? ? 83 C8 ? C3 A1 ? ? ? ? 0F B6 04 08");
 
 		DEFINE_PATTERN(Z_Free, "56 8B 74 24 08 85 F6 75 ? 68 ? ? ? ? E8 ? ? ? ? 83 C4 ? 83 C6");
@@ -95,7 +143,7 @@ namespace Patterns
 	{
 	#ifdef PLATFORM_WINDOWS
 
-	#if defined(SC_NEWEST) || defined(SC_5_25)
+	#if defined(SC_NEWEST) || defined (SC_5_26)
 		DEFINE_PATTERN(GetClientColor, "8B 4C 24 04 85 C9 7E");
 
 		DEFINE_PATTERN(WeaponsResource__GetFirstPos, "6B 54 24 04 ? 56 57 33 F6 8B F9 81 C2 ? ? ? ? 8B 02 85 C0 74");
@@ -105,7 +153,17 @@ namespace Patterns
 		*/
 
 		DEFINE_PATTERN(V___MsgFunc_ServerVer, "8D 44 24 40 C6 44 24 3C 00 68 ? ? ? ? 50 0F 11 44 24 48");
-	#else // 5.22
+	#elif defined(SC_5_25)
+		DEFINE_PATTERN(GetClientColor, "8B 4C 24 04 85 C9 7E");
+
+		DEFINE_PATTERN(WeaponsResource__GetFirstPos, "6B 54 24 04 ? 56 57 33 F6 8B F9 81 C2 ? ? ? ? 8B 02 85 C0 74");
+
+		/**
+		* Signatures that don't point to the beginning of functions
+		*/
+
+		DEFINE_PATTERN(V___MsgFunc_ServerVer, "8D 44 24 40 C6 44 24 3C 00 68 ? ? ? ? 50 0F 11 44 24 48");
+	#elif defined(SC_5_22) // 5.22
 		DEFINE_PATTERN(GetClientColor, "8B 44 24 04 85 C0 7E");
 
 		DEFINE_PATTERN(WeaponsResource__GetFirstPos, "53 55 56 57 8B 7C 24 14 6B FF");

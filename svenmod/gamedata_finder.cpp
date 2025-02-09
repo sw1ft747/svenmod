@@ -904,3 +904,39 @@ void *CGameDataFinder::FindR_RenderScene()
 
 	return pfnR_RenderScene;
 }
+
+void *CGameDataFinder::FindR_RenderScene_Gateway()
+{
+#ifdef PLATFORM_WINDOWS
+	void* pfnR_RenderScene_Gateway = MemoryUtils()->FindPattern(SvenModAPI()->Modules()->Hardware, Patterns::Hardware::R_RenderScene_Post_S_ExtraUpdate);
+#else
+	//TODO
+	void* pfnR_RenderScene_Gateway = MemoryUtils()->ResolveSymbol(SvenModAPI()->Modules()->Hardware, Symbols::Hardware::R_RenderScene_Post_S_ExtraUpdate);
+#endif
+
+	//no
+	/*if (pfnR_RenderScene_Gateway == NULL)
+	{
+		Sys_Error("[SvenMod] Couldn't find gateway for \"R_RenderScene\"");
+	}*/
+
+	return pfnR_RenderScene_Gateway;
+}
+
+void *CGameDataFinder::FindS_ExtraUpdate()
+{
+#ifdef PLATFORM_WINDOWS
+	void* pfnS_ExtraUpdate = MemoryUtils()->FindPattern(SvenModAPI()->Modules()->Hardware, Patterns::Hardware::S_ExtraUpdate);
+#else
+	//TODO
+	void* pfnS_ExtraUpdate = MemoryUtils()->ResolveSymbol(SvenModAPI()->Modules()->Hardware, Symbols::Hardware::S_ExtraUpdate);
+#endif
+
+	//no
+	/*if (pfnS_ExtraUpdate == NULL)
+	{
+		Sys_Error("[SvenMod] Couldn't find function \"S_ExtraUpdate\"");
+	}*/
+
+	return pfnS_ExtraUpdate;
+}

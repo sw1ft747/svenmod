@@ -25,6 +25,8 @@ namespace Patterns
 		EXTERN_PATTERN(Sys_InitGame);
 
 		EXTERN_PATTERN(R_RenderScene);
+		EXTERN_PATTERN(R_RenderScene_Post_S_ExtraUpdate);
+		EXTERN_PATTERN(S_ExtraUpdate);
 
 		EXTERN_PATTERN(SCR_BeginLoadingPlaque);
 		EXTERN_PATTERN(SCR_EndLoadingPlaque);

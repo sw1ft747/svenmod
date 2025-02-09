@@ -46,6 +46,8 @@ public:
 	void *FindSCR_EndLoadingPlaque();
 	void *FindCL_Disconnect();
 	void *FindR_RenderScene();
+	void *FindR_RenderScene_Gateway();
+	void *FindS_ExtraUpdate();
 };
 
 extern CGameDataFinder g_GameDataFinder;

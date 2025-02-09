@@ -44,6 +44,10 @@ public:
 
 extern IEngineClient *g_pEngineClient;
 
+#if defined(SC_5_26)
+#define ENGINECLIENT_INTERFACE_VERSION "SCEngineClient002"
+#else //!defined(SC_5_26)
 #define ENGINECLIENT_INTERFACE_VERSION "SCEngineClient001"
+#endif //defined(SC_5_26)
 
 #endif // IENGINECLIENT_H
