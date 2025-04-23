@@ -114,6 +114,7 @@ DECLARE_FUNC(void, __cdecl, HOOKED_CL_Disconnect)
 // R_RenderScene hook
 //-----------------------------------------------------------------------------
 
+#if !defined(SC_5_26)
 DECLARE_HOOK(void, __cdecl, R_RenderScene);
 
 DECLARE_FUNC(void, __cdecl, HOOKED_R_RenderScene)
@@ -125,6 +126,29 @@ DECLARE_FUNC(void, __cdecl, HOOKED_R_RenderScene)
 		g_Render.Draw();
 	}
 }
+#else //defined(SC_5_26)
+DECLARE_HOOK(void, __cdecl, R_RenderScene);
+DECLARE_HOOK(void, __cdecl, R_RenderScene_Gateway);
+DECLARE_HOOK(void, __cdecl, S_ExtraUpdate);
+
+DECLARE_FUNC(void, __declspec(naked), HOOKED_R_RenderScene_Gateway)
+{
+	__asm {
+		call ORIG_S_ExtraUpdate
+		jmp ORIG_R_RenderScene_Gateway ; could be push + retn instead of jmp though
+	}
+}
+
+DECLARE_FUNC(void, __cdecl, HOOKED_R_RenderScene)
+{
+	if (*g_pClientState == CLS_ACTIVE)
+	{
+		g_Render.Draw();
+	}
+
+	HOOKED_R_RenderScene_Gateway();
+}
+#endif //!defined(SC_5_26)
 
 //-----------------------------------------------------------------------------
 // User's message "CurrentWeapon" hook
@@ -1480,6 +1504,8 @@ void CGameHooksHandler::Init()
 	void *m_pfnSCR_EndLoadingPlaque = g_GameDataFinder.FindSCR_EndLoadingPlaque();
 	void *m_pfnCL_Disconnect = g_GameDataFinder.FindCL_Disconnect();
 	void *m_pfnR_RenderScene = g_GameDataFinder.FindR_RenderScene();
+	ORIG_R_RenderScene_Gateway = (decltype(ORIG_R_RenderScene_Gateway))g_GameDataFinder.FindR_RenderScene_Gateway();
+	ORIG_S_ExtraUpdate = (decltype(ORIG_S_ExtraUpdate))g_GameDataFinder.FindS_ExtraUpdate();
 
 	m_hPaintTraverse = DetoursAPI()->DetourVirtualFunction( vgui::panel(), 41, HOOKED_PaintTraverse, GET_FUNC_PTR(ORIG_PaintTraverse) );
 	m_hSCR_BeginLoadingPlaque = DetoursAPI()->DetourFunction( m_pfnSCR_BeginLoadingPlaque, HOOKED_SCR_BeginLoadingPlaque, GET_FUNC_PTR(ORIG_SCR_BeginLoadingPlaque) );
