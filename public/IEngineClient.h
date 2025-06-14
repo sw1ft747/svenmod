@@ -22,6 +22,12 @@ public:
 	virtual int				VGUI2_DrawCharacterOpq( int x, int y, int number, int r, int g, int b, unsigned int unknown ) = 0;
 
 	virtual void			*LoadClientModel( const char *pszModelName ) = 0;
+	
+#if defined(SC_5_26)
+	virtual char			*NET_AdrToString( netadr_t a, int n ) = 0;
+
+	virtual qboolean		NET_StringToAdr( char *s, netadr_t *a ) = 0;
+#endif
 
 	virtual netadr_t		*GetServerAddress( netadr_t *pAddress ) = 0;
 
@@ -46,8 +52,8 @@ extern IEngineClient *g_pEngineClient;
 
 #if defined(SC_5_26)
 #define ENGINECLIENT_INTERFACE_VERSION "SCEngineClient002"
-#else //!defined(SC_5_26)
+#else // !defined(SC_5_26)
 #define ENGINECLIENT_INTERFACE_VERSION "SCEngineClient001"
-#endif //defined(SC_5_26)
+#endif // defined(SC_5_26)
 
 #endif // IENGINECLIENT_H
