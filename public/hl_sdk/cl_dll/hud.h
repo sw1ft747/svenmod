@@ -458,7 +458,11 @@ struct extra_player_info_t // sizeof 88 * 33 = 2904
 	float health;
 	float armor;
 
+#if defined(SC_5_26)
+	char pad_1[8];
+#else // SC_5_26
 	char pad_1[4];
+#endif // 5.25 and older
 };
 
 struct team_info_t
