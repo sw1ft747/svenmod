@@ -347,12 +347,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Debug|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod_525</TargetName>
+    <TargetName>svenmod</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.26 Debug|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod_525</TargetName>
+    <TargetName>svenmod</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.dll</TargetExt>
@@ -362,17 +362,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.22 Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod_522</TargetName>
+    <TargetName>svenmod</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.25 Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod_525</TargetName>
+    <TargetName>svenmod</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='5.26 Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <TargetName>svenmod_525</TargetName>
+    <TargetName>svenmod</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
