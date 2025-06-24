@@ -22,7 +22,11 @@
 #endif
 
 #include "../common/Platform.h"
+#if defined(SC_5_26)
+#define MAX_PHYSENTS 1024 // Must have room for all entities in the world.
+#else // SC_5_26
 #define MAX_PHYSENTS 600 // Must have room for all entities in the world.
+#endif // SC_5_25
 #define MAX_MOVEENTS 64
 #define MAX_CLIP_PLANES 5
 
