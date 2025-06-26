@@ -151,7 +151,7 @@ public:
 	virtual Color				GetColorFromCvar(const char *pszName);
 
 private:
-	Cvar_DirectSetFn GetCvar_DirectSet();
+	Cvar_DirectSetFn			GetCvar_DirectSet();
 
 private:
 	// pointers to functions

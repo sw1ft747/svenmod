@@ -366,7 +366,9 @@ void CCvar::RegisterConCommand(ConCommandBase *pCommandBase)
 	if ( pCommandBase->IsRegistered() )
 		return;
 
-	if ( m_CommandHash.Insert(pCommandBase) )
+	bool bRegisteredInGame = ( FindCvar( pCommandBase->GetName() ) != NULL || FindCmd( pCommandBase->GetName() ) != NULL );
+
+	if ( !bRegisteredInGame && m_CommandHash.Insert( pCommandBase ) )
 	{
 		if ( pCommandBase->IsCommand() )
 		{
@@ -413,7 +415,9 @@ void CCvar::RegisterConCommand(ConCommandBase *pCommandBase)
 	}
 	else
 	{
-		Warning("[SvenMod] Console %s \"%s\" is already registered!\n", pCommandBase->IsCommand() ? "command" : "variable", pCommandBase->GetName());
+		Warning( "[SvenMod] Console %s \"%s\" is already %s!\n", pCommandBase->IsCommand() ? "command" : "variable",
+																pCommandBase->GetName(),
+																bRegisteredInGame ? "defined by the game" : "registered" );
 	}
 }
 
