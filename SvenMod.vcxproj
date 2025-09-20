@@ -451,7 +451,7 @@
       <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <PreprocessorDefinitions>SC_5_26;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SC_NEWEST;SC_5_26;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -559,7 +559,7 @@
       <AdditionalIncludeDirectories>svenmod\;public\;shared\</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <PreprocessorDefinitions>SC_5_26;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SC_NEWEST;;SC_5_26;DBG_ASSERT;DBG_ASSERT_FATAL;PLATFORM_EXPORTS;LIBUDIS86_EXPORTS;SYS_UTILS_DYNAMIC_LINKED;SYS_UTILS_EXPORTS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
