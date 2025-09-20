@@ -30,6 +30,7 @@ typedef enum
 } DETOUR_TYPE;
 
 extern bool g_bAutoPauseDetours;
+bool g_bGlobalAttach = false;
 
 //-----------------------------------------------------------------------------
 // CDetoursAPI
@@ -696,6 +697,9 @@ bool CDetourContext::Unpause()
 
 void CDetourContext::InstallDetours()
 {
+	if ( !g_bGlobalAttach )
+		g_DetoursAPI.SuspendThreads();
+
 	CDetourFunction *pFirstDetour = NULL;
 	CDetourFunction *pLastDetour = NULL;
 
@@ -719,6 +723,9 @@ void CDetourContext::InstallDetours()
 
 	if ( !pFirstDetour )
 	{
+		if ( !g_bGlobalAttach )
+			g_DetoursAPI.ResumeThreads();
+
 		RemoveDetours();
 		return;
 	}
@@ -727,8 +734,6 @@ void CDetourContext::InstallDetours()
 
 	if (m_type == DETOUR_FUNCTION)
 	{
-		g_DetoursAPI.SuspendThreads();
-
 		// Relative address
 		*(unsigned long *)(m_pPatchedBytes + 1) = (unsigned long)pFirstDetour->GetDetour() - ((unsigned long)m_pFunction + sizeof(void *) + 1);
 
@@ -737,8 +742,6 @@ void CDetourContext::InstallDetours()
 		memcpy(m_pFunction, m_pPatchedBytes, m_nStolenBytes);
 
 		MemoryUtils()->VirtualProtect(m_pFunction, m_nStolenBytes, dwProtection, NULL);
-
-		g_DetoursAPI.ResumeThreads();
 	}
 	else if (m_type == DETOUR_VTABLE_FUNCTION)
 	{
@@ -751,6 +754,9 @@ void CDetourContext::InstallDetours()
 
 	pLastDetour->SetTrampoline( m_pGateway );
 	m_bDetoursAttached = true;
+
+	if ( !g_bGlobalAttach )
+		g_DetoursAPI.ResumeThreads();
 }
 
 void CDetourContext::RemoveDetours()
@@ -758,19 +764,18 @@ void CDetourContext::RemoveDetours()
 	if ( !m_bDetoursAttached )
 		return;
 
+	if ( !g_bGlobalAttach )
+		g_DetoursAPI.SuspendThreads();
+
 	int dwProtection;
 
 	if (m_type == DETOUR_FUNCTION)
 	{
-		g_DetoursAPI.SuspendThreads();
-
 		MemoryUtils()->VirtualProtect(m_pFunction, m_nStolenBytes, PAGE_EXECUTE_READWRITE, &dwProtection);
 
 		memcpy(m_pFunction, m_pOriginalBytes, m_nStolenBytes);
 
 		MemoryUtils()->VirtualProtect(m_pFunction, m_nStolenBytes, dwProtection, NULL);
-
-		g_DetoursAPI.ResumeThreads();
 	}
 	else if (m_type == DETOUR_VTABLE_FUNCTION)
 	{
@@ -799,6 +804,9 @@ void CDetourContext::RemoveDetours()
 	}
 
 	m_bDetoursAttached = false;
+
+	if ( !g_bGlobalAttach )
+		g_DetoursAPI.ResumeThreads();
 }
 
 inline bool CDetourContext::HasDetours() const

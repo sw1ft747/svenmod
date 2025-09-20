@@ -315,6 +315,73 @@ int CPluginsManager::PluginsCount() const
 	return m_Plugins.size();
 }
 
+#ifdef PLATFORM_WINDOWS
+#include <Windows.h>
+#include <tlhelp32.h>
+static std::vector<DWORD> m_SuspendedThreads;
+static DWORD m_dwCurrentThreadID;
+static DWORD m_dwCurrentProcessID;
+#endif
+static void SuspendThreads()
+{
+#ifdef PLATFORM_WINDOWS
+	m_dwCurrentThreadID = (uint32_t)GetCurrentThreadId();
+	m_dwCurrentProcessID = (uint32_t)GetCurrentProcessId();
+
+	HANDLE hSnapshot = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD, 0 );
+
+	if ( hSnapshot != INVALID_HANDLE_VALUE )
+	{
+		THREADENTRY32 te;
+		te.dwSize = sizeof( te );
+
+		if ( Thread32First( hSnapshot, &te ) )
+		{
+			do
+			{
+				if ( te.dwSize >= FIELD_OFFSET( THREADENTRY32, th32OwnerProcessID ) + sizeof( te.th32OwnerProcessID ) )
+				{
+					if ( te.th32OwnerProcessID == m_dwCurrentProcessID && te.th32ThreadID != m_dwCurrentThreadID )
+					{
+						HANDLE hThread = ::OpenThread( THREAD_ALL_ACCESS, FALSE, te.th32ThreadID );
+
+						if ( hThread != NULL )
+						{
+							m_SuspendedThreads.push_back( te.th32ThreadID );
+
+							SuspendThread( hThread );
+							CloseHandle( hThread );
+						}
+					}
+				}
+				te.dwSize = sizeof( te );
+
+			} while ( Thread32Next( hSnapshot, &te ) );
+		}
+
+		CloseHandle( hSnapshot );
+	}
+#endif
+}
+
+static void ResumeThreads()
+{
+#ifdef PLATFORM_WINDOWS
+	for ( int i = m_SuspendedThreads.size() - 1; i >= 0; --i )
+	{
+		HANDLE hThread = OpenThread( THREAD_ALL_ACCESS, FALSE, m_SuspendedThreads[ i ] );
+
+		if ( hThread != NULL )
+		{
+			ResumeThread( hThread );
+			CloseHandle( hThread );
+		}
+	}
+
+	m_SuspendedThreads.clear();
+#endif
+}
+
 void CPluginsManager::LoadPlugins()
 {
 	Assert( m_Plugins.size() == 0 );
@@ -352,7 +419,9 @@ void CPluginsManager::LoadPlugins()
 	}
 
 	// Now load plugins
+	extern bool g_bGlobalAttach;
 	g_bAutoPauseDetours = true;
+	g_bGlobalAttach = true;
 
 	for (size_t i = 0; i < m_pPluginsKV->GetList().size(); i++)
 	{
@@ -367,16 +436,16 @@ void CPluginsManager::LoadPlugins()
 		}
 	}
 
-	//g_bAutoPauseDetours = false;
-	//DetoursAPI()->UnpauseAllDetours(); // Attach detours
-
 	for (int i = 0; i < m_Plugins.size(); i++)
 	{
 		m_Plugins[i]->GetCallback()->PostLoad(true);
 	}
 
+	SuspendThreads();
 	g_bAutoPauseDetours = false;
-	DetoursAPI()->UnpauseAllDetours(); // Attach detours
+	DetoursAPI()->UnpauseAllDetours();
+	g_bGlobalAttach = false;
+	ResumeThreads();
 
 	delete m_pPluginsKV;
 	m_pPluginsKV = NULL;
@@ -391,7 +460,9 @@ void CPluginsManager::LoadPluginsNow()
 	if ( !LoadPluginsFile() )
 		return;
 
+	extern bool g_bGlobalAttach;
 	g_bAutoPauseDetours = true;
+	g_bGlobalAttach = true;
 
 	// Load plugins
 	for (size_t i = 0; i < m_pPluginsKV->GetList().size(); i++)
@@ -407,16 +478,16 @@ void CPluginsManager::LoadPluginsNow()
 		}
 	}
 
-	//g_bAutoPauseDetours = false;
-	//DetoursAPI()->UnpauseAllDetours(); // Attach detours
-
 	for (int i = 0; i < m_Plugins.size(); i++)
 	{
 		m_Plugins[i]->GetCallback()->PostLoad(true);
 	}
 
+	SuspendThreads();
 	g_bAutoPauseDetours = false;
-	DetoursAPI()->UnpauseAllDetours(); // Attach detours
+	DetoursAPI()->UnpauseAllDetours();
+	g_bGlobalAttach = false;
+	ResumeThreads();
 
 	delete m_pPluginsKV;
 	m_pPluginsKV = NULL;
@@ -426,6 +497,10 @@ void CPluginsManager::LoadPluginsNow()
 
 void CPluginsManager::UnloadPlugins()
 {
+	extern bool g_bGlobalAttach;
+	g_bGlobalAttach = true;
+	SuspendThreads();
+
 	for (int i = m_Plugins.size() - 1; i >= 0; --i)
 	{
 		CPlugin *pPlugin = m_Plugins[i];
@@ -436,6 +511,9 @@ void CPluginsManager::UnloadPlugins()
 
 		delete pPlugin;
 	}
+
+	g_bGlobalAttach = false;
+	ResumeThreads();
 
 	m_Plugins.clear();
 }
