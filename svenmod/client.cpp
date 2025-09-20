@@ -404,6 +404,8 @@ void CClient::ShowWeaponData()
 
 		g_pUtils->DrawConsoleString(x, y, "Weapon ID: %d", g_iCurrentWeaponID);
 		y += offset; g_pUtils->DrawConsoleString(x, y, "Custom: %d", g_bCurrentWeaponCustom);
+		y += offset; g_pUtils->DrawConsoleString(x, y, "Weapon Data: 0x%X", &m_LocalState.weapondata[ g_iCurrentWeaponID ]);
+		y += offset; g_pUtils->DrawConsoleString(x, y, "Weapon Resource Data: 0x%X", g_pInventory->GetWeapon( g_iCurrentWeaponID ));
 
 		y += offset * 2;
 		g_pUtils->DrawConsoleString(x, y, "Clip: %d", g_pClientWeapon->Clip());
